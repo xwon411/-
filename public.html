@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#2d5016">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="대여 현황">
+<link rel="manifest" href="manifest-public.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>농생대 학생회 물품 대여 현황</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f4f0;--surface:#fff;--border:#e2e0d8;
+  --accent:#2d5016;--accent-light:#4a7c2a;--accent-pale:#e8f0e0;
+  --text:#1a1a16;--text-muted:#7a7a6e;
+  --ok:#16a34a;--warn:#dc2626;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
+
+/* 헤더 */
+header{background:var(--accent);color:white;padding:20px 24px 18px;}
+.hd-tag{font-size:9px;font-family:'JetBrains Mono',monospace;letter-spacing:.18em;opacity:.5;text-transform:uppercase;margin-bottom:5px;}
+.hd-title{font-size:20px;font-weight:900;letter-spacing:-.03em;}
+.hd-sub{font-size:12px;opacity:.6;margin-top:3px;}
+
+/* 업데이트 바 */
+.update-bar{background:var(--accent-pale);border-bottom:1px solid #d0dfc4;
+  padding:8px 16px;display:flex;align-items:center;gap:8px;font-size:12px;
+  flex-wrap:wrap;min-width:0;}
+.upd-dot{width:7px;height:7px;border-radius:50%;background:var(--ok);flex-shrink:0;animation:pulse 2s ease infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.upd-dot.loading{background:#f59e0b;animation:none;}
+.upd-label{color:var(--text-muted);white-space:nowrap;}
+.upd-time{font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--accent);
+  font-size:11px;word-break:break-all;}
+.upd-btn{margin-left:auto;padding:4px 10px;border-radius:20px;background:var(--accent);color:white;
+  font-size:11px;font-weight:600;border:none;cursor:pointer;font-family:'Noto Sans KR',sans-serif;
+  transition:background .15s;white-space:nowrap;flex-shrink:0;}
+.upd-btn:hover{background:var(--accent-light);}
+.upd-btn:disabled{opacity:.5;cursor:default;}
+
+/* 메인 */
+main{flex:1;padding:16px 16px 40px;max-width:600px;margin:0 auto;width:100%;}
+
+/* 물품 카드 */
+.item-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:18px 18px;margin-bottom:12px;transition:box-shadow .15s;}
+.item-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.07);}
+
+.ic-head{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.ic-icon{font-size:26px;line-height:1;flex-shrink:0;}
+.ic-info{flex:1;min-width:0;}
+.ic-name{font-size:15px;font-weight:800;letter-spacing:-.02em;}
+.ic-total{font-size:11px;color:var(--text-muted);margin-top:1px;}
+
+.ic-badge{padding:5px 11px;border-radius:30px;font-size:12px;font-weight:700;white-space:nowrap;flex-shrink:0;}
+.ic-badge.avail{background:#dcfce7;color:var(--ok);}
+.ic-badge.none {background:#fee2e2;color:var(--warn);}
+.ic-badge.few  {background:#fef9c3;color:#b45309;}
+
+/* 프로그레스 바 */
+.ic-bar-wrap{display:flex;align-items:center;gap:10px;}
+.ic-bar-track{flex:1;height:10px;background:var(--bg);border-radius:20px;overflow:hidden;border:1px solid var(--border);}
+.ic-bar-fill{height:100%;border-radius:20px;transition:width .8s cubic-bezier(.34,1.56,.64,1);}
+.ic-bar-nums{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;white-space:nowrap;min-width:48px;text-align:right;}
+
+/* 상태 칩 행 */
+.ic-chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;
+  border-radius:20px;font-size:11px;font-weight:600;}
+.chip-renting{background:#dbeafe;color:#2563eb;}
+.chip-broken {background:#ffe4e6;color:#be123c;}
+.chip-lost   {background:#ede9fe;color:#7c3aed;}
+.chip-unpaid {background:#fee2e2;color:#dc2626;}
+
+/* 안내 문구 */
+.notice{background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:15px 17px;margin-bottom:12px;font-size:12px;line-height:1.75;color:var(--text-muted);}
+.notice b{color:var(--text);}
+.notice-title{font-size:12px;font-weight:700;color:var(--accent);margin-bottom:7px;}
+
+/* ══ PWA 설치 배너 ══ */
+#pwa-banner{display:none;position:fixed;bottom:0;left:0;right:0;z-index:1000;
+  background:white;border-top:1px solid var(--border);padding:14px 18px;
+  box-shadow:0 -4px 20px rgba(0,0,0,.1);align-items:center;gap:12px;}
+#pwa-banner.show{display:flex;}
+.pwa-icon{width:44px;height:44px;border-radius:10px;flex-shrink:0;}
+.pwa-text{flex:1;}
+.pwa-text b{font-size:13px;display:block;margin-bottom:2px;}
+.pwa-text span{font-size:11px;color:var(--text-muted);}
+.pwa-install-btn{background:var(--accent);color:white;border:none;border-radius:8px;
+  padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;
+  font-family:'Noto Sans KR',sans-serif;}
+.pwa-close-btn{background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer;padding:4px;}
+
+/* 스켈레톤 로딩 */
+.skeleton{background:linear-gradient(90deg,#eee 25%,#f5f5f5 50%,#eee 75%);
+  background-size:200% 100%;animation:skel 1.4s ease infinite;border-radius:6px;}
+@keyframes skel{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* 푸터 */
+footer{text-align:center;padding:14px;font-size:11px;color:var(--text-muted);border-top:1px solid var(--border);}
+
+/* 내 대여 검색 */
+.search-section{background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:18px 18px;margin-bottom:12px;}
+.search-title{font-size:14px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px;}
+.search-sub{font-size:11px;color:var(--text-muted);margin-bottom:12px;line-height:1.6;}
+.search-row{display:flex;flex-direction:column;gap:8px;}
+.search-input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:9px;
+  font-size:15px;font-family:'Noto Sans KR',sans-serif;outline:none;transition:border-color .15s;
+  background:var(--bg);-webkit-appearance:none;}
+.search-input:focus{border-color:var(--accent);background:white;}
+.search-phone-row{display:flex;gap:8px;align-items:stretch;}
+.search-phone-row .search-input{flex:1;min-width:0;}
+.search-btn{padding:11px 20px;background:var(--accent);color:white;border:none;border-radius:9px;
+  font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;
+  white-space:nowrap;transition:background .15s;flex-shrink:0;
+  -webkit-tap-highlight-color:transparent;}
+.search-btn:hover{background:var(--accent-light);}
+.search-btn:active{background:var(--accent-light);transform:scale(.97);}
+
+/* 검색 결과 */
+.result-wrap{margin-top:12px;}
+.result-empty{text-align:center;padding:20px 0;color:var(--text-muted);font-size:13px;}
+.result-empty .r-ico{font-size:32px;margin-bottom:8px;opacity:.4;}
+.rental-result-card{border:1px solid var(--border);border-radius:10px;padding:13px 15px;margin-bottom:8px;background:var(--bg);}
+.rrc-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.rrc-icon{font-size:22px;flex-shrink:0;}
+.rrc-name{font-size:14px;font-weight:700;}
+.rrc-num{font-size:11px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;}
+.rrc-status{margin-left:auto;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;flex-shrink:0;}
+.rrc-st-renting{background:#dbeafe;color:#2563eb;}
+.rrc-st-unpaid {background:#fee2e2;color:#dc2626;}
+.rrc-st-returned{background:#dcfce7;color:#16a34a;}
+.rrc-dday{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:8px;font-size:12px;}
+.rrc-dday.ok  {background:#f0fdf4;border:1px solid #bbf7d0;}
+.rrc-dday.warn{background:#fef9c3;border:1px solid #fde68a;}
+.rrc-dday.over{background:#fee2e2;border:1px solid #fecaca;}
+.rrc-dday.done{background:var(--surface);border:1px solid var(--border);color:var(--text-muted);}
+.rrc-dday .dd-ico{font-size:16px;flex-shrink:0;}
+.rrc-dday .dd-txt{flex:1;min-width:0;}
+.rrc-dday .dd-big{font-size:14px;font-weight:900;font-family:'JetBrains Mono',monospace;word-break:break-all;}
+.rrc-date{font-size:10px;color:var(--text-muted);margin-top:6px;font-family:'JetBrains Mono',monospace;}
+
+@media(max-width:380px){
+  header{padding:14px 14px 12px;}
+  .hd-title{font-size:17px;}
+  main{padding:12px 12px 36px;}
+  .item-card,.search-section,.notice{padding:15px 14px;}
+  .ic-name{font-size:14px;}
+  .search-btn{padding:11px 14px;font-size:13px;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hd-tag">SNU CALS · Student Council</div>
+  <div class="hd-title">농생대 학생회 물품 대여 현황</div>
+  <div class="hd-sub">실시간 대여 가능 수량 안내</div>
+</header>
+
+<div class="update-bar">
+  <div class="upd-dot loading" id="upd-dot"></div>
+  <span class="upd-label">마지막 업데이트</span>
+  <span class="upd-time" id="upd-time">불러오는 중...</span>
+  <button class="upd-btn" id="upd-btn" onclick="loadData()">🔄 새로고침</button>
+</div>
+
+<main>
+  <!-- 내 대여 검색 -->
+  <div class="search-section">
+    <div class="search-title">🔍 내 대여 조회</div>
+    <div class="search-sub">이름과 전화번호를 입력하면 대여 기록과 반납 기한을 확인할 수 있어요</div>
+    <div class="search-row">
+      <input class="search-input" type="text" id="name-input" placeholder="이름 (예: 홍길동)"
+        onkeydown="if(event.key==='Enter')searchMyRental()">
+      <div class="search-phone-row">
+        <input class="search-input" type="tel" id="phone-input" placeholder="전화번호 (010-1234-5678)"
+          oninput="fmtPhone(this)" onkeydown="if(event.key==='Enter')searchMyRental()">
+        <button class="search-btn" onclick="searchMyRental()">조회</button>
+      </div>
+    </div>
+    <div class="result-wrap" id="search-result" style="display:none"></div>
+  </div>
+
+  <div id="cards">
+    <!-- 스켈레톤 -->
+    <div class="item-card" style="opacity:.5">
+      <div class="ic-head">
+        <div style="width:28px;height:28px;border-radius:50%" class="skeleton"></div>
+        <div style="flex:1">
+          <div style="width:100px;height:16px;margin-bottom:6px" class="skeleton"></div>
+          <div style="width:60px;height:11px" class="skeleton"></div>
+        </div>
+        <div style="width:80px;height:30px;border-radius:30px" class="skeleton"></div>
+      </div>
+      <div style="height:10px;border-radius:20px" class="skeleton"></div>
+    </div>
+  </div>
+
+  <div class="notice">
+    <div class="notice-title">📋 대여 안내</div>
+    <b>대여 위치</b> : 200동 1037A호 (학생회실)<br>
+    <b>대여 시간</b> : 평일 14:00 ~ 18:00<br>
+    <b>대여 기간</b><br>
+    &nbsp;&nbsp;· 약속우산 : 대여 후 일주일 이내 반납<br>
+    &nbsp;&nbsp;· 충전기 · 계산기 · 멀티탭 · 찜질팩 : 당일 18:00까지 반납<br>
+    <b>문의</b> : 복지부국장 김서준 (010-9643-4064)
+  </div>
+</main>
+
+<footer>농업생명과학대학 학생회 · 대여 현황은 실시간으로 갱신됩니다</footer>
+
+<script>
+// ── Firebase (읽기 전용) ──────────────────────────────────────
+const FB = 'https://cals-rental-default-rtdb.firebaseio.com';
+
+const DEFAULT_ITEM_NUMBERS = {
+  umbrella:[5,7,9,10,11,16,17,20,21,24,35,38,40,44,48,53,59,65,68,76,
+    'A-1','A-2','A-3','A-4','A-5','A-6','A-7','A-8','A-9','A-10',
+    'A-11','A-12','A-13','A-14','A-15','A-16','A-17','A-18','A-19','A-20',
+    'A-21','A-22','A-23','A-24','A-25','A-26','A-27','A-28','A-29','A-30',
+    'A-31','A-32','A-33','A-34','A-35','A-36','A-37','A-38','A-39','A-40',
+    'A-41','A-42','A-43','A-44','A-45','A-46','A-47','A-48','A-49','A-50'],
+  charger:['1-1-1','1-1-2','1-1-3','1-2-1','1-2-2','1-2-3','1-2-4','1-3-1','1-3-2','1-3-3','1-3-4','1-4-1','1-4-2'],
+  calculator:['2-1','2-2','2-3'], multitap:['3-1','3-2','3-3','3-4','3-5'], heatpack:['4-1','4-2','4-3','4-4','4-5']
+};
+
+let ITEM_NUMBERS = JSON.parse(JSON.stringify(DEFAULT_ITEM_NUMBERS));
+let rentals = [];
+let itemStatus = {};
+
+function fbKey(type, num){ return `${type}_${String(num).replace(/[\.\#\$\/\[\]]/g,'_')}`; }
+
+async function fbGet(path){
+  try{
+    const r = await fetch(`${FB}${path}.json`);
+    const d = await r.json();
+    return d || null;
+  } catch(e){ return null; }
+}
+
+function getItemState(type, num){
+  const key = fbKey(type, num);
+  const iSt = itemStatus[key];
+  if(iSt === 'broken') return 'broken';
+  if(iSt === 'lost')   return 'lost';
+  const recs = rentals
+    .filter(r => r.item === type && String(r.itemNum) === String(num))
+    .sort((a,b) => new Date(b.date) - new Date(a.date));
+  if(!recs.length) return 'available';
+  if(recs[0].status === 'returned') return 'available';
+  return recs[0].status;
+}
+
+// ── 렌더 ────────────────────────────────────────────────────
+function render(){
+  const types = Object.keys(ITEM_NUMBERS);
+  const wrap = document.getElementById('cards');
+  wrap.innerHTML = types.map(t => {
+    const nums   = ITEM_NUMBERS[t];
+    const total  = nums.length;
+    const states = nums.map(n => getItemState(t, n));
+    const avail  = states.filter(s => s === 'available').length;
+    const renting= states.filter(s => s === 'renting').length;
+    const unpaid = states.filter(s => s === 'unpaid').length;
+    const broken = states.filter(s => s === 'broken').length;
+    const lost   = states.filter(s => s === 'lost').length;
+
+    const pct    = total > 0 ? Math.round(avail / total * 100) : 0;
+    const color  = ITEM_COLORS[t];
+
+    // 배지
+    let badgeCls, badgeTxt;
+    if(avail === 0)       { badgeCls='none';  badgeTxt='대여 불가'; }
+    else if(avail <= 2)   { badgeCls='few';   badgeTxt=`${avail}개 가능`; }
+    else                  { badgeCls='avail'; badgeTxt=`${avail}개 가능`; }
+
+    // 상태 칩 (1개 이상인 것만 표시)
+    const chips = [
+      renting ? `<span class="chip chip-renting">📦 대여중 ${renting}</span>` : '',
+      unpaid  ? `<span class="chip chip-unpaid">⚠️ 미납 ${unpaid}</span>`   : '',
+      broken  ? `<span class="chip chip-broken">🔧 고장 ${broken}</span>`   : '',
+      lost    ? `<span class="chip chip-lost">❌ 분실 ${lost}</span>`        : '',
+    ].filter(Boolean).join('');
+
+    return `<div class="item-card">
+      <div class="ic-head">
+        <div class="ic-icon">${ITEM_ICONS[t]}</div>
+        <div class="ic-info">
+          <div class="ic-name">${ITEM_LABELS[t]}</div>
+          <div class="ic-total">전체 ${total}개</div>
+        </div>
+        <div class="ic-badge ${badgeCls}">${badgeTxt}</div>
+      </div>
+      <div class="ic-bar-wrap">
+        <div class="ic-bar-track">
+          <div class="ic-bar-fill" style="width:${pct}%;background:${color}"></div>
+        </div>
+        <div class="ic-bar-nums" style="color:${color}">${avail} / ${total}</div>
+      </div>
+      ${chips ? `<div class="ic-chips">${chips}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+// ── 내 대여 조회 ─────────────────────────────────────────────
+const ITEM_LABELS = {umbrella:'약속우산', charger:'충전기', calculator:'공학용 계산기', multitap:'멀티탭', heatpack:'찜질팩'};
+const ITEM_ICONS  = {umbrella:'☂️', charger:'🔌', calculator:'🧮', multitap:'🔋', heatpack:'🌡️'};
+const ITEM_COLORS = {umbrella:'#2d5016', charger:'#1d4ed8', calculator:'#92400e', multitap:'#4c1d95', heatpack:'#9f1239'};
+
+function getDueInfo(r) {
+  // 반납완료 상태면 별도 처리
+  if (r.status === 'returned') return null;
+
+  const rentedAt = new Date(r.date);
+  const now = new Date();
+  const pad = n => String(n).padStart(2,'0');
+
+  let dueDate;
+  if (r.item === 'umbrella') {
+    // 약속우산: 대여일 + 7일
+    dueDate = new Date(rentedAt);
+    dueDate.setDate(dueDate.getDate() + 7);
+  } else {
+    // 생필품: 대여 당일 18:00
+    dueDate = new Date(rentedAt);
+    dueDate.setHours(18, 0, 0, 0);
+  }
+
+  const diffMs  = dueDate - now;
+  const diffDay = Math.floor(diffMs / 86400000);
+  const diffHr  = Math.floor((diffMs % 86400000) / 3600000);
+  const diffMin = Math.floor((diffMs % 3600000) / 60000);
+
+  const dueStr = `${dueDate.getFullYear()}.${pad(dueDate.getMonth()+1)}.${pad(dueDate.getDate())} ${pad(dueDate.getHours())}:00`;
+
+  if (diffMs < 0) {
+    // 기한 초과
+    const overDay = Math.abs(diffDay);
+    const overHr  = Math.abs(diffHr);
+    return { cls:'over', ico:'🚨', big: overDay > 0 ? `${overDay}일 ${overHr}시간 초과` : `${overHr}시간 ${Math.abs(diffMin)}분 초과`, sub:`반납 기한: ${dueStr}`, dueStr };
+  } else if (diffDay === 0 && diffHr < 3) {
+    return { cls:'warn', ico:'⚠️', big: `${diffHr}시간 ${diffMin}분 남음`, sub:`반납 기한: ${dueStr}`, dueStr };
+  } else if (diffDay < 2) {
+    return { cls:'warn', ico:'⏰', big: diffDay > 0 ? `${diffDay}일 ${diffHr}시간 남음` : `${diffHr}시간 ${diffMin}분 남음`, sub:`반납 기한: ${dueStr}`, dueStr };
+  } else {
+    return { cls:'ok', ico:'✅', big: `${diffDay}일 ${diffHr}시간 남음`, sub:`반납 기한: ${dueStr}`, dueStr };
+  }
+}
+
+function fmtPhone(el){
+  let v = el.value.replace(/\D/g,'');
+  if(v.length <= 3) el.value = v;
+  else if(v.length <= 7) el.value = v.slice(0,3)+'-'+v.slice(3);
+  else el.value = v.slice(0,3)+'-'+v.slice(3,7)+'-'+v.slice(7,11);
+}
+
+function searchMyRental() {
+  const name  = document.getElementById('name-input').value.trim();
+  const phone = document.getElementById('phone-input').value.trim();
+  const resultWrap = document.getElementById('search-result');
+
+  if (!name || !phone) {
+    resultWrap.style.display = 'block';
+    resultWrap.innerHTML = `<div class="result-empty">
+      <div class="r-ico">✏️</div>
+      <div>이름과 전화번호를 모두 입력해주세요</div>
+    </div>`;
+    return;
+  }
+
+  // 이름 + 전화번호 모두 일치하는 기록만 (최신순)
+  const found = [...rentals]
+    .filter(r => r.name === name && r.phone === phone)
+    .sort((a,b) => new Date(b.date) - new Date(a.date));
+
+  resultWrap.style.display = 'block';
+
+  if (!found.length) {
+    resultWrap.innerHTML = `<div class="result-empty">
+      <div class="r-ico">📭</div>
+      <div><b>${name}</b>님의 대여 기록이 없습니다</div>
+    </div>`;
+    return;
+  }
+
+  const pad = n => String(n).padStart(2,'0');
+  function fmtDate(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return `${d.getFullYear()}.${pad(d.getMonth()+1)}.${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  resultWrap.innerHTML = found.map(r => {
+    const stMap = { renting:'renting', unpaid:'unpaid', returned:'returned', broken:'unpaid', lost:'unpaid' };
+    const stLbl = { renting:'대여중', unpaid:'미납', returned:'반납완료', broken:'고장', lost:'분실' };
+    const stCls = stMap[r.status] || 'renting';
+    const due   = getDueInfo(r);
+
+    let ddHtml = '';
+    if (r.status === 'returned') {
+      ddHtml = `<div class="rrc-dday done"><span class="dd-ico">✅</span><span class="dd-txt">반납 완료</span></div>`;
+    } else if (due) {
+      ddHtml = `<div class="rrc-dday ${due.cls}">
+        <span class="dd-ico">${due.ico}</span>
+        <span class="dd-txt">
+          <div class="dd-big">${due.big}</div>
+          <div style="font-size:10px;margin-top:2px;opacity:.7">${due.sub}</div>
+        </span>
+      </div>`;
+    }
+
+    return `<div class="rental-result-card">
+      <div class="rrc-head">
+        <div class="rrc-icon">${ITEM_ICONS[r.item] || '📦'}</div>
+        <div>
+          <div class="rrc-name">${ITEM_LABELS[r.item] || r.item}</div>
+          <div class="rrc-num">번호 ${r.itemNum}</div>
+        </div>
+        <div class="rrc-status rrc-st-${stCls}">${stLbl[r.status] || r.status}</div>
+      </div>
+      ${ddHtml}
+      <div class="rrc-date">대여일시: ${fmtDate(r.date)}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── 로드 ─────────────────────────────────────────────────────
+async function loadData(){
+  const dot = document.getElementById('upd-dot');
+  const timeEl = document.getElementById('upd-time');
+  const btn = document.getElementById('upd-btn');
+
+  dot.className = 'upd-dot loading';
+  timeEl.textContent = '불러오는 중...';
+  btn.disabled = true;
+
+  try{
+    const [rData, iData, nData] = await Promise.all([
+      fbGet('/rentals'), fbGet('/itemStatus'), fbGet('/itemNumbers')
+    ]);
+
+    rentals    = rData ? Object.values(rData) : [];
+    itemStatus = iData || {};
+    if(nData){
+      Object.keys(ITEM_NUMBERS).forEach(t => {
+        if(nData[t]) ITEM_NUMBERS[t] = nData[t];
+      });
+    }
+
+    render();
+
+    const now = new Date();
+    const pad = n => String(n).padStart(2,'0');
+    timeEl.textContent =
+      `${now.getFullYear()}.${pad(now.getMonth()+1)}.${pad(now.getDate())} `+
+      `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+    dot.className = 'upd-dot';
+  } catch(e){
+    timeEl.textContent = '불러오기 실패';
+    dot.className = 'upd-dot loading';
+  } finally{
+    btn.disabled = false;
+  }
+}
+
+// 초기 로드 + 30초마다 자동 갱신
+loadData();
+setInterval(loadData, 30000);
+</script>
+<!-- PWA 설치 배너 -->
+<div id="pwa-banner">
+  <img src="icon-192.png" class="pwa-icon" alt="앱 아이콘">
+  <div class="pwa-text">
+    <b>홈 화면에 추가</b>
+    <span>앱처럼 빠르게 실행할 수 있어요</span>
+  </div>
+  <button class="pwa-install-btn" id="pwa-install-btn">설치</button>
+  <button class="pwa-close-btn" onclick="dismissPWA()">✕</button>
+</div>
+
+<script>
+// ══ PWA 서비스 워커 등록 ══
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(r => console.log('SW registered'))
+      .catch(e => console.log('SW error', e));
+  });
+}
+
+// PWA 설치 배너
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  if(!localStorage.getItem('pwa-dismissed-public')){
+    document.getElementById('pwa-banner').classList.add('show');
+  }
+});
+
+document.getElementById('pwa-install-btn').addEventListener('click', async () => {
+  if(!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  document.getElementById('pwa-banner').classList.remove('show');
+});
+
+function dismissPWA(){
+  document.getElementById('pwa-banner').classList.remove('show');
+  localStorage.setItem('pwa-dismissed-public', '1');
+}
+
+window.addEventListener('appinstalled', () => {
+  document.getElementById('pwa-banner').classList.remove('show');
+});
+</script>
+</body>
+</html>

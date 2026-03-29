@@ -1,0 +1,1514 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#2d5016">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="대여 관리">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>농업생명과학대학 학생회 대여 관리</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#f5f4f0;--surface:#fff;--surface2:#f0efe9;--border:#e2e0d8;
+  --accent:#2d5016;--accent-light:#4a7c2a;--accent-pale:#e8f0e0;
+  --text:#1a1a16;--text-muted:#7a7a6e;--text-light:#b0b0a0;
+  --s-renting:#2563eb;--s-returned:#16a34a;--s-unpaid:#dc2626;
+  --s-broken:#be123c;--s-lost:#7c3aed;
+  --c-umbrella:#2d5016;--c-charger:#1d4ed8;--c-calculator:#7c2d12;
+  --c-multitap:#4c1d95;--c-heatpack:#9f1239;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* ══ PWA 설치 배너 ══ */
+#pwa-banner{display:none;position:fixed;bottom:0;left:0;right:0;z-index:1000;
+  background:white;border-top:1px solid var(--border);padding:14px 18px;
+  box-shadow:0 -4px 20px rgba(0,0,0,.1);align-items:center;gap:12px;}
+#pwa-banner.show{display:flex;}
+.pwa-icon{width:44px;height:44px;border-radius:10px;flex-shrink:0;}
+.pwa-text{flex:1;}
+.pwa-text b{font-size:13px;display:block;margin-bottom:2px;}
+.pwa-text span{font-size:11px;color:var(--text-muted);}
+.pwa-install-btn{background:var(--accent);color:white;border:none;border-radius:8px;
+  padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;
+  font-family:'Noto Sans KR',sans-serif;}
+.pwa-close-btn{background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer;padding:4px;}
+#pw-overlay{
+  position:fixed;inset:0;background:var(--accent);z-index:9999;
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:0;
+}
+.pw-box{
+  background:white;border-radius:16px;padding:36px 40px;width:340px;
+  box-shadow:0 32px 80px rgba(0,0,0,.25);text-align:center;
+}
+.pw-logo{font-size:11px;font-family:'JetBrains Mono',monospace;letter-spacing:.18em;
+  color:var(--text-muted);text-transform:uppercase;margin-bottom:10px;}
+.pw-title{font-size:18px;font-weight:900;letter-spacing:-.03em;margin-bottom:4px;}
+.pw-sub{font-size:12px;color:var(--text-muted);margin-bottom:24px;}
+.pw-input-wrap{position:relative;margin-bottom:12px;}
+.pw-input{width:100%;padding:11px 40px 11px 14px;border:1.5px solid var(--border);
+  border-radius:8px;font-size:15px;font-family:'JetBrains Mono',monospace;
+  letter-spacing:.12em;outline:none;transition:border-color .15s;text-align:center;}
+.pw-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(45,80,22,.1);}
+.pw-input.err{border-color:#dc2626;animation:shake .35s ease;}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.pw-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:14px;padding:4px;}
+.pw-err{font-size:12px;color:#dc2626;font-weight:600;min-height:18px;margin-bottom:10px;}
+.pw-btn{width:100%;padding:11px;background:var(--accent);color:white;border:none;
+  border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;
+  font-family:'Noto Sans KR',sans-serif;transition:background .15s;}
+.pw-btn:hover{background:var(--accent-light);}
+.pw-hint{font-size:10px;color:var(--text-light);margin-top:14px;}
+.layout{display:flex;min-height:100vh;}
+.sidebar{width:220px;background:var(--accent);color:white;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:200;}
+.sidebar-logo{padding:24px 20px 18px;border-bottom:1px solid rgba(255,255,255,.12);}
+.sidebar-logo .tag{font-size:9px;font-family:'JetBrains Mono',monospace;letter-spacing:.15em;opacity:.55;text-transform:uppercase;margin-bottom:5px;}
+.sidebar-logo h1{font-size:16px;font-weight:700;line-height:1.3;}
+.nav{flex:1;padding:14px 10px;display:flex;flex-direction:column;gap:2px;}
+.nav-lbl{font-size:9px;letter-spacing:.14em;text-transform:uppercase;opacity:.4;padding:10px 10px 4px;font-family:'JetBrains Mono',monospace;}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:500;color:rgba(255,255,255,.7);transition:all .15s;border:1px solid transparent;}
+.nav-item:hover{background:rgba(255,255,255,.1);color:white;}
+.nav-item.active{background:rgba(255,255,255,.18);color:white;border-color:rgba(255,255,255,.15);}
+.nav-badge{margin-left:auto;background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;font-family:'JetBrains Mono',monospace;min-width:20px;text-align:center;}
+.sidebar-clock{padding:12px 16px;border-top:1px solid rgba(255,255,255,.1);font-family:'JetBrains Mono',monospace;font-size:11px;opacity:.45;display:flex;align-items:center;gap:6px;}
+.main{margin-left:220px;flex:1;padding:30px;}
+.page{display:none;}.page.active{display:block;}
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:26px;}
+.page-title{font-size:22px;font-weight:900;letter-spacing:-.03em;}
+.page-sub{font-size:12px;color:var(--text-muted);margin-top:3px;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .15s;font-family:'Noto Sans KR',sans-serif;white-space:nowrap;}
+.btn-primary{background:var(--accent);color:white;}.btn-primary:hover{background:var(--accent-light);}
+.btn-ghost{background:white;color:var(--text);border:1px solid var(--border);}.btn-ghost:hover{background:var(--surface2);}
+.btn-sm{padding:5px 9px;font-size:11px;border-radius:5px;}
+.btn-danger{background:#fee2e2;color:#dc2626;border:1px solid #fecaca;}
+.btn-green{background:#dcfce7;color:#16a34a;border:1px solid #bbf7d0;}
+.btn-orange{background:#ffedd5;color:#ea580c;border:1px solid #fed7aa;}
+.btn-purple{background:#ede9fe;color:#7c3aed;border:1px solid #ddd6fe;}
+.stats-row{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:22px;}
+.stat-card{background:white;border:1px solid var(--border);border-radius:10px;padding:14px;position:relative;overflow:hidden;}
+.stat-card::after{content:attr(data-icon);position:absolute;bottom:6px;right:10px;font-size:26px;opacity:.08;}
+.stat-label{font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px;}
+.stat-value{font-size:26px;font-weight:900;letter-spacing:-.04em;}
+.stat-sub{font-size:10px;color:var(--text-muted);margin-top:3px;}
+.stat-avail{font-size:12px;font-weight:700;color:var(--s-returned);margin-top:3px;}
+.section{background:white;border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:18px;}
+.section-header{padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.section-title{font-size:13px;font-weight:700;}
+.section-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+.search-wrap{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:6px 11px;}
+.search-wrap input{background:none;border:none;outline:none;font-size:12px;color:var(--text);width:150px;font-family:'Noto Sans KR',sans-serif;}
+.search-wrap input::placeholder{color:var(--text-muted);}
+select.flt{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:6px 9px;font-size:12px;color:var(--text);font-family:'Noto Sans KR',sans-serif;cursor:pointer;outline:none;}
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+thead th{padding:9px 13px;text-align:left;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);background:var(--surface2);border-bottom:1px solid var(--border);font-family:'JetBrains Mono',monospace;white-space:nowrap;}
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:#fafaf7;}
+tbody td{padding:10px 13px;vertical-align:middle;}
+.td-name{font-weight:600;}.td-mono{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);}
+.td-sub{font-size:11px;color:var(--text-muted);}.td-actions{display:flex;gap:4px;flex-wrap:wrap;}
+.item-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;}
+.ib-umbrella{background:#e8f0e0;color:var(--c-umbrella);}.ib-charger{background:#dbeafe;color:var(--c-charger);}
+.ib-calculator{background:#fef3c7;color:var(--c-calculator);}.ib-multitap{background:#ede9fe;color:var(--c-multitap);}
+.ib-heatpack{background:#fce7f3;color:var(--c-heatpack);}
+.sbadge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;}
+.sbadge::before{content:'';width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.sb-renting{background:#dbeafe;color:var(--s-renting);}.sb-renting::before{background:var(--s-renting);}
+.sb-returned,.sb-available{background:#dcfce7;color:var(--s-returned);}.sb-returned::before,.sb-available::before{background:var(--s-returned);}
+.sb-unpaid{background:#fee2e2;color:var(--s-unpaid);}.sb-unpaid::before{background:var(--s-unpaid);animation:bl 1.2s ease infinite;}
+.sb-broken{background:#ffe4e6;color:var(--s-broken);}.sb-broken::before{background:var(--s-broken);}
+.sb-lost{background:#ede9fe;color:var(--s-lost);}.sb-lost::before{background:var(--s-lost);}
+@keyframes bl{0%,100%{opacity:1}50%{opacity:.25}}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(3px);z-index:500;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:white;border-radius:14px;width:480px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.18);animation:mIn .22s cubic-bezier(.34,1.56,.64,1);}
+@keyframes mIn{from{opacity:0;transform:scale(.92) translateY(16px)}to{opacity:1;transform:none}}
+.modal-header{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;position:sticky;top:0;background:white;z-index:10;}
+.modal-title{font-size:15px;font-weight:700;}.modal-sub{font-size:11px;color:var(--text-muted);margin-top:3px;}
+.modal-close{background:none;border:none;cursor:pointer;font-size:18px;color:var(--text-muted);padding:4px;line-height:1;flex-shrink:0;}
+.modal-body{padding:20px 24px;}.modal-footer{padding:12px 24px 20px;display:flex;gap:8px;justify-content:flex-end;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px;}
+.fg{display:flex;flex-direction:column;gap:5px;}.fg.full{grid-column:1/-1;}
+.fg label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);font-family:'JetBrains Mono',monospace;}
+.fi{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:9px 12px;color:var(--text);font-size:13px;font-family:'Noto Sans KR',sans-serif;outline:none;transition:border-color .15s;width:100%;}
+.fi:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(45,80,22,.08);}
+.fi::placeholder{color:var(--text-muted);}.fi option{background:white;}
+.r-warn{display:none;background:#fee2e2;border:1px solid #fecaca;border-radius:7px;padding:9px 13px;font-size:12px;font-weight:600;color:#dc2626;}
+.item-type-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;}
+.item-type-btn{padding:9px 4px;border-radius:8px;cursor:pointer;border:2px solid var(--border);background:var(--surface2);text-align:center;font-size:11px;font-weight:600;transition:all .15s;}
+.item-type-btn .ico{font-size:18px;margin-bottom:3px;}
+.item-type-btn.sel-umbrella{border-color:var(--c-umbrella);background:#e8f0e0;color:var(--c-umbrella);}
+.item-type-btn.sel-charger{border-color:var(--c-charger);background:#dbeafe;color:var(--c-charger);}
+.item-type-btn.sel-calculator{border-color:var(--c-calculator);background:#fef3c7;color:var(--c-calculator);}
+.item-type-btn.sel-multitap{border-color:var(--c-multitap);background:#ede9fe;color:var(--c-multitap);}
+.item-type-btn.sel-heatpack{border-color:var(--c-heatpack);background:#fce7f3;color:var(--c-heatpack);}
+.s5-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+.s5-opt{padding:12px 4px;border-radius:9px;cursor:pointer;border:2px solid var(--border);background:var(--surface2);text-align:center;font-size:11px;font-weight:600;transition:all .15s;}
+.s5-opt:hover{transform:translateY(-1px);}
+.s5-opt .s5ico{font-size:20px;margin-bottom:4px;}
+.s5-opt.sel-renting{border-color:var(--s-renting);background:#dbeafe;color:var(--s-renting);}
+.s5-opt.sel-returned{border-color:var(--s-returned);background:#dcfce7;color:var(--s-returned);}
+.s5-opt.sel-unpaid{border-color:var(--s-unpaid);background:#fee2e2;color:var(--s-unpaid);}
+.s5-opt.sel-broken{border-color:var(--s-broken);background:#ffe4e6;color:var(--s-broken);}
+.s5-opt.sel-lost{border-color:var(--s-lost);background:#ede9fe;color:var(--s-lost);}
+.inv-tabs{display:flex;gap:6px;padding:13px 13px 0;flex-wrap:wrap;}
+.inv-tab{padding:5px 13px;border-radius:20px;cursor:pointer;font-size:12px;font-weight:600;border:1px solid var(--border);background:var(--surface2);transition:all .15s;}
+.inv-tab.active{background:var(--accent);color:white;border-color:var(--accent);}
+.inv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;padding:14px;}
+.inv-item{border:1px solid var(--border);border-radius:8px;padding:10px 7px;text-align:center;font-size:11px;cursor:pointer;transition:all .15s;background:white;}
+.inv-item:hover{border-color:var(--accent);transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.inv-item .inv-num{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;margin-bottom:5px;}
+.inv-item.st-available{background:#f0fdf4;border-color:#bbf7d0;}
+.inv-item.st-renting{background:#eff6ff;border-color:#bfdbfe;}
+.inv-item.st-unpaid{background:#fef9c3;border-color:#fde68a;}
+.inv-item.st-broken{background:#fff1f2;border-color:#fecdd3;}
+.inv-item.st-lost{background:#fdf4ff;border-color:#e9d5ff;}
+.cond-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.cond-opt{padding:12px 4px;border-radius:9px;cursor:pointer;border:2px solid var(--border);background:var(--surface2);text-align:center;font-size:11px;font-weight:600;transition:all .15s;}
+.cond-opt:hover{transform:translateY(-1px);}
+.cond-opt .cico{font-size:20px;margin-bottom:4px;}
+.cond-opt.sel-available{border-color:var(--s-returned);background:#dcfce7;color:var(--s-returned);}
+.cond-opt.sel-unpaid{border-color:var(--s-unpaid);background:#fee2e2;color:var(--s-unpaid);}
+.cond-opt.sel-broken{border-color:var(--s-broken);background:#ffe4e6;color:var(--s-broken);}
+.cond-opt.sel-lost{border-color:var(--s-lost);background:#ede9fe;color:var(--s-lost);}
+.bl-grid{display:flex;flex-direction:column;gap:10px;padding:14px;}
+.bl-card{background:white;border:1px solid var(--border);border-radius:10px;padding:16px 18px;display:flex;align-items:flex-start;gap:13px;}
+.bl-avatar{width:38px;height:38px;border-radius:50%;background:#fee2e2;color:#dc2626;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0;}
+.bl-info{flex:1;min-width:0;}
+.bl-name{font-weight:700;font-size:14px;}.bl-meta{font-size:11px;color:var(--text-muted);margin-top:2px;}
+.bl-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px;}
+.bl-actions{display:flex;flex-direction:column;gap:5px;flex-shrink:0;}
+.alert-banner{background:#fef2f2;border:1px solid #fecaca;border-radius:9px;padding:11px 16px;display:flex;align-items:center;gap:10px;margin-bottom:18px;font-size:13px;}
+.alert-banner .cnt{background:#ef4444;color:white;font-weight:700;padding:2px 7px;border-radius:20px;font-family:'JetBrains Mono',monospace;font-size:11px;}
+.empty-state{padding:46px 20px;text-align:center;color:var(--text-muted);}
+.empty-state .ico{font-size:38px;margin-bottom:11px;opacity:.4;}.empty-state p{font-size:13px;}
+
+/* 물품 목록 관리 */
+.inv-manage-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:6px;padding:14px;max-height:300px;overflow-y:auto;}
+.inv-manage-item{border:1px solid var(--border);border-radius:7px;padding:8px 6px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:space-between;gap:4px;background:white;}
+.inv-manage-item .imn{flex:1;text-align:left;}
+.inv-manage-item .del-btn{width:18px;height:18px;border-radius:50%;background:#fee2e2;color:#dc2626;border:none;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;line-height:1;transition:all .15s;}
+.inv-manage-item .del-btn:hover{background:#fecaca;}
+.inv-add-row{display:flex;gap:8px;align-items:center;padding:0 14px 14px;}
+.inv-add-row input{flex:1;}
+.toast-wrap{position:fixed;bottom:22px;right:22px;z-index:9999;display:flex;flex-direction:column;gap:6px;}
+.toast{background:white;border:1px solid var(--border);border-radius:9px;padding:10px 15px;font-size:12px;display:flex;align-items:center;gap:8px;box-shadow:0 6px 20px rgba(0,0,0,.1);min-width:240px;animation:tIn .25s ease;}
+@keyframes tIn{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
+.toast.ok{border-left:3px solid var(--s-returned);}.toast.err{border-left:3px solid var(--s-unpaid);}.toast.inf{border-left:3px solid var(--s-renting);}
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid var(--border);z-index:300;padding:4px 0 env(safe-area-inset-bottom,4px);}
+.mobile-nav-inner{display:flex;justify-content:space-around;}
+.mnav-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 6px;cursor:pointer;border-radius:7px;font-size:9px;font-weight:600;color:var(--text-muted);transition:all .15s;min-width:46px;text-align:center;background:none;border:none;font-family:'Noto Sans KR',sans-serif;position:relative;}
+.mnav-item .mico{font-size:18px;}.mnav-item.active{color:var(--accent);}
+.mnav-item .mbadge{position:absolute;top:1px;right:2px;background:#ef4444;color:white;font-size:8px;font-weight:700;padding:1px 3px;border-radius:8px;}
+.fab{display:none;position:fixed;bottom:68px;right:16px;width:50px;height:50px;border-radius:50%;background:var(--accent);color:white;font-size:22px;border:none;cursor:pointer;box-shadow:0 4px 16px rgba(45,80,22,.4);align-items:center;justify-content:center;z-index:290;transition:transform .15s;}
+.fab:active{transform:scale(.92);}
+@media(max-width:768px){
+  .sidebar{display:none;}.mobile-nav{display:block;}.fab{display:flex;}
+  .main{margin-left:0;padding:14px 11px 78px;}
+  .page-title{font-size:19px;}
+  .stats-row{grid-template-columns:repeat(2,1fr);gap:8px;}
+  .stat-value{font-size:22px;}
+  .section-header{flex-direction:column;align-items:flex-start;}
+  .section-actions{width:100%;}
+  .modal{width:calc(100vw - 18px);max-height:88vh;}
+  .form-grid{grid-template-columns:1fr;}.fg.full{grid-column:1;}
+  .item-type-grid{grid-template-columns:repeat(3,1fr);}
+  .s5-grid{grid-template-columns:repeat(3,1fr);}
+  .cond-grid{grid-template-columns:repeat(2,1fr);}
+  .modal-body{padding:14px 16px;}.modal-footer{padding:10px 16px 16px;}
+  thead th{padding:7px 9px;font-size:8px;}tbody td{padding:8px 9px;}
+  .btn-sm{padding:4px 7px;font-size:10px;}.td-actions{flex-direction:column;gap:3px;}
+  .inv-grid{grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:6px;padding:10px;}
+  .toast-wrap{left:11px;right:11px;bottom:70px;}.toast{min-width:unset;}
+  .page-header{flex-direction:column;gap:9px;}.bl-card{flex-direction:column;}.bl-actions{flex-direction:row;}
+}
+@media(max-width:400px){.stats-row{grid-template-columns:1fr 1fr;}.item-type-grid{grid-template-columns:repeat(2,1fr);}}
+
+/* ══ STATS PAGE ══ */
+.sp-period{display:flex;gap:5px;}
+.sp-btn{padding:4px 11px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text-muted);transition:all .15s;font-family:'Noto Sans KR',sans-serif;}
+.sp-btn.active{background:var(--accent);color:white;border-color:var(--accent);}
+
+/* 전체 stats 레이아웃: 3열 그리드 */
+.stats-layout{display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:auto auto;gap:12px;}
+
+/* 카드 공통 */
+.sc{background:white;border:1px solid var(--border);border-radius:10px;padding:14px;}
+.sc-title{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;font-family:'JetBrains Mono',monospace;}
+
+/* 회전율 카드 행 — 3열 그리드 위에 full-width */
+.turnover-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px;}
+.tv-card{background:white;border:1px solid var(--border);border-radius:10px;padding:12px 10px;text-align:center;position:relative;overflow:hidden;}
+.tv-card::before{content:attr(data-ico);position:absolute;right:6px;top:4px;font-size:22px;opacity:.07;}
+.tv-icon{font-size:16px;margin-bottom:3px;}
+.tv-name{font-size:9px;font-weight:700;color:var(--text-muted);letter-spacing:.04em;margin-bottom:7px;}
+.tv-ring-wrap{display:flex;justify-content:center;}
+.tv-ring{width:46px;height:46px;}
+.tv-rate-label{font-size:8px;font-weight:700;margin-top:3px;letter-spacing:.04em;}
+.tv-footer{margin-top:6px;display:flex;justify-content:space-around;font-size:9px;color:var(--text-muted);}
+
+/* 도넛 패널 — col-span 1 */
+.donut-panel{display:flex;flex-direction:column;gap:7px;}
+.donut-row{display:flex;align-items:center;gap:8px;}
+.donut-mini-wrap{position:relative;width:50px;height:50px;flex-shrink:0;}
+.donut-info{flex:1;min-width:0;}
+.donut-name{font-size:10px;font-weight:700;margin-bottom:2px;}
+.donut-meta{font-size:9px;color:var(--text-muted);display:flex;gap:5px;flex-wrap:wrap;}
+.dm-chip{display:inline-flex;align-items:center;gap:3px;}
+.dm-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+
+/* 학부 바 */
+.dept-rows{display:flex;flex-direction:column;gap:6px;}
+.dept-row{display:flex;align-items:center;gap:8px;}
+.dept-lbl{font-size:10px;color:var(--text-muted);width:130px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.dept-track{flex:1;height:8px;background:var(--surface2);border-radius:20px;overflow:hidden;}
+.dept-fill{height:100%;border-radius:20px;background:var(--accent);transition:width .7s cubic-bezier(.34,1.56,.64,1);}
+.dept-val{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:var(--accent);min-width:18px;text-align:right;}
+
+/* 차트 캔버스 높이 */
+.ch140{height:140px;position:relative;}
+.ch160{height:160px;position:relative;}
+
+/* 라인 차트 — col-span 3 */
+.sc-full{grid-column:1/-1;}
+.ch120{height:120px;position:relative;}
+
+@media(max-width:1100px){
+  .stats-layout{grid-template-columns:1fr 1fr;}
+  .sc-full{grid-column:1/-1;}
+}
+@media(max-width:768px){
+  .turnover-row{grid-template-columns:repeat(3,1fr);}
+  .stats-layout{grid-template-columns:1fr;}
+  .dept-lbl{width:100px;}
+}
+</style>
+</head>
+<body>
+<!-- ══ 비밀번호 잠금 오버레이 ══ -->
+<div id="pw-overlay">
+  <div class="pw-box">
+    <div class="pw-logo">SNU CALS · Student Council</div>
+    <div class="pw-title">관리자 로그인</div>
+    <div class="pw-sub">농업생명과학대학 학생회 대여 관리 시스템</div>
+    <div class="pw-input-wrap">
+      <input class="pw-input" type="password" id="pw-input"
+        placeholder="비밀번호 입력"
+        onkeydown="if(event.key==='Enter')checkPw()"
+        autocomplete="current-password">
+      <button class="pw-toggle" onclick="togglePwVis()" id="pw-toggle-btn">👁️</button>
+    </div>
+    <div class="pw-err" id="pw-err"></div>
+    <button class="pw-btn" onclick="checkPw()">🔓 로그인</button>
+    <div class="pw-hint">비밀번호를 모르는 경우 학생회 관리자에게 문의하세요</div>
+  </div>
+</div>
+
+<div class="layout">
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="tag">SNU CALS · Student Council</div>
+    <h1>농업생명과학대학<br>대여 관리</h1>
+  </div>
+  <nav class="nav">
+    <div class="nav-lbl">메뉴</div>
+    <div class="nav-item active" onclick="showPage('dashboard')">📊 대시보드</div>
+    <div class="nav-item" onclick="showPage('rentals')">📋 대여 현황</div>
+    <div class="nav-item" onclick="showPage('inventory')">🗂️ 물품 현황</div>
+    <div class="nav-item" onclick="showPage('unpaid')">📦 물품 관리 <span class="nav-badge" id="badge-unpaid">0</span></div>
+    <div class="nav-item" onclick="showPage('blacklist')">🚫 블랙리스트 <span class="nav-badge" id="badge-bl" style="display:none">0</span></div>
+    <div class="nav-item" onclick="showPage('stats')">📈 통계</div>
+    <div class="nav-item" onclick="openRentalModal()">＋ 대여 등록</div>
+  </nav>
+  <div class="sidebar-clock">
+    <span id="sync-dot" style="width:6px;height:6px;border-radius:50%;background:#9ca3af;flex-shrink:0;transition:background .5s"></span>
+    <span id="clock-time">--:--:--</span>
+  </div>
+</aside>
+<main class="main">
+
+<!-- DASHBOARD -->
+<div class="page active" id="page-dashboard">
+  <div class="page-header">
+    <div><div class="page-title">대시보드</div><div class="page-sub">전체 대여 현황 요약</div></div>
+    <button class="btn btn-primary" onclick="openRentalModal()">＋ 대여 등록</button>
+  </div>
+  <div id="unpaid-banner" class="alert-banner" style="display:none">
+    ⚠️ 미납/고장/분실 물품이 <span class="cnt" id="banner-cnt">0</span>건 있습니다.
+    <button class="btn btn-danger btn-sm" style="margin-left:auto" onclick="showPage('unpaid')">확인</button>
+  </div>
+  <div class="stats-row">
+    <div class="stat-card" data-icon="☂️"><div class="stat-label">약속우산</div><div class="stat-value" id="st-umbrella" style="color:var(--c-umbrella)">0</div><div class="stat-sub">대여중</div><div class="stat-avail">가능 <span id="av-umbrella">0</span>개</div></div>
+    <div class="stat-card" data-icon="🔌"><div class="stat-label">충전기</div><div class="stat-value" id="st-charger" style="color:var(--c-charger)">0</div><div class="stat-sub">대여중</div><div class="stat-avail">가능 <span id="av-charger">0</span>개</div></div>
+    <div class="stat-card" data-icon="🧮"><div class="stat-label">공학용 계산기</div><div class="stat-value" id="st-calculator" style="color:var(--c-calculator)">0</div><div class="stat-sub">대여중</div><div class="stat-avail">가능 <span id="av-calculator">0</span>개</div></div>
+    <div class="stat-card" data-icon="🔋"><div class="stat-label">멀티탭</div><div class="stat-value" id="st-multitap" style="color:var(--c-multitap)">0</div><div class="stat-sub">대여중</div><div class="stat-avail">가능 <span id="av-multitap">0</span>개</div></div>
+    <div class="stat-card" data-icon="🌡️"><div class="stat-label">찜질팩</div><div class="stat-value" id="st-heatpack" style="color:var(--c-heatpack)">0</div><div class="stat-sub">대여중</div><div class="stat-avail">가능 <span id="av-heatpack">0</span>개</div></div>
+    <div class="stat-card" data-icon="⚠️"><div class="stat-label">미납/고장/분실</div><div class="stat-value" id="st-unpaid" style="color:var(--s-unpaid)">0</div><div class="stat-sub">처리 필요</div></div>
+  </div>
+  <div class="section">
+    <div class="section-header"><div class="section-title">🕐 최근 대여 내역</div><button class="btn btn-ghost btn-sm" onclick="showPage('rentals')">전체 보기</button></div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>이름</th><th>연락처</th><th>학부</th><th>물품</th><th>번호</th><th>대여일시</th><th>상태</th><th>처리</th></tr></thead>
+      <tbody id="tbl-recent"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- RENTALS -->
+<div class="page" id="page-rentals">
+  <div class="page-header">
+    <div><div class="page-title">대여 현황</div><div class="page-sub">전체 대여 내역</div></div>
+    <button class="btn btn-primary" onclick="openRentalModal()">＋ 대여 등록</button>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">📋 전체 내역</div>
+      <div class="section-actions">
+        <div class="search-wrap">🔍<input type="text" id="s-search" placeholder="이름, 연락처 검색" oninput="renderRentals()"></div>
+        <select class="flt" id="s-item" onchange="renderRentals()">
+          <option value="">전체 물품</option>
+          <option value="umbrella">약속우산</option><option value="charger">충전기</option>
+          <option value="calculator">공학용 계산기</option><option value="multitap">멀티탭</option><option value="heatpack">찜질팩</option>
+        </select>
+        <select class="flt" id="s-status" onchange="renderRentals()">
+          <option value="">전체 상태</option>
+          <option value="renting">대여중</option><option value="returned">반납완료</option>
+          <option value="unpaid">미납</option><option value="broken">고장</option><option value="lost">분실</option>
+        </select>
+        <button class="btn btn-ghost btn-sm" onclick="exportCSV()">⬇️ CSV 다운로드</button>
+      </div>
+    </div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>#</th><th>이름</th><th>연락처</th><th>학부</th><th>물품</th><th>번호</th><th>대여일시</th><th>반납일시</th><th>상태</th><th>처리</th></tr></thead>
+      <tbody id="tbl-rentals"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- INVENTORY -->
+<div class="page" id="page-inventory">
+  <div class="page-header">
+    <div><div class="page-title">물품 현황</div><div class="page-sub">물품 클릭 → 상태 변경</div></div>
+    <button class="btn btn-ghost" onclick="openManageModal()">⚙️ 물품 목록 관리</button>
+  </div>
+  <div class="section"><div class="inv-tabs" id="inv-tabs"></div><div class="inv-grid" id="inv-grid"></div></div>
+</div>
+
+<!-- UNPAID / 물품관리 -->
+<div class="page" id="page-unpaid">
+  <div class="page-header"><div><div class="page-title">물품 관리</div><div class="page-sub">미납 · 고장 · 분실 내역 및 물품 이상 현황</div></div></div>
+
+  <!-- 섹션 1: 대여 기록 기반 이상 목록 (사람 정보 있음) -->
+  <div class="section" style="margin-bottom:16px">
+    <div class="section-header"><div class="section-title">👤 대여 이상 내역 (미납·고장·분실)</div></div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>이름</th><th>연락처</th><th>학부</th><th>물품</th><th>번호</th><th>대여일시</th><th>경과일</th><th>상태</th><th>처리</th></tr></thead>
+      <tbody id="tbl-unpaid"></tbody>
+    </table></div>
+  </div>
+
+  <!-- 섹션 2: 물품현황에서 직접 처리한 고장/분실 (사람 정보 없음) -->
+  <div class="section">
+    <div class="section-header"><div class="section-title">🔧 물품 자체 이상 (직접 처리)</div></div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>물품</th><th>번호</th><th>상태</th><th>처리</th></tr></thead>
+      <tbody id="tbl-item-cond"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- BLACKLIST -->
+<div class="page" id="page-blacklist">
+  <div class="page-header"><div><div class="page-title">🚫 블랙리스트</div><div class="page-sub">미납·분실 대상자 — 납부 시 자동 해제</div></div></div>
+  <div class="section" style="margin-bottom:14px">
+    <div class="section-header">
+      <div class="section-title">필터</div>
+      <div class="section-actions">
+        <div class="search-wrap">🔍<input type="text" id="bl-search" placeholder="이름, 연락처, 학부" oninput="renderBlacklist()" style="width:180px"></div>
+        <select class="flt" id="bl-filter" onchange="renderBlacklist()">
+          <option value="">전체 사유</option><option value="unpaid">미납</option><option value="lost">분실</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div id="bl-grid" class="bl-grid"></div>
+</div>
+
+<!-- ══ STATS PAGE ══ -->
+<div class="page" id="page-stats">
+  <div class="page-header" style="margin-bottom:12px">
+    <div><div class="page-title">📈 통계</div><div class="page-sub">물품 대여 현황 분석</div></div>
+    <div class="sp-period">
+      <div class="sp-btn active" data-p="all" onclick="setPeriod('all')">전체</div>
+      <div class="sp-btn" data-p="7"   onclick="setPeriod('7')">7일</div>
+      <div class="sp-btn" data-p="30"  onclick="setPeriod('30')">30일</div>
+    </div>
+  </div>
+
+  <!-- 누적 통계 카드 5개 (기간 필터 적용) -->
+  <div class="turnover-row" id="st-turnover"></div>
+
+  <!-- 3열 그리드 -->
+  <div class="stats-layout">
+
+    <!-- 열1: 물품별 실시간 현황 도넛 -->
+    <div class="sc">
+      <div class="sc-title">🔴 실시간 물품 상태</div>
+      <div class="donut-panel" id="st-donuts"></div>
+    </div>
+
+    <!-- 열2: 학부별 바 -->
+    <div class="sc">
+      <div class="sc-title">🏫 학부별 대여 건수</div>
+      <div class="dept-rows" id="st-dept"></div>
+    </div>
+
+    <!-- 열3: 시간대별 -->
+    <div class="sc">
+      <div class="sc-title">🕐 시간대별 분포</div>
+      <div class="ch140"><canvas id="chart-hour"></canvas></div>
+    </div>
+
+    <!-- 일별 추이 (전체 너비) -->
+    <div class="sc sc-full">
+      <div class="sc-title">📅 일별 대여 추이 <span id="st-line-range" style="font-size:9px;font-weight:400;color:var(--text-muted);text-transform:none;letter-spacing:0;margin-left:4px"></span></div>
+      <div class="ch120"><canvas id="chart-daily"></canvas></div>
+    </div>
+
+  </div>
+</div>
+
+</main></div>
+
+<!-- RENTAL MODAL -->
+<div class="modal-overlay" id="modal-rental">
+<div class="modal">
+  <div class="modal-header"><div><div class="modal-title">대여 등록</div></div><button class="modal-close" onclick="closeModal('modal-rental')">✕</button></div>
+  <div class="modal-body">
+    <div class="form-grid">
+      <div class="fg"><label>이름 *</label><input class="fi" id="f-name" placeholder="홍길동" oninput="checkRestriction()"></div>
+      <div class="fg"><label>전화번호 *</label><input class="fi" id="f-phone" placeholder="010-0000-0000" oninput="fmtPhone(this);checkRestriction()"></div>
+      <div class="fg full"><div class="r-warn" id="r-warn"></div></div>
+      <div class="fg full"><label>학부 *</label><select class="fi" id="f-dept"><option value="">-- 학부 선택 --</option></select></div>
+      <div class="fg full">
+        <label>대여 물품 *</label>
+        <div class="item-type-grid">
+          <div class="item-type-btn" data-t="umbrella" onclick="selectItemType('umbrella')"><div class="ico">☂️</div>약속우산</div>
+          <div class="item-type-btn" data-t="charger" onclick="selectItemType('charger')"><div class="ico">🔌</div>충전기</div>
+          <div class="item-type-btn" data-t="calculator" onclick="selectItemType('calculator')"><div class="ico">🧮</div>계산기</div>
+          <div class="item-type-btn" data-t="multitap" onclick="selectItemType('multitap')"><div class="ico">🔋</div>멀티탭</div>
+          <div class="item-type-btn" data-t="heatpack" onclick="selectItemType('heatpack')"><div class="ico">🌡️</div>찜질팩</div>
+        </div>
+      </div>
+      <div class="fg full" id="item-num-wrap" style="display:none"><label>물품 번호 *</label><select class="fi" id="f-item-num"></select></div>
+      <div class="fg full"><label>메모</label><input class="fi" id="f-note" placeholder="특이사항"></div>
+    </div>
+  </div>
+  <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-rental')">취소</button><button class="btn btn-primary" onclick="submitRental()">✅ 등록</button></div>
+</div>
+</div>
+
+<!-- STATUS MODAL -->
+<div class="modal-overlay" id="modal-status">
+<div class="modal" style="width:400px">
+  <div class="modal-header">
+    <div><div class="modal-title">상태 변경</div><div class="modal-sub" id="status-modal-sub"></div></div>
+    <button class="modal-close" onclick="closeModal('modal-status')">✕</button>
+  </div>
+  <div class="modal-body">
+    <div id="status-info-box" style="background:var(--surface2);border-radius:8px;padding:11px 13px;margin-bottom:14px;font-size:13px;"></div>
+    <div class="fg" style="margin-bottom:6px"><label>상태 선택 (5가지)</label></div>
+    <div class="s5-grid" id="s5-opts"></div>
+    <div class="fg" id="return-date-wrap" style="display:none;margin-top:13px"><label>반납 일시</label><input class="fi" type="datetime-local" id="f-return-date"></div>
+    <div class="fg" style="margin-top:12px"><label>메모</label><input class="fi" id="f-status-note" placeholder="사유"></div>
+  </div>
+  <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-status')">취소</button><button class="btn btn-primary" onclick="applyStatus()">저장</button></div>
+</div>
+</div>
+
+<!-- INVENTORY ITEM MODAL -->
+<div class="modal-overlay" id="modal-inv">
+<div class="modal" style="width:360px">
+  <div class="modal-header">
+    <div><div class="modal-title" id="inv-modal-title">물품 상태</div><div class="modal-sub" id="inv-modal-sub"></div></div>
+    <button class="modal-close" onclick="closeModal('modal-inv')">✕</button>
+  </div>
+  <div class="modal-body">
+    <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px">고장·분실 처리 시 대여 불가 처리됩니다.</p>
+    <div class="cond-grid" id="inv-cond-opts"></div>
+    <div class="fg" style="margin-top:12px"><label>메모 (선택)</label><input class="fi" id="f-inv-note" placeholder="사유"></div>
+  </div>
+  <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-inv')">취소</button><button class="btn btn-primary" onclick="applyInvCond()">저장</button></div>
+</div>
+</div>
+
+
+<!-- 물품 목록 관리 MODAL -->
+<div class="modal-overlay" id="modal-manage">
+<div class="modal" style="width:500px">
+  <div class="modal-header">
+    <div>
+      <div class="modal-title">⚙️ 물품 목록 관리</div>
+      <div class="modal-sub">물품 번호 추가 · 삭제 (대여 기록이 있는 번호는 삭제 불가)</div>
+    </div>
+    <button class="modal-close" onclick="closeModal('modal-manage')">✕</button>
+  </div>
+  <div class="modal-body" style="padding:16px 20px">
+    <!-- 물품 종류 탭 -->
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px" id="manage-tabs"></div>
+    <!-- 현재 목록 -->
+    <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);font-family:'JetBrains Mono',monospace;margin-bottom:8px">현재 목록 <span id="manage-count" style="color:var(--accent)"></span></div>
+    <div class="inv-manage-grid" id="manage-list"></div>
+    <!-- 추가 입력 -->
+    <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:14px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);font-family:'JetBrains Mono',monospace;margin-bottom:8px">새 번호 추가</div>
+      <div class="inv-add-row">
+        <input class="fi" id="manage-new-num" placeholder="예: A-51 또는 77" style="font-family:'JetBrains Mono',monospace" onkeydown="if(event.key==='Enter')addItemNum()">
+        <button class="btn btn-primary btn-sm" onclick="addItemNum()">＋ 추가</button>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" onclick="closeModal('modal-manage')">닫기</button>
+  </div>
+</div>
+</div>
+
+<!-- MOBILE NAV -->
+<nav class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <button class="mnav-item active" id="mnav-dashboard" onclick="showPage('dashboard')"><span class="mico">📊</span>대시보드</button>
+    <button class="mnav-item" id="mnav-rentals" onclick="showPage('rentals')"><span class="mico">📋</span>대여</button>
+    <button class="mnav-item" id="mnav-inventory" onclick="showPage('inventory')"><span class="mico">🗂️</span>물품</button>
+    <button class="mnav-item" id="mnav-unpaid" onclick="showPage('unpaid')"><span class="mico">📦</span>물품관리<span class="mbadge" id="mbadge-unpaid" style="display:none">0</span></button>
+    <button class="mnav-item" id="mnav-blacklist" onclick="showPage('blacklist')"><span class="mico">🚫</span>블랙리스트<span class="mbadge" id="mbadge-bl" style="display:none">0</span></button>
+    <button class="mnav-item" id="mnav-stats" onclick="showPage('stats')"><span class="mico">📈</span>통계</button>
+  </div>
+</nav>
+<button class="fab" onclick="openRentalModal()">＋</button>
+<div class="toast-wrap" id="toasts"></div>
+
+<script>
+// ══ DATA ══
+const DEPTS=['식물생산과학부','산림과학부','식품·동물생명공학부','응용생물화학부',
+  '조경·지역시스템공학부','바이오시스템·소재학부','농경제사회학부','스마트시스템과학과'];
+
+const ITEM_LABELS={umbrella:'약속우산',charger:'충전기',calculator:'공학용 계산기',multitap:'멀티탭',heatpack:'찜질팩'};
+const ITEM_ICONS={umbrella:'☂️',charger:'🔌',calculator:'🧮',multitap:'🔋',heatpack:'🌡️'};
+
+// 기본 물품 목록 (Firebase에 없으면 이 값 사용)
+const DEFAULT_ITEM_NUMBERS={
+  umbrella:[5,7,9,10,11,16,17,20,21,24,35,38,40,44,48,53,59,65,68,76,
+    'A-1','A-2','A-3','A-4','A-5','A-6','A-7','A-8','A-9','A-10',
+    'A-11','A-12','A-13','A-14','A-15','A-16','A-17','A-18','A-19','A-20',
+    'A-21','A-22','A-23','A-24','A-25','A-26','A-27','A-28','A-29','A-30',
+    'A-31','A-32','A-33','A-34','A-35','A-36','A-37','A-38','A-39','A-40',
+    'A-41','A-42','A-43','A-44','A-45','A-46','A-47','A-48','A-49','A-50'],
+  charger:['1-1-1','1-1-2','1-1-3','1-2-1','1-2-2','1-2-3','1-2-4','1-3-1','1-3-2','1-3-3','1-3-4','1-4-1','1-4-2'],
+  calculator:['2-1','2-2','2-3'],multitap:['3-1','3-2','3-3','3-4','3-5'],heatpack:['4-1','4-2','4-3','4-4','4-5']
+};
+// 실제 사용하는 물품 목록 (Firebase에서 덮어씀)
+let ITEM_NUMBERS=JSON.parse(JSON.stringify(DEFAULT_ITEM_NUMBERS));
+
+// 5가지 상태
+// renting  → 대여중 (물품 대여불가)
+// returned → 반납완료 (물품 대여가능, 블랙리스트 해제)
+// unpaid   → 미납 (물품 대여불가, 사람 블랙리스트)
+// broken   → 고장 (물품 대여불가, 사람 무관)
+// lost     → 분실 (물품 대여불가 영구, 사람 블랙리스트)
+const S5=[
+  {v:'renting', l:'대여중',  cl:'sb-renting',  ico:'📦'},
+  {v:'returned',l:'반납완료',cl:'sb-returned', ico:'✅'},
+  {v:'unpaid',  l:'미납',    cl:'sb-unpaid',   ico:'⚠️'},
+  {v:'broken',  l:'고장',    cl:'sb-broken',   ico:'🔧'},
+  {v:'lost',    l:'분실',    cl:'sb-lost',     ico:'❌'}
+];
+const BL_STATUS=['unpaid','lost']; // 블랙리스트 등록 상태
+
+function sInfo(v){return S5.find(s=>s.v===v)||{v,l:v,cl:'sb-renting',ico:'?'};}
+function sBadge(v){const s=sInfo(v);return `<span class="sbadge ${s.cl}">${s.l}</span>`;}
+function itemBadge(t){return `<span class="item-badge ib-${t}">${ITEM_ICONS[t]} ${ITEM_LABELS[t]}</span>`;}
+
+// ══ FIREBASE ══
+const FB='https://cals-rental-default-rtdb.firebaseio.com';
+function fbKey(type,num){return `${type}_${String(num).replace(/[\.\#\$\/\[\]]/g,'_')}`;}
+
+async function fbGet(path){
+  try{const r=await fetch(`${FB}${path}.json`);const d=await r.json();return d||null;}catch(e){return null;}
+}
+function fbPut(path,data){
+  fetch(`${FB}${path}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})
+    .then(()=>dot(true)).catch(()=>{dot(false);toast('동기화 실패','err');});
+}
+function fbDel(path){fetch(`${FB}${path}.json`,{method:'DELETE'}).then(()=>dot(true)).catch(()=>dot(false));}
+function dot(ok){
+  const el=document.getElementById('sync-dot');if(!el)return;
+  el.style.background=ok?'#16a34a':'#dc2626';
+  setTimeout(()=>el.style.background='#9ca3af',2000);
+}
+
+// ══ STATE ══
+let rentals=[];
+// itemStatus: 물품현황에서 직접 설정한 고장/분실 상태
+// key = fbKey(type,num), value = 'broken' | 'lost' | null(정상)
+let itemStatus={};
+let currentInvTab='umbrella';
+let editId=null,invType='',invNum='';
+let selItemType='',selStatus='';
+
+// ══ INIT ══
+async function init(){
+  document.getElementById('tbl-recent').innerHTML=
+    `<tr><td colspan="8" style="text-align:center;padding:28px;color:var(--text-muted);font-size:13px">⏳ 불러오는 중...</td></tr>`;
+  const [rData,iData,nData]=await Promise.all([fbGet('/rentals'),fbGet('/itemStatus'),fbGet('/itemNumbers')]);
+  rentals=rData?Object.values(rData).sort((a,b)=>new Date(b.date)-new Date(a.date)):[];
+  itemStatus=iData||{};
+  // Firebase에 저장된 물품 목록 있으면 덮어쓰기
+  if(nData){
+    Object.keys(ITEM_NUMBERS).forEach(t=>{
+      if(nData[t]) ITEM_NUMBERS[t]=nData[t];
+    });
+  }
+  const sel=document.getElementById('f-dept');
+  DEPTS.forEach(d=>sel.innerHTML+=`<option value="${d}">${d}</option>`);
+  // 우산 7일 자동 미납 처리
+  await autoUnpaidUmbrella();
+  renderAll();setInterval(tick,1000);tick();
+  // 1시간마다 자동 미납 체크
+  setInterval(autoUnpaidUmbrella,1000*60*60);
+}
+
+// 약속우산 대여 후 7일 경과 시 자동으로 미납 처리
+async function autoUnpaidUmbrella(){
+  const now=Date.now();
+  const SEVEN_DAYS=7*24*60*60*1000;
+  let changed=false;
+  for(const r of rentals){
+    if(r.item==='umbrella'&&r.status==='renting'){
+      if(now-new Date(r.date).getTime()>SEVEN_DAYS){
+        r.status='unpaid';
+        r.note=(r.note?r.note+' / ':'')+'7일 경과 자동 미납 처리';
+        fbPut(`/rentals/${r.id}`,r);
+        changed=true;
+      }
+    }
+  }
+  if(changed){
+    toast('약속우산 7일 경과 — 자동 미납 처리되었습니다','inf');
+  }
+}
+function renderAll(){updateStats();renderRecent();renderRentals();renderInventory();renderUnpaid();renderBlacklist();}
+
+// ══ 물품 실질 상태 계산 ══
+// 우선순위: itemStatus(고장/분실) > 대여기록 상태 > available
+function getItemState(type,num){
+  const key=fbKey(type,num);
+  const iSt=itemStatus[key];
+  if(iSt==='broken') return 'broken';
+  if(iSt==='lost') return 'lost';
+  // 가장 최근 대여 기록
+  const recs=rentals.filter(r=>r.item===type&&String(r.itemNum)===String(num))
+    .sort((a,b)=>new Date(b.date)-new Date(a.date));
+  if(!recs.length) return 'available';
+  const last=recs[0];
+  if(last.status==='returned') return 'available';
+  return last.status; // renting, unpaid, broken, lost
+}
+function isAvailable(type,num){const s=getItemState(type,num);return s==='available';}
+
+// ══ STATS ══
+function updateStats(){
+  const renting=rentals.filter(r=>r.status==='renting');
+  Object.keys(ITEM_NUMBERS).forEach(t=>{
+    const rc=renting.filter(r=>r.item===t).length;
+    const av=ITEM_NUMBERS[t].filter(n=>isAvailable(t,n)).length;
+    const se=document.getElementById('st-'+t),ae=document.getElementById('av-'+t);
+    if(se)se.textContent=rc;if(ae)ae.textContent=av;
+  });
+  // 물품관리 배지: 대여기록 이상 + 직접 처리한 고장/분실 모두 포함
+  const rentalBad=rentals.filter(r=>['unpaid','broken','lost'].includes(r.status)).length;
+  // 직접 처리한 건 중 대여기록과 중복되지 않는 것만 카운트
+  const rentedBrokenLostKeys=new Set(
+    rentals.filter(r=>['broken','lost'].includes(r.status)).map(r=>fbKey(r.item,r.itemNum))
+  );
+  const directBad=Object.entries(itemStatus).filter(([k,v])=>['broken','lost'].includes(v)&&!rentedBrokenLostKeys.has(k)).length;
+  const bad=rentalBad+directBad;
+  document.getElementById('st-unpaid').textContent=bad;
+  document.getElementById('badge-unpaid').textContent=bad;
+  document.getElementById('banner-cnt').textContent=bad;
+  document.getElementById('unpaid-banner').style.display=bad>0?'flex':'none';
+  const mu=document.getElementById('mbadge-unpaid');if(mu){mu.textContent=bad;mu.style.display=bad>0?'block':'none';}
+  const blCnt=new Set(rentals.filter(r=>BL_STATUS.includes(r.status)).map(r=>`${r.name}_${r.phone}`)).size;
+  const bb=document.getElementById('badge-bl'),mb=document.getElementById('mbadge-bl');
+  if(bb){bb.textContent=blCnt;bb.style.display=blCnt>0?'inline-flex':'none';}
+  if(mb){mb.textContent=blCnt;mb.style.display=blCnt>0?'block':'none';}
+}
+
+// ══ TABLE HELPERS ══
+function fmtDate(iso){if(!iso)return '—';const d=new Date(iso);return `${d.getFullYear()}.${p2(d.getMonth()+1)}.${p2(d.getDate())} ${p2(d.getHours())}:${p2(d.getMinutes())}`;}
+function p2(n){return String(n).padStart(2,'0');}
+function daysSince(iso){return Math.floor((Date.now()-new Date(iso))/86400000);}
+
+function actionBtns(r){
+  let b=`<button class="btn btn-ghost btn-sm" onclick="openStatusModal(${r.id})">상태변경</button>`;
+  if(r.status==='renting'||r.status==='unpaid')
+    b+=`<button class="btn btn-green btn-sm" onclick="quickReturn(${r.id})">반납</button>`;
+  b+=`<button class="btn btn-danger btn-sm" onclick="deleteRental(${r.id})">삭제</button>`;
+  return `<div class="td-actions">${b}</div>`;
+}
+function makeRow(r,cols){return makeRowIdx(r,null,cols);}
+function makeRowIdx(r,idx,cols){
+  const cells={
+    idx:()=>`<td class="td-mono">${idx!=null?idx+1:'—'}</td>`,
+    name:`<td class="td-name">${r.name}</td>`,
+    phone:`<td class="td-mono">${r.phone}</td>`,
+    dept:`<td class="td-sub" style="max-width:130px;white-space:normal;font-size:11px">${r.dept||''}</td>`,
+    item:`<td>${itemBadge(r.item)}</td>`,num:`<td class="td-mono">${r.itemNum}</td>`,
+    date:`<td class="td-mono" style="font-size:11px">${fmtDate(r.date)}</td>`,
+    returnDate:`<td class="td-mono" style="font-size:11px">${fmtDate(r.returnDate)}</td>`,
+    status:`<td>${sBadge(r.status)}</td>`,actions:`<td>${actionBtns(r)}</td>`,
+    days:`<td style="font-weight:700;color:var(--s-unpaid);font-family:'JetBrains Mono',monospace">${daysSince(r.date)}일</td>`
+  };
+  return `<tr>${cols.map(c=>c==='idx'?cells.idx():cells[c]).join('')}</tr>`;
+}
+function emptyRow(n,msg='내역이 없습니다'){return `<tr><td colspan="${n}"><div class="empty-state"><div class="ico">📭</div><p>${msg}</p></div></td></tr>`;}
+
+// ══ RENDER TABLES ══
+function renderRecent(){
+  const list=[...rentals].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,10);
+  document.getElementById('tbl-recent').innerHTML=
+    list.length?list.map(r=>makeRow(r,['name','phone','dept','item','num','date','status','actions'])).join(''):emptyRow(8);
+}
+function renderRentals(){
+  const q=(document.getElementById('s-search').value||'').toLowerCase();
+  const fi=document.getElementById('s-item').value,fs=document.getElementById('s-status').value;
+  let list=[...rentals].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  if(q)list=list.filter(r=>r.name.includes(q)||r.phone.includes(q));
+  if(fi)list=list.filter(r=>r.item===fi);if(fs)list=list.filter(r=>r.status===fs);
+  document.getElementById('tbl-rentals').innerHTML=
+    list.length?list.map((r,i)=>makeRowIdx(r,i,['idx','name','phone','dept','item','num','date','returnDate','status','actions'])).join(''):emptyRow(10);
+}
+function renderUnpaid(){
+  // 섹션 1: 대여 기록 기반 (사람 정보 있음)
+  const list=rentals.filter(r=>['unpaid','broken','lost'].includes(r.status)).sort((a,b)=>new Date(a.date)-new Date(b.date));
+  document.getElementById('tbl-unpaid').innerHTML=
+    list.length?list.map(r=>makeRow(r,['name','phone','dept','item','num','date','days','status','actions'])).join(''):emptyRow(9,'대여 이상 내역 없음');
+
+  // 섹션 2: 물품현황에서 직접 처리한 고장/분실 (대여 기록과 무관한 것만)
+  // itemStatus 중 현재 대여 기록으로 이미 표시된 물품은 제외
+  const rentedBrokenLost=new Set(
+    rentals.filter(r=>['broken','lost'].includes(r.status)).map(r=>`${r.item}_${r.itemNum}`)
+  );
+  const directItems=Object.entries(itemStatus)
+    .filter(([key,val])=>['broken','lost'].includes(val))
+    .filter(([key])=>!rentedBrokenLost.has(key.replace(/_([^_]+)$/,(m,p)=>'_'+p)))
+    .map(([key,val])=>{
+      // key 형식: "umbrella_A-1" (특수문자를 _로 치환했을 수 있음)
+      // type은 첫 번째 _ 이전, num은 나머지
+      const underIdx=key.indexOf('_');
+      const type=key.slice(0,underIdx);
+      const numRaw=key.slice(underIdx+1);
+      // 원래 번호 복원: ITEM_NUMBERS에서 매칭
+      const origNum=(ITEM_NUMBERS[type]||[]).find(n=>String(n).replace(/[\.\#\$\/\[\]]/g,'_')===numRaw||String(n)===numRaw)||numRaw;
+      return {key,type,num:origNum,val};
+    })
+    .filter(({type})=>ITEM_NUMBERS[type]); // 유효한 물품 타입만
+
+  const tb2=document.getElementById('tbl-item-cond');
+  if(!directItems.length){
+    tb2.innerHTML=emptyRow(4,'물품 자체 이상 없음');
+    return;
+  }
+  tb2.innerHTML=directItems.map(({key,type,num,val})=>`<tr>
+    <td>${itemBadge(type)}</td>
+    <td class="td-mono">${num}</td>
+    <td>${sBadge(val)}</td>
+    <td><div class="td-actions">
+      <button class="btn btn-green btn-sm" onclick="restoreItemFromUnpaid('${key}','${type}','${num}')">복구</button>
+    </div></td>
+  </tr>`).join('');
+}
+
+function restoreItemFromUnpaid(key,type,num){
+  delete itemStatus[key];
+  fbDel(`/itemStatus/${key}`);
+  renderAll();
+  toast(`${ITEM_LABELS[type]} ${num} 복구 완료`,'ok');
+}
+
+// ══ INVENTORY ══
+function renderInventory(){
+  document.getElementById('inv-tabs').innerHTML=Object.keys(ITEM_NUMBERS).map(t=>
+    `<div class="inv-tab${t===currentInvTab?' active':''}" onclick="switchInvTab('${t}')">${ITEM_ICONS[t]} ${ITEM_LABELS[t]}</div>`
+  ).join('');
+  const nums=ITEM_NUMBERS[currentInvTab];
+  const stMap={available:'st-available',renting:'st-renting',unpaid:'st-unpaid',broken:'st-broken',lost:'st-lost'};
+  const lbMap={
+    available:`<span class="sbadge sb-available" style="font-size:10px">가능</span>`,
+    renting:`<span class="sbadge sb-renting" style="font-size:10px">대여중</span>`,
+    unpaid:`<span class="sbadge sb-unpaid" style="font-size:10px">미납</span>`,
+    broken:`<span class="sbadge sb-broken" style="font-size:10px">고장</span>`,
+    lost:`<span class="sbadge sb-lost" style="font-size:10px">분실</span>`
+  };
+  document.getElementById('inv-grid').innerHTML=nums.map(num=>{
+    const st=getItemState(currentInvTab,num);
+    const rec=rentals.filter(r=>r.item===currentInvTab&&String(r.itemNum)===String(num))
+      .sort((a,b)=>new Date(b.date)-new Date(a.date))[0];
+    const renterStr=(rec&&rec.status==='renting')?`<div style="font-size:10px;color:var(--text-muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${rec.name}</div>`:'';
+    return `<div class="inv-item ${stMap[st]||'st-available'}" onclick="openInvModal('${currentInvTab}','${num}')">
+      <div class="inv-num">${num}</div>${lbMap[st]||lbMap.available}${renterStr}
+    </div>`;
+  }).join('');
+}
+function switchInvTab(t){currentInvTab=t;renderInventory();}
+
+function openInvModal(type,num){
+  invType=type;invNum=num;
+  const st=getItemState(type,num);
+  document.getElementById('inv-modal-title').textContent=`${ITEM_LABELS[type]} ${num}`;
+  document.getElementById('inv-modal-sub').textContent=`현재: ${sInfo(st==='available'?'returned':st).l}`;
+  document.getElementById('f-inv-note').value='';
+  const cur=st==='available'?'available':st;
+  const opts=[
+    {v:'available',l:'대여가능',ico:'✅'},{v:'unpaid',l:'미납',ico:'⚠️'},
+    {v:'broken',l:'고장',ico:'🔧'},{v:'lost',l:'분실',ico:'❌'}
+  ];
+  document.getElementById('inv-cond-opts').innerHTML=opts.map(o=>
+    `<div class="cond-opt${cur===o.v?' sel-'+o.v:''}" data-v="${o.v}" onclick="pickCond('${o.v}')">
+      <div class="cico">${o.ico}</div>${o.l}
+    </div>`).join('');
+  openModal('modal-inv');
+}
+function pickCond(v){
+  document.querySelectorAll('#inv-cond-opts .cond-opt').forEach(el=>{
+    el.className='cond-opt'+(el.dataset.v===v?' sel-'+v:'');
+  });
+}
+async function applyInvCond(){
+  const sel=document.querySelector('#inv-cond-opts .cond-opt[class*="sel-"]');
+  if(!sel){toast('상태를 선택해주세요','err');return;}
+  const val=sel.dataset.v;
+  const note=document.getElementById('f-inv-note').value.trim();
+  const key=fbKey(invType,invNum);
+  if(val==='available'){
+    delete itemStatus[key];fbDel(`/itemStatus/${key}`);
+    // 해당 물품의 미납/분실 대여기록도 반납완료로 전환
+    const targets=rentals.filter(r=>r.item===invType&&String(r.itemNum)===String(invNum)&&['unpaid','broken','lost'].includes(r.status));
+    for(const r of targets){
+      r.status='returned';r.returnDate=r.returnDate||new Date().toISOString();
+      if(note)r.note=note;fbPut(`/rentals/${r.id}`,r);
+    }
+  }else{
+    itemStatus[key]=val;fbPut(`/itemStatus/${key}`,val);
+    // 현재 대여중 기록을 해당 상태로 업데이트
+    const rec=rentals.find(r=>r.item===invType&&String(r.itemNum)===String(invNum)&&r.status==='renting');
+    if(rec){rec.status=val;if(note)rec.note=note;fbPut(`/rentals/${rec.id}`,rec);}
+  }
+  closeModal('modal-inv');renderAll();
+  toast(`${ITEM_LABELS[invType]} ${invNum} → ${val==='available'?'대여가능':sInfo(val).l}`,'ok');
+}
+
+// ══ RENTAL MODAL ══
+function openRentalModal(){
+  selItemType='';
+  ['f-name','f-phone','f-note'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-dept').value='';
+  document.getElementById('item-num-wrap').style.display='none';
+  document.querySelectorAll('.item-type-btn').forEach(b=>b.className='item-type-btn');
+  const w=document.getElementById('r-warn');if(w){w.style.display='none';w.textContent='';}
+  openModal('modal-rental');
+}
+function checkRestriction(){
+  const name=document.getElementById('f-name').value.trim();
+  const phone=document.getElementById('f-phone').value.trim();
+  const w=document.getElementById('r-warn');if(!w)return;
+  if(!name&&!phone){w.style.display='none';return;}
+  const bl=rentals.find(r=>r.name===name&&(phone?r.phone===phone:true)&&BL_STATUS.includes(r.status));
+  if(bl){w.textContent=`⛔ ${bl.name}님은 "${sInfo(bl.status).l}" 상태로 대여가 제한됩니다.`;w.style.display='block';}
+  else{w.style.display='none';}
+}
+function selectItemType(t){
+  selItemType=t;
+  document.querySelectorAll('.item-type-btn').forEach(b=>b.className='item-type-btn'+(b.dataset.t===t?' sel-'+t:''));
+  const busy=new Set(rentals.filter(r=>r.item===t&&r.status==='renting').map(r=>String(r.itemNum)));
+  const nums=ITEM_NUMBERS[t].filter(n=>isAvailable(t,n));
+  const sel=document.getElementById('f-item-num');
+  sel.innerHTML=nums.length
+    ?nums.map(n=>{const u=busy.has(String(n));return `<option value="${n}"${u?' disabled':''}>${n}${u?' (대여중)':''}</option>`;}).join('')
+    :'<option disabled>대여 가능 물품 없음</option>';
+  document.getElementById('item-num-wrap').style.display='block';
+}
+function fmtPhone(el){
+  let v=el.value.replace(/\D/g,'').slice(0,11);
+  if(v.length>=8)v=v.replace(/(\d{3})(\d{4})(\d{4})/,'$1-$2-$3');
+  else if(v.length>=4)v=v.replace(/(\d{3})(\d+)/,'$1-$2');
+  el.value=v;
+}
+function submitRental(){
+  const name=document.getElementById('f-name').value.trim();
+  const phone=document.getElementById('f-phone').value.trim();
+  const dept=document.getElementById('f-dept').value;
+  const itemNum=document.getElementById('f-item-num').value;
+  const note=document.getElementById('f-note').value.trim();
+  if(!name||!phone||!dept||!selItemType||!itemNum){toast('모든 필수 항목을 입력해주세요','err');return;}
+  const bl=rentals.find(r=>r.name===name&&r.phone===phone&&BL_STATUS.includes(r.status));
+  if(bl){toast(`⛔ ${name}님은 "${sInfo(bl.status).l}" 상태로 대여가 제한됩니다.`,'err');return;}
+  const id=Date.now();
+  const rec={id,name,phone,dept,item:selItemType,itemNum,date:new Date().toISOString(),returnDate:null,status:'renting',note};
+  rentals.unshift(rec);
+  closeModal('modal-rental');renderAll();
+  toast(`${name}님 ${ITEM_LABELS[selItemType]} ${itemNum} 대여 등록!`,'ok');
+  fbPut(`/rentals/${id}`,rec);
+}
+
+// ══ STATUS MODAL (대여현황) ══
+function openStatusModal(id){
+  editId=id;const r=rentals.find(x=>x.id===id);if(!r)return;
+  document.getElementById('status-modal-sub').textContent=`${r.dept||''} | ${ITEM_LABELS[r.item]} ${r.itemNum}`;
+  document.getElementById('status-info-box').innerHTML=`<strong>${r.name}</strong> · <span class="td-mono">${r.phone}</span>`;
+  selStatus=r.status;
+  document.getElementById('s5-opts').innerHTML=S5.map(s=>
+    `<div class="s5-opt${r.status===s.v?' sel-'+s.v:''}" data-v="${s.v}" onclick="pickStatus('${s.v}')">
+      <div class="s5ico">${s.ico}</div>${s.l}
+    </div>`).join('');
+  document.getElementById('f-status-note').value=r.note||'';
+  document.getElementById('return-date-wrap').style.display=r.status==='returned'?'block':'none';
+  if(r.returnDate)document.getElementById('f-return-date').value=r.returnDate.slice(0,16);
+  openModal('modal-status');
+}
+function pickStatus(v){
+  selStatus=v;
+  document.querySelectorAll('.s5-opt').forEach(el=>el.className='s5-opt'+(el.dataset.v===v?' sel-'+v:''));
+  document.getElementById('return-date-wrap').style.display=v==='returned'?'block':'none';
+}
+function applyStatus(){
+  const r=rentals.find(x=>x.id===editId);if(!r)return;
+  r.status=selStatus;
+  r.note=document.getElementById('f-status-note').value.trim();
+  const key=fbKey(r.item,r.itemNum);
+  if(selStatus==='returned'){
+    const rd=document.getElementById('f-return-date').value;
+    r.returnDate=rd?new Date(rd).toISOString():new Date().toISOString();
+    // 반납 → itemStatus 초기화 (물품 다시 대여가능)
+    delete itemStatus[key];fbDel(`/itemStatus/${key}`);
+  }else if(selStatus==='broken'||selStatus==='lost'){
+    // 고장/분실 → itemStatus 업데이트
+    itemStatus[key]=selStatus;fbPut(`/itemStatus/${key}`,selStatus);
+  }else if(selStatus==='unpaid'){
+    // 미납 → 물품은 대여기록 기반으로 막힘 (itemStatus 변경 안함)
+  }
+  closeModal('modal-status');renderAll();
+  toast(`상태: ${sInfo(selStatus).l}`,'ok');
+  fbPut(`/rentals/${r.id}`,r);
+}
+function quickReturn(id){
+  const r=rentals.find(x=>x.id===id);if(!r)return;
+  r.status='returned';r.returnDate=new Date().toISOString();
+  const key=fbKey(r.item,r.itemNum);
+  delete itemStatus[key];fbDel(`/itemStatus/${key}`);
+  renderAll();toast(`${r.name}님 ${ITEM_LABELS[r.item]} 반납 완료!`,'ok');
+  fbPut(`/rentals/${r.id}`,r);
+}
+function deleteRental(id){
+  if(!confirm('이 내역을 삭제하시겠습니까?'))return;
+  rentals=rentals.filter(x=>x.id!==id);renderAll();toast('삭제되었습니다','inf');fbDel(`/rentals/${id}`);
+}
+
+// ══ BLACKLIST ══
+function renderBlacklist(){
+  const q=(document.getElementById('bl-search')?.value||'').toLowerCase();
+  const sf=document.getElementById('bl-filter')?.value||'';
+  const map={};
+  rentals.filter(r=>BL_STATUS.includes(r.status)).forEach(r=>{
+    const k=`${r.name}__${r.phone}`;
+    if(!map[k])map[k]={name:r.name,phone:r.phone,dept:r.dept||'',records:[]};
+    map[k].records.push(r);
+  });
+  let persons=Object.values(map);
+  if(q)persons=persons.filter(p=>p.name.toLowerCase().includes(q)||p.phone.includes(q)||p.dept.toLowerCase().includes(q));
+  if(sf)persons=persons.filter(p=>p.records.some(r=>r.status===sf));
+  const grid=document.getElementById('bl-grid');
+  if(!persons.length){grid.innerHTML=`<div class="empty-state"><div class="ico">🎉</div><p>블랙리스트 대상자가 없습니다</p></div>`;return;}
+  grid.innerHTML=persons.map(p=>{
+    const tags=p.records.map(r=>`<span class="sbadge ${sInfo(r.status).cl}" style="font-size:10px">${sInfo(r.status).l} · ${ITEM_LABELS[r.item]||r.item} ${r.itemNum}</span>`).join('');
+    const hasU=p.records.some(r=>r.status==='unpaid');
+    const hasL=p.records.some(r=>r.status==='lost');
+    const payBtns=[
+      hasU?`<button class="btn btn-orange btn-sm" onclick="blPay('${p.name}','${p.phone}','unpaid')">연체료 납부</button>`:'',
+      hasL?`<button class="btn btn-purple btn-sm" onclick="blPay('${p.name}','${p.phone}','lost')">분실비 납부</button>`:''
+    ].filter(Boolean).join('');
+    return `<div class="bl-card">
+      <div class="bl-avatar">${p.name.charAt(0)}</div>
+      <div class="bl-info">
+        <div class="bl-name">${p.name}</div>
+        <div class="bl-meta">${p.phone} · ${p.dept}</div>
+        <div class="bl-tags">${tags}</div>
+      </div>
+      <div class="bl-actions">
+        ${payBtns}
+        <button class="btn btn-ghost btn-sm" onclick="goRentals('${p.name}')">내역 보기</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+async function blPay(name,phone,status){
+  const targets=rentals.filter(r=>r.name===name&&r.phone===phone&&r.status===status);
+  for(const r of targets){
+    r.status='returned';r.returnDate=r.returnDate||new Date().toISOString();
+    const key=fbKey(r.item,r.itemNum);
+    delete itemStatus[key];fbDel(`/itemStatus/${key}`);
+    fbPut(`/rentals/${r.id}`,r);
+  }
+  renderAll();
+  toast(`${name}님 ${status==='unpaid'?'연체료':'분실비'} 납부 → 블랙리스트 해제!`,'ok');
+}
+function goRentals(name){showPage('rentals');document.getElementById('s-search').value=name;renderRentals();}
+
+// ══ 물품 목록 관리 모달 ══
+let manageTab='umbrella';
+
+function openManageModal(){
+  manageTab=currentInvTab;
+  renderManageTabs();
+  renderManageList();
+  document.getElementById('manage-new-num').value='';
+  openModal('modal-manage');
+}
+
+function renderManageTabs(){
+  document.getElementById('manage-tabs').innerHTML=Object.keys(ITEM_NUMBERS).map(t=>
+    `<div class="inv-tab${t===manageTab?' active':''}" onclick="switchManageTab('${t}')" style="font-size:12px">${ITEM_ICONS[t]} ${ITEM_LABELS[t]}</div>`
+  ).join('');
+}
+
+function switchManageTab(t){
+  manageTab=t;
+  renderManageTabs();
+  renderManageList();
+  document.getElementById('manage-new-num').value='';
+}
+
+function renderManageList(){
+  const nums=ITEM_NUMBERS[manageTab];
+  document.getElementById('manage-count').textContent=`(${nums.length}개)`;
+  // 대여 기록 있는 번호 (삭제 불가)
+  const hasRecord=new Set(rentals.filter(r=>r.item===manageTab).map(r=>String(r.itemNum)));
+  document.getElementById('manage-list').innerHTML=nums.length
+    ? nums.map(n=>{
+        const key=String(n);
+        const locked=hasRecord.has(key);
+        const lockIcon=locked?'<span title="대여 기록 있어 삭제 불가" style="font-size:10px;opacity:.5">🔒</span>':'';
+        const delBtn=locked
+          ?`<span style="width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;opacity:.3;font-size:11px">✕</span>`
+          :`<button class="del-btn" onclick="deleteItemNum('${key}')" title="삭제">✕</button>`;
+        return `<div class="inv-manage-item">
+          <span class="imn">${n}</span>${lockIcon}${delBtn}
+        </div>`;
+      }).join('')
+    : '<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:13px">등록된 물품 없음</div>';
+}
+
+function addItemNum(){
+  const input=document.getElementById('manage-new-num');
+  const val=input.value.trim();
+  if(!val){toast('번호를 입력해주세요','err');return;}
+  // 중복 확인
+  if(ITEM_NUMBERS[manageTab].some(n=>String(n)===val)){
+    toast(`이미 존재하는 번호입니다: ${val}`,'err');return;
+  }
+  ITEM_NUMBERS[manageTab].push(val);
+  saveItemNumbers();
+  input.value='';
+  renderManageList();
+  renderInventory();
+  updateStats();
+  toast(`${ITEM_LABELS[manageTab]} ${val} 추가 완료!`,'ok');
+}
+
+function deleteItemNum(numStr){
+  // 대여 기록 있으면 삭제 불가
+  const hasRecord=rentals.some(r=>r.item===manageTab&&String(r.itemNum)===numStr);
+  if(hasRecord){toast('대여 기록이 있는 물품은 삭제할 수 없습니다','err');return;}
+  if(!confirm(`${ITEM_LABELS[manageTab]} ${numStr}를 목록에서 삭제하시겠습니까?`))return;
+  ITEM_NUMBERS[manageTab]=ITEM_NUMBERS[manageTab].filter(n=>String(n)!==numStr);
+  // itemStatus에서도 제거
+  const key=fbKey(manageTab,numStr);
+  if(itemStatus[key]){delete itemStatus[key];fbDel(`/itemStatus/${key}`);}
+  saveItemNumbers();
+  renderManageList();
+  renderInventory();
+  updateStats();
+  toast(`${ITEM_LABELS[manageTab]} ${numStr} 삭제 완료`,'inf');
+}
+
+function saveItemNumbers(){
+  fbPut('/itemNumbers',ITEM_NUMBERS);
+}
+
+// ══ CSV 다운로드 ══
+function exportCSV(){
+  if(!rentals.length){toast('내보낼 대여 기록이 없습니다','inf');return;}
+
+  const ITEM={'umbrella':'약속우산','charger':'충전기','calculator':'공학용 계산기','multitap':'멀티탭','heatpack':'찜질팩'};
+  const STATUS={'renting':'대여중','returned':'반납완료','unpaid':'미납','broken':'고장','lost':'분실'};
+  const pad=n=>String(n).padStart(2,'0');
+  const fmtDate=iso=>{
+    if(!iso)return '';
+    const d=new Date(iso);
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  };
+
+  const header=['이름','연락처','학부','물품','번호','대여일시','반납일시','상태','메모'];
+  const rows=[...rentals]
+    .sort((a,b)=>new Date(b.date)-new Date(a.date))
+    .map(r=>[
+      r.name, r.phone, r.dept||'',
+      ITEM[r.item]||r.item, r.itemNum,
+      fmtDate(r.date), fmtDate(r.returnDate),
+      STATUS[r.status]||r.status, r.note||''
+    ].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(','));
+
+  // BOM 추가 (엑셀 한글 깨짐 방지)
+  const csv='\uFEFF'+[header.join(','),...rows].join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  const today=new Date();
+  a.href=url;
+  a.download=`대여기록_${today.getFullYear()}-${pad(today.getMonth()+1)}-${pad(today.getDate())}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast(`${rentals.length}건 CSV 다운로드 완료!`,'ok');
+}
+
+// ══ UTILS ══
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item,.mnav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  const L={dashboard:'대시보드',rentals:'대여 현황',inventory:'물품 현황',unpaid:'물품 관리',blacklist:'블랙리스트',stats:'통계'};
+  [...document.querySelectorAll('.nav-item')].find(n=>n.textContent.includes(L[id]||''))?.classList.add('active');
+  const mn=document.getElementById('mnav-'+id);if(mn)mn.classList.add('active');
+  if(id==='rentals')renderRentals();
+  if(id==='inventory')renderInventory();
+  if(id==='unpaid')renderUnpaid();
+  if(id==='blacklist')renderBlacklist();
+  if(id==='stats')renderStats();
+  updateStats();
+}
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function toast(msg,type='inf'){
+  const c=document.getElementById('toasts');
+  const el=document.createElement('div');el.className=`toast ${type}`;
+  el.innerHTML=`<span>${type==='ok'?'✅':type==='err'?'❌':'ℹ️'}</span> ${msg}`;
+  c.appendChild(el);setTimeout(()=>el.remove(),3500);
+}
+function tick(){const e=document.getElementById('clock-time');if(e){const n=new Date();e.textContent=`${p2(n.getHours())}:${p2(n.getMinutes())}:${p2(n.getSeconds())}`; }}
+['modal-rental','modal-status','modal-inv','modal-manage'].forEach(id=>{
+  document.getElementById(id).addEventListener('click',e=>{if(e.target.id===id)closeModal(id);});
+});
+// ══ STATS ══
+const ITEM_CLR={umbrella:'#2d5016',charger:'#1d4ed8',calculator:'#92400e',multitap:'#4c1d95',heatpack:'#9f1239'};
+const ST_CLR={renting:'#2563eb',returned:'#16a34a',unpaid:'#dc2626',broken:'#be123c',lost:'#7c3aed'};
+const ST_LBL={renting:'대여중',returned:'반납완료',unpaid:'미납',broken:'고장',lost:'분실'};
+
+let _period='all';
+let _charts={};   // Chart.js 인스턴스 저장
+
+function setPeriod(p){
+  _period=p;
+  document.querySelectorAll('.sp-btn').forEach(b=>b.classList.toggle('active',b.dataset.p===p));
+  renderStats();
+}
+
+function _filtered(){
+  if(_period==='all') return rentals;
+  const cut=Date.now()-parseInt(_period)*86400000;
+  return rentals.filter(r=>new Date(r.date).getTime()>=cut);
+}
+
+function _destroyAll(){
+  Object.values(_charts).forEach(c=>{try{c.destroy();}catch(e){}});
+  _charts={};
+}
+
+// ── ① 누적 통계 카드 (기간 필터 적용) ────────────────────────
+function renderTurnover(list){
+  const wrap=document.getElementById('st-turnover');
+  if(!wrap)return;
+  const types=Object.keys(ITEM_NUMBERS);
+  wrap.innerHTML=types.map(t=>{
+    const total   = list.filter(r=>r.item===t).length;
+    const returned= list.filter(r=>r.item===t&&r.status==='returned').length;
+    const unpaid  = list.filter(r=>r.item===t&&['unpaid','lost'].includes(r.status)).length;
+    const returnRate = total>0 ? Math.round(returned/total*100) : 0;
+    const unpaidRate = total>0 ? Math.round(unpaid/total*100)  : 0;
+
+    // 평균 대여 기간 (반납완료 건만, 단위: 시간)
+    const doneList = list.filter(r=>r.item===t&&r.status==='returned'&&r.returnDate&&r.date);
+    const avgHr = doneList.length
+      ? Math.round(doneList.reduce((s,r)=>(s+(new Date(r.returnDate)-new Date(r.date))),0)/doneList.length/3600000)
+      : null;
+    const avgStr = avgHr===null ? '—' : avgHr<24 ? `${avgHr}시간` : `${Math.floor(avgHr/24)}일 ${avgHr%24}시간`;
+
+    // 반납률 바 색상
+    const barColor = returnRate>=80?'#16a34a':returnRate>=50?'#f59e0b':'#dc2626';
+
+    return `<div class="tv-card" data-ico="${ITEM_ICONS[t]}">
+      <div class="tv-icon">${ITEM_ICONS[t]}</div>
+      <div class="tv-name">${ITEM_LABELS[t]}</div>
+
+      <div style="font-size:22px;font-weight:900;letter-spacing:-.04em;color:${ITEM_CLR[t]};margin:4px 0 1px">${total}</div>
+      <div style="font-size:9px;color:var(--text-muted);margin-bottom:8px">누적 대여</div>
+
+      <div style="width:100%;height:4px;background:var(--surface2);border-radius:10px;overflow:hidden;margin-bottom:6px">
+        <div style="height:100%;width:${returnRate}%;background:${barColor};border-radius:10px;transition:width .6s"></div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text-muted)">
+        <span>반납률 <b style="color:${barColor};font-family:'JetBrains Mono',monospace">${returnRate}%</b></span>
+        <span>미납 <b style="color:${unpaid>0?'#dc2626':'var(--text-muted)'};font-family:'JetBrains Mono',monospace">${unpaidRate}%</b></span>
+      </div>
+      <div style="margin-top:6px;font-size:9px;color:var(--text-muted)">평균 <b style="color:var(--text)">${avgStr}</b></div>
+    </div>`;
+  }).join('');
+}
+
+// ── ② 물품별 도넛 (가로형 리스트) ────────────────────────────
+function renderDonuts(){
+  const wrap=document.getElementById('st-donuts');
+  if(!wrap)return;
+  const types=Object.keys(ITEM_NUMBERS);
+  wrap.innerHTML=types.map(t=>`
+    <div class="donut-row">
+      <div class="donut-mini-wrap"><canvas id="dnt-${t}"></canvas></div>
+      <div class="donut-info">
+        <div class="donut-name">${ITEM_ICONS[t]} ${ITEM_LABELS[t]}</div>
+        <div class="donut-meta" id="dnt-meta-${t}"></div>
+      </div>
+    </div>`).join('');
+
+  types.forEach(t=>{
+    const nums=ITEM_NUMBERS[t];
+    const counts={available:0,renting:0,unpaid:0,broken:0,lost:0};
+    nums.forEach(n=>{const s=getItemState(t,n);counts[s]=(counts[s]||0)+1;});
+    const labels=Object.keys(counts).filter(k=>counts[k]>0);
+    const data=labels.map(k=>counts[k]);
+    const colors=labels.map(k=>k==='available'?'#16a34a':ST_CLR[k]);
+    const ctx=document.getElementById('dnt-'+t)?.getContext('2d');
+    if(!ctx)return;
+    _charts['dnt-'+t]=new Chart(ctx,{
+      type:'doughnut',
+      data:{labels:labels.map(k=>k==='available'?'가능':ST_LBL[k]),datasets:[{data,backgroundColor:colors,borderWidth:2,borderColor:'#fff',hoverOffset:3}]},
+      options:{responsive:true,maintainAspectRatio:false,cutout:'65%',
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.label}: ${c.raw}개`}}}
+      }
+    });
+    const meta=document.getElementById('dnt-meta-'+t);
+    if(meta) meta.innerHTML=labels.map((k,i)=>`
+      <span class="dm-chip"><span class="dm-dot" style="background:${colors[i]}"></span>${k==='available'?'가능':ST_LBL[k]} ${data[i]}</span>`).join('');
+  });
+}
+
+// ── ③ 학부별 바 ────────────────────────────────────────────────
+function renderDept(list){
+  const wrap=document.getElementById('st-dept');
+  if(!wrap)return;
+  const map={};
+  list.forEach(r=>{if(r.dept)map[r.dept]=(map[r.dept]||0)+1;});
+  const sorted=Object.entries(map).sort((a,b)=>b[1]-a[1]);
+  const mx=sorted[0]?.[1]||1;
+  if(!sorted.length){wrap.innerHTML='<div style="padding:30px;text-align:center;color:var(--text-muted);font-size:13px">데이터 없음</div>';return;}
+  wrap.innerHTML=sorted.map(([dept,cnt])=>`
+    <div class="dept-row">
+      <div class="dept-lbl" title="${dept}">${dept}</div>
+      <div class="dept-track"><div class="dept-fill" style="width:${Math.round(cnt/mx*100)}%"></div></div>
+      <div class="dept-val">${cnt}</div>
+    </div>`).join('');
+}
+
+// ── ④ 시간대별 분포 (0~23시) ─────────────────────────────────
+function renderHourChart(list){
+  _charts['hour']?.destroy();
+  const ctx=document.getElementById('chart-hour')?.getContext('2d');
+  if(!ctx)return;
+  const hours=Array(24).fill(0);
+  list.forEach(r=>{if(r.date){const h=new Date(r.date).getHours();hours[h]++;}});
+  _charts['hour']=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:Array.from({length:24},(_,i)=>`${i}시`),
+      datasets:[{
+        label:'대여 건수',
+        data:hours,
+        backgroundColor:hours.map((_,i)=>(i>=9&&i<=18)?'#2d5016cc':'#2d501640'),
+        borderColor:hours.map((_,i)=>(i>=9&&i<=18)?'#2d5016':'#2d501666'),
+        borderWidth:1,borderRadius:3
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.raw}건`}}},
+      scales:{
+        x:{grid:{display:false},ticks:{font:{size:9},maxTicksLimit:12}},
+        y:{beginAtZero:true,ticks:{stepSize:1,font:{size:10}},grid:{color:'#f0efe9'}}
+      }
+    }
+  });
+}
+
+// ── ⑤ 일별 추이 라인 ──────────────────────────────────────────
+function renderDailyChart(list){
+  _charts['daily']?.destroy();
+  const ctx=document.getElementById('chart-daily')?.getContext('2d');
+  if(!ctx)return;
+  const days=_period==='all'?30:parseInt(_period);
+  const dateArr=[];
+  for(let i=days-1;i>=0;i--){
+    const d=new Date();d.setDate(d.getDate()-i);
+    dateArr.push(d.toISOString().slice(0,10));
+  }
+  document.getElementById('st-line-range').textContent=
+    `(최근 ${days}일)`;
+  const types=Object.keys(ITEM_NUMBERS);
+  _charts['daily']=new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:dateArr.map(d=>{const[,m,dd]=d.split('-');return `${m}/${dd}`;}),
+      datasets:types.map(t=>({
+        label:`${ITEM_ICONS[t]} ${ITEM_LABELS[t]}`,
+        data:dateArr.map(d=>list.filter(r=>r.item===t&&r.date?.slice(0,10)===d).length),
+        borderColor:ITEM_CLR[t],
+        backgroundColor:ITEM_CLR[t]+'18',
+        borderWidth:2,pointRadius:2.5,pointHoverRadius:5,
+        fill:false,tension:.4
+      }))
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:12,boxWidth:10,boxHeight:10}}},
+      scales:{
+        x:{grid:{color:'#f5f4f0'},ticks:{font:{size:10},maxTicksLimit:15}},
+        y:{beginAtZero:true,ticks:{stepSize:1,font:{size:11}},grid:{color:'#f5f4f0'}}
+      }
+    }
+  });
+}
+
+// ── 전체 렌더 진입점 ──────────────────────────────────────────
+function renderStats(){
+  _destroyAll();
+  const list=_filtered();
+  renderTurnover(list);
+  renderDonuts();       // 도넛은 항상 전체 물품 현황 기준
+  renderDept(list);
+  renderHourChart(list);
+  renderDailyChart(list);
+}
+
+// ══ 비밀번호 인증 ══
+// ⚠️ 비밀번호를 변경하려면 아래 ADMIN_PW 값을 수정하세요
+const ADMIN_PW = 'cals2026';
+
+function checkPw(){
+  const input=document.getElementById('pw-input');
+  const errEl=document.getElementById('pw-err');
+  const val=input.value;
+  if(val===ADMIN_PW){
+    sessionStorage.setItem('cals_auth','1');
+    document.getElementById('pw-overlay').style.display='none';
+    errEl.textContent='';
+  } else {
+    input.classList.add('err');
+    errEl.textContent='비밀번호가 올바르지 않습니다';
+    input.value='';
+    setTimeout(()=>input.classList.remove('err'),400);
+    input.focus();
+  }
+}
+
+function togglePwVis(){
+  const input=document.getElementById('pw-input');
+  const btn=document.getElementById('pw-toggle-btn');
+  if(input.type==='password'){input.type='text';btn.textContent='🙈';}
+  else{input.type='password';btn.textContent='👁️';}
+}
+
+// 이미 인증된 세션이면 바로 진입
+(function(){
+  if(sessionStorage.getItem('cals_auth')==='1'){
+    document.addEventListener('DOMContentLoaded',()=>{
+      const ov=document.getElementById('pw-overlay');
+      if(ov)ov.style.display='none';
+    });
+  } else {
+    document.addEventListener('DOMContentLoaded',()=>{
+      document.getElementById('pw-input')?.focus();
+    });
+  }
+})();
+
+init();
+</script>
+<!-- PWA 설치 배너 -->
+<div id="pwa-banner">
+  <img src="icon-192.png" class="pwa-icon" alt="앱 아이콘">
+  <div class="pwa-text">
+    <b>홈 화면에 추가</b>
+    <span>앱처럼 빠르게 실행할 수 있어요</span>
+  </div>
+  <button class="pwa-install-btn" id="pwa-install-btn">설치</button>
+  <button class="pwa-close-btn" onclick="dismissPWA()">✕</button>
+</div>
+
+<script>
+// ══ PWA 서비스 워커 등록 ══
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(r => console.log('SW registered'))
+      .catch(e => console.log('SW error', e));
+  });
+}
+
+// PWA 설치 배너
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // 이미 설치됐거나 닫은 적 있으면 표시 안 함
+  if(!localStorage.getItem('pwa-dismissed')){
+    document.getElementById('pwa-banner').classList.add('show');
+  }
+});
+
+document.getElementById('pwa-install-btn').addEventListener('click', async () => {
+  if(!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  document.getElementById('pwa-banner').classList.remove('show');
+});
+
+function dismissPWA(){
+  document.getElementById('pwa-banner').classList.remove('show');
+  localStorage.setItem('pwa-dismissed', '1');
+}
+
+// 이미 설치된 경우 배너 숨김
+window.addEventListener('appinstalled', () => {
+  document.getElementById('pwa-banner').classList.remove('show');
+});
+</script>
+</body>
+</html>
