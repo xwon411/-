@@ -326,6 +326,24 @@ tbody td{padding:10px 13px;vertical-align:middle;}
     <span id="sync-dot" style="width:6px;height:6px;border-radius:50%;background:#9ca3af;flex-shrink:0;transition:background .5s"></span>
     <span id="clock-time">--:--:--</span>
   </div>
+  <div style="padding:0 10px 12px;display:flex;gap:6px">
+    <button id="undo-btn" onclick="undoAction()"
+      style="flex:1;padding:8px 4px;border-radius:7px;border:1px solid rgba(255,255,255,.2);
+             background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);font-size:11px;font-weight:600;
+             cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .15s;display:flex;
+             align-items:center;justify-content:center;gap:4px;"
+      disabled>
+      ↩ 되돌리기
+    </button>
+    <button id="redo-btn" onclick="redoAction()"
+      style="flex:1;padding:8px 4px;border-radius:7px;border:1px solid rgba(255,255,255,.2);
+             background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);font-size:11px;font-weight:600;
+             cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .15s;display:flex;
+             align-items:center;justify-content:center;gap:4px;"
+      disabled>
+      앞으로 ↪
+    </button>
+  </div>
 </aside>
 <main class="main">
 
@@ -627,6 +645,124 @@ const S5=[
 ];
 const BL_STATUS=['unpaid','lost']; // 블랙리스트 등록 상태
 
+// ══ 되돌리기 / 앞으로 (Undo / Redo) 시스템 ══
+const UNDO_LIMIT = 10;
+let undoStack = [];
+let redoStack = []; // 앞으로 가기 스택
+
+// 현재 상태 스냅샷 저장 — 액션 실행 전에 호출
+// 새 액션이 실행되면 redoStack 초기화
+function saveSnapshot(label) {
+  const snapshot = {
+    label,
+    rentals: JSON.parse(JSON.stringify(rentals)),
+    itemStatus: JSON.parse(JSON.stringify(itemStatus)),
+    ITEM_NUMBERS: JSON.parse(JSON.stringify(ITEM_NUMBERS)),
+  };
+  undoStack.push(snapshot);
+  if (undoStack.length > UNDO_LIMIT) undoStack.shift();
+  redoStack = []; // 새 액션 시 앞으로 가기 스택 초기화
+  updateHistoryBtns();
+}
+
+// 현재 상태를 스택에 저장 (undo/redo 내부에서 사용)
+function captureCurrentState(label) {
+  return {
+    label,
+    rentals: JSON.parse(JSON.stringify(rentals)),
+    itemStatus: JSON.parse(JSON.stringify(itemStatus)),
+    ITEM_NUMBERS: JSON.parse(JSON.stringify(ITEM_NUMBERS)),
+  };
+}
+
+// ── 되돌리기 ──
+async function undoAction() {
+  if (!undoStack.length) return;
+  // 현재 상태를 redoStack에 저장
+  const current = captureCurrentState(undoStack[undoStack.length - 1].label);
+  redoStack.push(current);
+  if (redoStack.length > UNDO_LIMIT) redoStack.shift();
+
+  const snap = undoStack.pop();
+  await applySnapshot(snap, '↩ 되돌리기');
+}
+
+// ── 앞으로 ──
+async function redoAction() {
+  if (!redoStack.length) return;
+  // 현재 상태를 undoStack에 저장
+  const current = captureCurrentState(redoStack[redoStack.length - 1].label);
+  undoStack.push(current);
+  if (undoStack.length > UNDO_LIMIT) undoStack.shift();
+
+  const snap = redoStack.pop();
+  await applySnapshot(snap, '↪ 앞으로');
+}
+
+// ── 스냅샷 복원 공통 로직 ──
+async function applySnapshot(snap, prefix) {
+  rentals = snap.rentals;
+  itemStatus = snap.itemStatus;
+  ITEM_NUMBERS = snap.ITEM_NUMBERS;
+
+  setHistoryLoading(true);
+  try {
+    const rentalsObj = {};
+    rentals.forEach(r => { rentalsObj[r.id] = r; });
+    await fetch(`${FB}/rentals.json`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(rentalsObj)
+    });
+    await fetch(`${FB}/itemStatus.json`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(itemStatus)
+    });
+    await fetch(`${FB}/itemNumbers.json`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(ITEM_NUMBERS)
+    });
+    dot(true);
+  } catch(e) {
+    dot(false);
+    toast('동기화 실패', 'err');
+  }
+  setHistoryLoading(false);
+  updateHistoryBtns();
+  renderAll();
+  toast(`${prefix} "${snap.label}" 완료`, 'ok');
+}
+
+// ── 버튼 상태 업데이트 ──
+function updateHistoryBtns() {
+  _updateBtn('undo-btn', undoStack, '↩ 되돌리기');
+  _updateBtn('redo-btn', redoStack, '앞으로 ↪');
+}
+
+function _updateBtn(id, stack, defaultLabel) {
+  const btn = document.getElementById(id);
+  if (!btn) return;
+  const has = stack.length > 0;
+  const last = has ? stack[stack.length - 1].label : '';
+  btn.disabled = !has;
+  btn.style.color      = has ? 'rgba(255,255,255,.9)'  : 'rgba(255,255,255,.35)';
+  btn.style.background = has ? 'rgba(255,255,255,.18)' : 'rgba(255,255,255,.06)';
+  btn.style.borderColor= has ? 'rgba(255,255,255,.35)' : 'rgba(255,255,255,.12)';
+  btn.style.cursor     = has ? 'pointer' : 'default';
+  btn.innerHTML = has
+    ? `${defaultLabel.startsWith('↩') ? '↩' : '↪'} <span style="font-size:10px;opacity:.75;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70px;display:inline-block;vertical-align:middle">${last}</span>`
+    : defaultLabel;
+}
+
+// ── 로딩 중 표시 ──
+function setHistoryLoading(v) {
+  ['undo-btn','redo-btn'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    btn.disabled = v;
+    if (v) btn.innerHTML = '⏳';
+  });
+}
+
 function sInfo(v){return S5.find(s=>s.v===v)||{v,l:v,cl:'sb-renting',ico:'?'};}
 function sBadge(v){const s=sInfo(v);return `<span class="sbadge ${s.cl}">${s.l}</span>`;}
 function itemBadge(t){return `<span class="item-badge ib-${t}">${ITEM_ICONS[t]} ${ITEM_LABELS[t]}</span>`;}
@@ -684,20 +820,15 @@ async function init(){
 async function autoUnpaidUmbrella(){
   const now=Date.now();
   const SEVEN_DAYS=7*24*60*60*1000;
-  let changed=false;
-  for(const r of rentals){
-    if(r.item==='umbrella'&&r.status==='renting'){
-      if(now-new Date(r.date).getTime()>SEVEN_DAYS){
-        r.status='unpaid';
-        r.note=(r.note?r.note+' / ':'')+'7일 경과 자동 미납 처리';
-        fbPut(`/rentals/${r.id}`,r);
-        changed=true;
-      }
-    }
+  const targets=rentals.filter(r=>r.item==='umbrella'&&r.status==='renting'&&now-new Date(r.date).getTime()>SEVEN_DAYS);
+  if(!targets.length) return;
+  saveSnapshot(`약속우산 자동 미납 처리 (${targets.length}건)`);
+  for(const r of targets){
+    r.status='unpaid';
+    r.note=(r.note?r.note+' / ':'')+'7일 경과 자동 미납 처리';
+    fbPut(`/rentals/${r.id}`,r);
   }
-  if(changed){
-    toast('약속우산 7일 경과 — 자동 미납 처리되었습니다','inf');
-  }
+  toast('약속우산 7일 경과 — 자동 미납 처리되었습니다','inf');
 }
 function renderAll(){updateStats();renderRecent();renderRentals();renderInventory();renderUnpaid();renderBlacklist();}
 
@@ -891,6 +1022,7 @@ async function applyInvCond(){
   if(!sel){toast('상태를 선택해주세요','err');return;}
   const val=sel.dataset.v;
   const note=document.getElementById('f-inv-note').value.trim();
+  saveSnapshot(`물품현황 ${ITEM_LABELS[invType]||invType} ${invNum} → ${val==='available'?'대여가능':sInfo(val).l}`);
   const key=fbKey(invType,invNum);
   if(val==='available'){
     delete itemStatus[key];fbDel(`/itemStatus/${key}`);
@@ -955,6 +1087,7 @@ function submitRental(){
   if(!name||!phone||!dept||!selItemType||!itemNum){toast('모든 필수 항목을 입력해주세요','err');return;}
   const bl=rentals.find(r=>r.name===name&&r.phone===phone&&BL_STATUS.includes(r.status));
   if(bl){toast(`⛔ ${name}님은 "${sInfo(bl.status).l}" 상태로 대여가 제한됩니다.`,'err');return;}
+  saveSnapshot(`${name} ${ITEM_LABELS[selItemType]} 대여 등록`);
   const id=Date.now();
   const rec={id,name,phone,dept,item:selItemType,itemNum,date:new Date().toISOString(),returnDate:null,status:'renting',note};
   rentals.unshift(rec);
@@ -985,6 +1118,7 @@ function pickStatus(v){
 }
 function applyStatus(){
   const r=rentals.find(x=>x.id===editId);if(!r)return;
+  saveSnapshot(`${r.name} 상태변경 → ${sInfo(selStatus).l}`);
   r.status=selStatus;
   r.note=document.getElementById('f-status-note').value.trim();
   const key=fbKey(r.item,r.itemNum);
@@ -1005,6 +1139,7 @@ function applyStatus(){
 }
 function quickReturn(id){
   const r=rentals.find(x=>x.id===id);if(!r)return;
+  saveSnapshot(`${r.name} ${ITEM_LABELS[r.item]} 반납`);
   r.status='returned';r.returnDate=new Date().toISOString();
   const key=fbKey(r.item,r.itemNum);
   delete itemStatus[key];fbDel(`/itemStatus/${key}`);
@@ -1013,6 +1148,8 @@ function quickReturn(id){
 }
 function deleteRental(id){
   if(!confirm('이 내역을 삭제하시겠습니까?'))return;
+  const r=rentals.find(x=>x.id===id);
+  saveSnapshot(`${r?r.name+' ':''} 대여 기록 삭제`);
   rentals=rentals.filter(x=>x.id!==id);renderAll();toast('삭제되었습니다','inf');fbDel(`/rentals/${id}`);
 }
 
@@ -1054,6 +1191,7 @@ function renderBlacklist(){
   }).join('');
 }
 async function blPay(name,phone,status){
+  saveSnapshot(`${name} ${status==='unpaid'?'연체료':'분실비'} 납부`);
   const targets=rentals.filter(r=>r.name===name&&r.phone===phone&&r.status===status);
   for(const r of targets){
     r.status='returned';r.returnDate=r.returnDate||new Date().toISOString();
@@ -1114,10 +1252,10 @@ function addItemNum(){
   const input=document.getElementById('manage-new-num');
   const val=input.value.trim();
   if(!val){toast('번호를 입력해주세요','err');return;}
-  // 중복 확인
   if(ITEM_NUMBERS[manageTab].some(n=>String(n)===val)){
     toast(`이미 존재하는 번호입니다: ${val}`,'err');return;
   }
+  saveSnapshot(`물품 추가: ${ITEM_LABELS[manageTab]} ${val}`);
   ITEM_NUMBERS[manageTab].push(val);
   saveItemNumbers();
   input.value='';
@@ -1128,12 +1266,11 @@ function addItemNum(){
 }
 
 function deleteItemNum(numStr){
-  // 대여 기록 있으면 삭제 불가
   const hasRecord=rentals.some(r=>r.item===manageTab&&String(r.itemNum)===numStr);
   if(hasRecord){toast('대여 기록이 있는 물품은 삭제할 수 없습니다','err');return;}
   if(!confirm(`${ITEM_LABELS[manageTab]} ${numStr}를 목록에서 삭제하시겠습니까?`))return;
+  saveSnapshot(`물품 삭제: ${ITEM_LABELS[manageTab]} ${numStr}`);
   ITEM_NUMBERS[manageTab]=ITEM_NUMBERS[manageTab].filter(n=>String(n)!==numStr);
-  // itemStatus에서도 제거
   const key=fbKey(manageTab,numStr);
   if(itemStatus[key]){delete itemStatus[key];fbDel(`/itemStatus/${key}`);}
   saveItemNumbers();
