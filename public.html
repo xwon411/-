@@ -74,15 +74,6 @@ main{flex:1;padding:16px 16px 40px;max-width:600px;margin:0 auto;width:100%;}
 .ic-bar-fill{height:100%;border-radius:20px;transition:width .8s cubic-bezier(.34,1.56,.64,1);}
 .ic-bar-nums{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;white-space:nowrap;min-width:48px;text-align:right;}
 
-/* 상태 칩 행 */
-.ic-chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
-.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;
-  border-radius:20px;font-size:11px;font-weight:600;}
-.chip-renting{background:#dbeafe;color:#2563eb;}
-.chip-broken {background:#ffe4e6;color:#be123c;}
-.chip-lost   {background:#ede9fe;color:#7c3aed;}
-.chip-unpaid {background:#fee2e2;color:#dc2626;}
-
 /* 안내 문구 */
 .notice{background:var(--surface);border:1px solid var(--border);border-radius:12px;
   padding:15px 17px;margin-bottom:12px;font-size:12px;line-height:1.75;color:var(--text-muted);}
@@ -256,38 +247,26 @@ function render(){
   const types = Object.keys(ITEM_NUMBERS);
   const wrap = document.getElementById('cards');
   wrap.innerHTML = types.map(t => {
-    const nums   = ITEM_NUMBERS[t];
-    const total  = nums.length;
+    const nums  = ITEM_NUMBERS[t];
+    const total = nums.length;
     const states = nums.map(n => getItemState(t, n));
     const avail  = states.filter(s => s === 'available').length;
-    const renting= states.filter(s => s === 'renting').length;
-    const unpaid = states.filter(s => s === 'unpaid').length;
-    const broken = states.filter(s => s === 'broken').length;
-    const lost   = states.filter(s => s === 'lost').length;
 
-    const pct    = total > 0 ? Math.round(avail / total * 100) : 0;
-    const color  = ITEM_COLORS[t];
+    const pct   = total > 0 ? Math.round(avail / total * 100) : 0;
+    const color = ITEM_COLORS[t];
 
     // 배지
     let badgeCls, badgeTxt;
-    if(avail === 0)       { badgeCls='none';  badgeTxt='대여 불가'; }
-    else if(avail <= 2)   { badgeCls='few';   badgeTxt=`${avail}개 가능`; }
-    else                  { badgeCls='avail'; badgeTxt=`${avail}개 가능`; }
-
-    // 상태 칩 (1개 이상인 것만 표시)
-    const chips = [
-      renting ? `<span class="chip chip-renting">📦 대여중 ${renting}</span>` : '',
-      unpaid  ? `<span class="chip chip-unpaid">⚠️ 미납 ${unpaid}</span>`   : '',
-      broken  ? `<span class="chip chip-broken">🔧 고장 ${broken}</span>`   : '',
-      lost    ? `<span class="chip chip-lost">❌ 분실 ${lost}</span>`        : '',
-    ].filter(Boolean).join('');
+    if(avail === 0)     { badgeCls='none';  badgeTxt='대여 불가'; }
+    else if(avail <= 2) { badgeCls='few';   badgeTxt=`${avail}개 가능`; }
+    else                { badgeCls='avail'; badgeTxt=`${avail}개 가능`; }
 
     return `<div class="item-card">
       <div class="ic-head">
         <div class="ic-icon">${ITEM_ICONS[t]}</div>
         <div class="ic-info">
           <div class="ic-name">${ITEM_LABELS[t]}</div>
-          <div class="ic-total">전체 ${total}개</div>
+          <div class="ic-total">전체 ${total}개 중 ${avail}개 가능</div>
         </div>
         <div class="ic-badge ${badgeCls}">${badgeTxt}</div>
       </div>
@@ -297,7 +276,6 @@ function render(){
         </div>
         <div class="ic-bar-nums" style="color:${color}">${avail} / ${total}</div>
       </div>
-      ${chips ? `<div class="ic-chips">${chips}</div>` : ''}
     </div>`;
   }).join('');
 }
