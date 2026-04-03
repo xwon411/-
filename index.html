@@ -174,12 +174,26 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 .cond-opt.sel-broken{border-color:var(--s-broken);background:#ffe4e6;color:var(--s-broken);}
 .cond-opt.sel-lost{border-color:var(--s-lost);background:#ede9fe;color:var(--s-lost);}
 .bl-grid{display:flex;flex-direction:column;gap:10px;padding:14px;}
-.bl-card{background:white;border:1px solid var(--border);border-radius:10px;padding:16px 18px;display:flex;align-items:flex-start;gap:13px;}
+.bl-card{background:white;border:1px solid var(--border);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:0;}
+.bl-card-top{display:flex;align-items:flex-start;gap:13px;}
 .bl-avatar{width:38px;height:38px;border-radius:50%;background:#fee2e2;color:#dc2626;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0;}
 .bl-info{flex:1;min-width:0;}
 .bl-name{font-weight:700;font-size:14px;}.bl-meta{font-size:11px;color:var(--text-muted);margin-top:2px;}
 .bl-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px;}
-.bl-actions{display:flex;flex-direction:column;gap:5px;flex-shrink:0;}
+.bl-actions{display:flex;flex-wrap:wrap;gap:5px;flex-shrink:0;}
+/* 문자 발송 영역 */
+.bl-sms-section{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
+.bl-sms-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.sms-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;}
+.sms-sent{background:#dcfce7;color:#16a34a;}
+.sms-none{background:#f3f4f6;color:#9ca3af;}
+.sms-last-time{font-size:11px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;}
+.sms-log-wrap{margin-top:8px;display:flex;flex-direction:column;gap:4px;}
+.sms-log-item{font-size:11px;color:var(--text-muted);display:flex;align-items:flex-start;gap:6px;padding:5px 8px;background:var(--surface2);border-radius:6px;}
+.sms-log-item .sli-time{font-family:'JetBrains Mono',monospace;white-space:nowrap;flex-shrink:0;}
+.sms-log-item .sli-note{color:var(--text);}
+/* 문자 발송 모달 */
+.sms-modal-info{background:var(--surface2);border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:13px;}
 .alert-banner{background:#fef2f2;border:1px solid #fecaca;border-radius:9px;padding:11px 16px;display:flex;align-items:center;gap:10px;margin-bottom:18px;font-size:13px;}
 .alert-banner .cnt{background:#ef4444;color:white;font-weight:700;padding:2px 7px;border-radius:20px;font-family:'JetBrains Mono',monospace;font-size:11px;}
 .empty-state{padding:46px 20px;text-align:center;color:var(--text-muted);}
@@ -284,6 +298,56 @@ tbody td{padding:10px 13px;vertical-align:middle;}
   .stats-layout{grid-template-columns:1fr;}
   .dept-lbl{width:100px;}
 }
+
+/* ══ 의약품 관리 ══ */
+.med-banner{background:#fefce8;border:1px solid #fde68a;border-radius:9px;padding:11px 16px;display:flex;align-items:center;gap:10px;margin-bottom:18px;font-size:13px;flex-wrap:wrap;}
+.med-banner .med-banner-items{flex:1;display:flex;flex-wrap:wrap;gap:6px;font-size:12px;color:#92400e;}
+.med-banner-tag{background:#fef3c7;border:1px solid #fde68a;border-radius:20px;padding:2px 9px;font-size:11px;font-weight:600;white-space:nowrap;}
+
+.med-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:7px;padding:10px;}
+.med-card{background:white;border:1.5px solid var(--border);border-radius:8px;padding:9px 11px;cursor:pointer;transition:all .15s;position:relative;}
+.med-card:hover{border-color:var(--accent);transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,0,0,.07);}
+.med-card.low{border-color:#f59e0b;background:#fffbeb;}
+.med-card.empty{border-color:#ef4444;background:#fef2f2;}
+.med-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:5px;margin-bottom:4px;}
+.med-card-name{font-weight:700;font-size:11.5px;line-height:1.3;word-break:keep-all;}
+.med-cat-badge{font-size:9px;font-weight:600;padding:1px 6px;border-radius:20px;white-space:nowrap;flex-shrink:0;background:var(--accent-pale);color:var(--accent);}
+.med-qty{font-size:20px;font-weight:900;letter-spacing:-.04em;font-family:'JetBrains Mono',monospace;}
+.med-qty.low{color:#d97706;}
+.med-qty.empty{color:#dc2626;}
+.med-unit{font-size:10px;color:var(--text-muted);margin-top:1px;}
+.med-status-dot{position:absolute;top:8px;right:8px;width:6px;height:6px;border-radius:50%;background:#16a34a;}
+.med-status-dot.low{background:#f59e0b;animation:bl 1.5s ease infinite;}
+.med-status-dot.empty{background:#dc2626;animation:bl .8s ease infinite;}
+
+/* 카테고리 탭 */
+.med-cat-tabs{display:flex;gap:6px;padding:13px 13px 0;flex-wrap:wrap;}
+.med-cat-tab{padding:5px 13px;border-radius:20px;cursor:pointer;font-size:12px;font-weight:600;border:1px solid var(--border);background:var(--surface2);transition:all .15s;}
+.med-cat-tab.active{background:var(--accent);color:white;border-color:var(--accent);}
+
+/* 의약품 조정 모달 */
+.med-adj-row{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:10px 0;}
+.med-adj-btn{min-width:48px;padding:8px 10px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:var(--surface2);color:var(--text);transition:all .15s;font-family:'JetBrains Mono',monospace;}
+.med-adj-btn:hover{border-color:var(--accent);background:var(--accent-pale);color:var(--accent);}
+.med-adj-btn.minus{border-color:#fecaca;color:#dc2626;background:#fef2f2;}
+.med-adj-btn.minus:hover{background:#fee2e2;}
+.med-qty-display{font-size:38px;font-weight:900;letter-spacing:-.05em;text-align:center;margin:12px 0 4px;font-family:'JetBrains Mono',monospace;}
+.med-qty-label{text-align:center;font-size:12px;color:var(--text-muted);margin-bottom:12px;}
+
+/* 이력 테이블 */
+.med-log-change{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;}
+.med-log-change.plus{color:#16a34a;}
+.med-log-change.minus{color:#dc2626;}
+
+@media(max-width:768px){
+  .med-grid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px;padding:8px;}
+  .med-card{padding:8px 9px;}
+  .med-qty{font-size:18px;}
+  #med-bottom-grid{grid-template-columns:1fr!important;}
+}
+@media(max-width:400px){
+  .med-grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));}
+}
 </style>
 </head>
 <body>
@@ -320,6 +384,7 @@ tbody td{padding:10px 13px;vertical-align:middle;}
     <div class="nav-item" onclick="showPage('unpaid')">📦 물품 관리 <span class="nav-badge" id="badge-unpaid">0</span></div>
     <div class="nav-item" onclick="showPage('blacklist')">🚫 블랙리스트 <span class="nav-badge" id="badge-bl" style="display:none">0</span></div>
     <div class="nav-item" onclick="showPage('stats')">📈 통계</div>
+    <div class="nav-item" onclick="showPage('medicine')">💊 의약품 관리 <span class="nav-badge" id="badge-med" style="display:none">0</span></div>
     <div class="nav-item" onclick="openRentalModal()">＋ 대여 등록</div>
   </nav>
   <div class="sidebar-clock">
@@ -331,16 +396,14 @@ tbody td{padding:10px 13px;vertical-align:middle;}
       style="flex:1;padding:8px 4px;border-radius:7px;border:1px solid rgba(255,255,255,.2);
              background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);font-size:11px;font-weight:600;
              cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .15s;display:flex;
-             align-items:center;justify-content:center;gap:4px;"
-      disabled>
+             align-items:center;justify-content:center;gap:4px;" disabled>
       ↩ 되돌리기
     </button>
     <button id="redo-btn" onclick="redoAction()"
       style="flex:1;padding:8px 4px;border-radius:7px;border:1px solid rgba(255,255,255,.2);
              background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);font-size:11px;font-weight:600;
              cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .15s;display:flex;
-             align-items:center;justify-content:center;gap:4px;"
-      disabled>
+             align-items:center;justify-content:center;gap:4px;" disabled>
       앞으로 ↪
     </button>
   </div>
@@ -352,10 +415,6 @@ tbody td{padding:10px 13px;vertical-align:middle;}
   <div class="page-header">
     <div><div class="page-title">대시보드</div><div class="page-sub">전체 대여 현황 요약</div></div>
     <button class="btn btn-primary" onclick="openRentalModal()">＋ 대여 등록</button>
-  </div>
-  <div id="unpaid-banner" class="alert-banner" style="display:none">
-    ⚠️ 미납/고장/분실 물품이 <span class="cnt" id="banner-cnt">0</span>건 있습니다.
-    <button class="btn btn-danger btn-sm" style="margin-left:auto" onclick="showPage('unpaid')">확인</button>
   </div>
   <div class="stats-row">
     <div class="stat-card" data-icon="☂️"><div class="stat-label">약속우산</div><div class="stat-value" id="st-umbrella" style="color:var(--c-umbrella)">0</div><div class="stat-sub">대여중</div><div class="stat-avail">가능 <span id="av-umbrella">0</span>개</div></div>
@@ -394,6 +453,11 @@ tbody td{padding:10px 13px;vertical-align:middle;}
           <option value="">전체 상태</option>
           <option value="renting">대여중</option><option value="returned">반납완료</option>
           <option value="unpaid">미납</option><option value="broken">고장</option><option value="lost">분실</option>
+        </select>
+        <select class="flt" id="s-day" onchange="renderRentals()">
+          <option value="">전체 요일</option>
+          <option value="0">일요일</option><option value="1">월요일</option><option value="2">화요일</option>
+          <option value="3">수요일</option><option value="4">목요일</option><option value="5">금요일</option><option value="6">토요일</option>
         </select>
         <button class="btn btn-ghost btn-sm" onclick="exportCSV()">⬇️ CSV 다운로드</button>
       </div>
@@ -498,6 +562,85 @@ tbody td{padding:10px 13px;vertical-align:middle;}
   </div>
 </div>
 
+<!-- MEDICINE PAGE -->
+<div class="page" id="page-medicine">
+  <div class="page-header">
+    <div><div class="page-title">💊 의약품 관리</div><div class="page-sub">재고 현황 및 사용 이력</div></div>
+  </div>
+  <!-- 부족 인라인 알림 (의약품 페이지 전용, 대시보드 배너와 별개) -->
+  <div id="med-page-banner" class="med-banner" style="display:none">
+    <span>💊 <strong>재고 부족 품목</strong> —</span>
+    <div class="med-banner-items" id="med-page-banner-items"></div>
+  </div>
+  <!-- 카테고리 탭 -->
+  <div class="section" style="overflow:visible">
+    <div class="section-header">
+      <div class="section-title">📦 재고 현황</div>
+      <div class="section-actions">
+        <select class="flt" id="med-cat-filter" onchange="renderMedicine()">
+          <option value="" id="med-cat-all">전체 종류</option>
+        </select>
+      </div>
+    </div>
+    <div class="med-grid" id="med-grid"></div>
+  </div>
+  <!-- 이력 + 통계 2열 레이아웃 -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px" id="med-bottom-grid">
+    <!-- 이력 (절반) -->
+    <div class="section" style="margin-bottom:0">
+      <div class="section-header">
+        <div class="section-title">📋 사용·변경 이력</div>
+        <div class="section-actions">
+          <select class="flt" id="med-log-filter" onchange="renderMedLog()" style="max-width:120px">
+            <option value="">전체</option>
+          </select>
+          <button class="btn btn-ghost btn-sm" onclick="clearMedLog()">🗑</button>
+        </div>
+      </div>
+      <div class="tbl-wrap" style="max-height:340px;overflow-y:auto"><table>
+        <thead><tr><th>일시</th><th>품명</th><th>변경량</th><th>사유</th><th>잔여</th><th></th></tr></thead>
+        <tbody id="tbl-med-log"></tbody>
+      </table></div>
+    </div>
+    <!-- 통계 -->
+    <div class="section" style="margin-bottom:0">
+      <div class="section-header">
+        <div class="section-title">📊 사용 통계</div>
+        <div class="section-actions">
+          <select class="flt" id="med-stat-period" onchange="renderMedStats()">
+            <option value="7">최근 7일</option>
+            <option value="30" selected>최근 30일</option>
+            <option value="90">최근 90일</option>
+            <option value="all">전체</option>
+          </select>
+        </div>
+      </div>
+      <div style="padding:12px 14px;display:flex;flex-direction:column;gap:14px">
+        <!-- 총 사용량 상위 바 차트 -->
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;font-family:'JetBrains Mono',monospace;margin-bottom:8px">사용량 TOP 8</div>
+          <div id="med-stat-bars" style="display:flex;flex-direction:column;gap:5px"></div>
+        </div>
+        <!-- 사유별 도넛 -->
+        <div style="display:flex;gap:12px;align-items:center">
+          <div style="flex:0 0 90px;height:90px;position:relative">
+            <canvas id="med-stat-donut"></canvas>
+          </div>
+          <div>
+            <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;font-family:'JetBrains Mono',monospace;margin-bottom:6px">사유별 건수</div>
+            <div id="med-stat-legend" style="display:flex;flex-direction:column;gap:4px"></div>
+          </div>
+        </div>
+        <!-- 일별 사용 추이 -->
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;font-family:'JetBrains Mono',monospace;margin-bottom:6px">일별 사용 추이</div>
+          <div style="height:80px;position:relative"><canvas id="med-stat-line"></canvas></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 </main></div>
 
 <!-- RENTAL MODAL -->
@@ -594,6 +737,87 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 </div>
 </div>
 
+<!-- 문자 발송 모달 -->
+<div class="modal-overlay" id="modal-sms">
+<div class="modal" style="width:400px">
+  <div class="modal-header">
+    <div>
+      <div class="modal-title">✉️ 문자 발송 기록</div>
+      <div class="modal-sub" id="sms-modal-sub"></div>
+    </div>
+    <button class="modal-close" onclick="closeModal('modal-sms')">✕</button>
+  </div>
+  <div class="modal-body">
+    <div class="sms-modal-info" id="sms-modal-info"></div>
+    <div class="fg" style="margin-bottom:14px">
+      <label>메모 <span style="font-weight:400;opacity:.6">(선택)</span></label>
+      <input class="fi" id="sms-note-input" placeholder="예: 1차 독촉 문자, 반납 안내 등">
+    </div>
+    <!-- 발송 이력 -->
+    <div id="sms-log-section" style="display:none">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);font-family:'JetBrains Mono',monospace;margin-bottom:8px">발송 이력</div>
+      <div id="sms-log-items" class="sms-log-wrap"></div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" onclick="closeModal('modal-sms')">취소</button>
+    <button class="btn btn-primary" onclick="confirmSmsSent()">✉️ 발송 기록 저장</button>
+  </div>
+</div>
+</div>
+
+<!-- MEDICINE ADJUST MODAL -->
+<div class="modal-overlay" id="modal-med">
+<div class="modal" style="width:400px">
+  <div class="modal-header">
+    <div>
+      <div class="modal-title" id="med-modal-title">의약품 재고 조정</div>
+      <div class="modal-sub" id="med-modal-sub"></div>
+    </div>
+    <button class="modal-close" onclick="closeModal('modal-med')">✕</button>
+  </div>
+  <div class="modal-body">
+    <!-- 현재 재고 표시 -->
+    <div style="background:var(--surface2);border-radius:8px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;">
+      <span style="font-size:12px;color:var(--text-muted);">현재 재고</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:900;" id="med-modal-cur">0</span>
+      <span style="font-size:12px;color:var(--text-muted);" id="med-modal-unit">정</span>
+    </div>
+    <!-- 사유 선택 -->
+    <div class="fg" style="margin-bottom:12px">
+      <label>사유 *</label>
+      <select class="fi" id="med-reason" onchange="medReasonChange()">
+        <option value="사용">사용 (차감)</option>
+        <option value="구비 추가">구비 추가 (증가)</option>
+        <option value="폐기">폐기 (차감)</option>
+        <option value="수량 정정">수량 정정 (직접 입력)</option>
+        <option value="기타">기타</option>
+      </select>
+    </div>
+    <!-- 빠른 버튼 -->
+    <div id="med-adj-quick" class="med-adj-row">
+      <button class="med-adj-btn minus" onclick="medAdjDelta(-5)">－5</button>
+      <button class="med-adj-btn minus" onclick="medAdjDelta(-1)">－1</button>
+      <button class="med-adj-btn" onclick="medAdjDelta(+1)">＋1</button>
+      <button class="med-adj-btn" onclick="medAdjDelta(+5)">＋5</button>
+    </div>
+    <!-- 직접 입력 -->
+    <div class="fg" style="margin-top:10px">
+      <label id="med-direct-label">사용 수량 직접 입력</label>
+      <input class="fi" type="number" id="med-direct-qty" placeholder="0" min="0"
+        style="font-family:'JetBrains Mono',monospace;font-size:16px;text-align:center;"
+        oninput="medSetDeltaDirect(this.value)">
+    </div>
+    <!-- 결과 미리보기 -->
+    <div id="med-preview" style="margin-top:10px;padding:9px 13px;border-radius:7px;font-size:13px;text-align:center;display:none;"></div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" onclick="closeModal('modal-med')">취소</button>
+    <button class="btn btn-primary" onclick="saveMedAdj()">💾 저장</button>
+  </div>
+</div>
+</div>
+
 <!-- MOBILE NAV -->
 <nav class="mobile-nav">
   <div class="mobile-nav-inner">
@@ -603,6 +827,7 @@ tbody td{padding:10px 13px;vertical-align:middle;}
     <button class="mnav-item" id="mnav-unpaid" onclick="showPage('unpaid')"><span class="mico">📦</span>물품관리<span class="mbadge" id="mbadge-unpaid" style="display:none">0</span></button>
     <button class="mnav-item" id="mnav-blacklist" onclick="showPage('blacklist')"><span class="mico">🚫</span>블랙리스트<span class="mbadge" id="mbadge-bl" style="display:none">0</span></button>
     <button class="mnav-item" id="mnav-stats" onclick="showPage('stats')"><span class="mico">📈</span>통계</button>
+    <button class="mnav-item" id="mnav-medicine" onclick="showPage('medicine')"><span class="mico">💊</span>의약품<span class="mbadge" id="mbadge-med" style="display:none">0</span></button>
   </div>
 </nav>
 <button class="fab" onclick="openRentalModal()">＋</button>
@@ -645,121 +870,75 @@ const S5=[
 ];
 const BL_STATUS=['unpaid','lost']; // 블랙리스트 등록 상태
 
-// ══ 되돌리기 / 앞으로 (Undo / Redo) 시스템 ══
-const UNDO_LIMIT = 10;
-let undoStack = [];
-let redoStack = []; // 앞으로 가기 스택
+// ══ 되돌리기 / 앞으로 (Undo / Redo) ══
+const UNDO_LIMIT=10;
+let undoStack=[],redoStack=[];
 
-// 현재 상태 스냅샷 저장 — 액션 실행 전에 호출
-// 새 액션이 실행되면 redoStack 초기화
-function saveSnapshot(label) {
-  const snapshot = {
-    label,
-    rentals: JSON.parse(JSON.stringify(rentals)),
-    itemStatus: JSON.parse(JSON.stringify(itemStatus)),
-    ITEM_NUMBERS: JSON.parse(JSON.stringify(ITEM_NUMBERS)),
-  };
-  undoStack.push(snapshot);
-  if (undoStack.length > UNDO_LIMIT) undoStack.shift();
-  redoStack = []; // 새 액션 시 앞으로 가기 스택 초기화
+function saveSnapshot(label){
+  undoStack.push({label,
+    rentals:JSON.parse(JSON.stringify(rentals)),
+    itemStatus:JSON.parse(JSON.stringify(itemStatus)),
+    ITEM_NUMBERS:JSON.parse(JSON.stringify(ITEM_NUMBERS))
+  });
+  if(undoStack.length>UNDO_LIMIT) undoStack.shift();
+  redoStack=[];
   updateHistoryBtns();
 }
-
-// 현재 상태를 스택에 저장 (undo/redo 내부에서 사용)
-function captureCurrentState(label) {
-  return {
-    label,
-    rentals: JSON.parse(JSON.stringify(rentals)),
-    itemStatus: JSON.parse(JSON.stringify(itemStatus)),
-    ITEM_NUMBERS: JSON.parse(JSON.stringify(ITEM_NUMBERS)),
+function captureNow(label){
+  return {label,
+    rentals:JSON.parse(JSON.stringify(rentals)),
+    itemStatus:JSON.parse(JSON.stringify(itemStatus)),
+    ITEM_NUMBERS:JSON.parse(JSON.stringify(ITEM_NUMBERS))
   };
 }
-
-// ── 되돌리기 ──
-async function undoAction() {
-  if (!undoStack.length) return;
-  // 현재 상태를 redoStack에 저장
-  const current = captureCurrentState(undoStack[undoStack.length - 1].label);
-  redoStack.push(current);
-  if (redoStack.length > UNDO_LIMIT) redoStack.shift();
-
-  const snap = undoStack.pop();
-  await applySnapshot(snap, '↩ 되돌리기');
+async function undoAction(){
+  if(!undoStack.length) return;
+  redoStack.push(captureNow(undoStack[undoStack.length-1].label));
+  if(redoStack.length>UNDO_LIMIT) redoStack.shift();
+  await applySnapshot(undoStack.pop(),'↩ 되돌리기');
 }
-
-// ── 앞으로 ──
-async function redoAction() {
-  if (!redoStack.length) return;
-  // 현재 상태를 undoStack에 저장
-  const current = captureCurrentState(redoStack[redoStack.length - 1].label);
-  undoStack.push(current);
-  if (undoStack.length > UNDO_LIMIT) undoStack.shift();
-
-  const snap = redoStack.pop();
-  await applySnapshot(snap, '↪ 앞으로');
+async function redoAction(){
+  if(!redoStack.length) return;
+  undoStack.push(captureNow(redoStack[redoStack.length-1].label));
+  if(undoStack.length>UNDO_LIMIT) undoStack.shift();
+  await applySnapshot(redoStack.pop(),'↪ 앞으로');
 }
-
-// ── 스냅샷 복원 공통 로직 ──
-async function applySnapshot(snap, prefix) {
-  rentals = snap.rentals;
-  itemStatus = snap.itemStatus;
-  ITEM_NUMBERS = snap.ITEM_NUMBERS;
-
+async function applySnapshot(snap,prefix){
+  rentals=snap.rentals; itemStatus=snap.itemStatus; ITEM_NUMBERS=snap.ITEM_NUMBERS;
   setHistoryLoading(true);
-  try {
-    const rentalsObj = {};
-    rentals.forEach(r => { rentalsObj[r.id] = r; });
-    await fetch(`${FB}/rentals.json`, {
-      method: 'PUT', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(rentalsObj)
-    });
-    await fetch(`${FB}/itemStatus.json`, {
-      method: 'PUT', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(itemStatus)
-    });
-    await fetch(`${FB}/itemNumbers.json`, {
-      method: 'PUT', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(ITEM_NUMBERS)
-    });
+  try{
+    const ro={};rentals.forEach(r=>{ro[r.id]=r;});
+    await fetch(`${FB}/rentals.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(ro)});
+    await fetch(`${FB}/itemStatus.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(itemStatus)});
+    await fetch(`${FB}/itemNumbers.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(ITEM_NUMBERS)});
     dot(true);
-  } catch(e) {
-    dot(false);
-    toast('동기화 실패', 'err');
-  }
+  }catch(e){dot(false);toast('동기화 실패','err');}
   setHistoryLoading(false);
   updateHistoryBtns();
   renderAll();
-  toast(`${prefix} "${snap.label}" 완료`, 'ok');
+  toast(`${prefix} "${snap.label}" 완료`,'ok');
 }
-
-// ── 버튼 상태 업데이트 ──
-function updateHistoryBtns() {
-  _updateBtn('undo-btn', undoStack, '↩ 되돌리기');
-  _updateBtn('redo-btn', redoStack, '앞으로 ↪');
+function updateHistoryBtns(){
+  _updateBtn('undo-btn',undoStack,'↩ 되돌리기');
+  _updateBtn('redo-btn',redoStack,'앞으로 ↪');
 }
-
-function _updateBtn(id, stack, defaultLabel) {
-  const btn = document.getElementById(id);
-  if (!btn) return;
-  const has = stack.length > 0;
-  const last = has ? stack[stack.length - 1].label : '';
-  btn.disabled = !has;
-  btn.style.color      = has ? 'rgba(255,255,255,.9)'  : 'rgba(255,255,255,.35)';
-  btn.style.background = has ? 'rgba(255,255,255,.18)' : 'rgba(255,255,255,.06)';
-  btn.style.borderColor= has ? 'rgba(255,255,255,.35)' : 'rgba(255,255,255,.12)';
-  btn.style.cursor     = has ? 'pointer' : 'default';
-  btn.innerHTML = has
-    ? `${defaultLabel.startsWith('↩') ? '↩' : '↪'} <span style="font-size:10px;opacity:.75;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70px;display:inline-block;vertical-align:middle">${last}</span>`
-    : defaultLabel;
+function _updateBtn(id,stack,def){
+  const btn=document.getElementById(id);if(!btn)return;
+  const has=stack.length>0;
+  const last=has?stack[stack.length-1].label:'';
+  btn.disabled=!has;
+  btn.style.color=has?'rgba(255,255,255,.9)':'rgba(255,255,255,.35)';
+  btn.style.background=has?'rgba(255,255,255,.18)':'rgba(255,255,255,.06)';
+  btn.style.borderColor=has?'rgba(255,255,255,.35)':'rgba(255,255,255,.12)';
+  btn.style.cursor=has?'pointer':'default';
+  btn.innerHTML=has
+    ?`${def.startsWith('↩')?'↩':'↪'} <span style="font-size:10px;opacity:.75;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:68px;display:inline-block;vertical-align:middle">${last}</span>`
+    :def;
 }
-
-// ── 로딩 중 표시 ──
-function setHistoryLoading(v) {
-  ['undo-btn','redo-btn'].forEach(id => {
-    const btn = document.getElementById(id);
-    if (!btn) return;
-    btn.disabled = v;
-    if (v) btn.innerHTML = '⏳';
+function setHistoryLoading(v){
+  ['undo-btn','redo-btn'].forEach(id=>{
+    const btn=document.getElementById(id);if(!btn)return;
+    btn.disabled=v;if(v)btn.innerHTML='⏳';
   });
 }
 
@@ -790,6 +969,8 @@ let rentals=[];
 // itemStatus: 물품현황에서 직접 설정한 고장/분실 상태
 // key = fbKey(type,num), value = 'broken' | 'lost' | null(정상)
 let itemStatus={};
+// smsLog: { "이름__전화번호": [{sentAt: ISO, note: ""},...] }
+let smsLog={};
 let currentInvTab='umbrella';
 let editId=null,invType='',invNum='';
 let selItemType='',selStatus='';
@@ -798,9 +979,10 @@ let selItemType='',selStatus='';
 async function init(){
   document.getElementById('tbl-recent').innerHTML=
     `<tr><td colspan="8" style="text-align:center;padding:28px;color:var(--text-muted);font-size:13px">⏳ 불러오는 중...</td></tr>`;
-  const [rData,iData,nData]=await Promise.all([fbGet('/rentals'),fbGet('/itemStatus'),fbGet('/itemNumbers')]);
+  const [rData,iData,nData,sData]=await Promise.all([fbGet('/rentals'),fbGet('/itemStatus'),fbGet('/itemNumbers'),fbGet('/smsLog')]);
   rentals=rData?Object.values(rData).sort((a,b)=>new Date(b.date)-new Date(a.date)):[];
   itemStatus=iData||{};
+  smsLog=sData||{};
   // Firebase에 저장된 물품 목록 있으면 덮어쓰기
   if(nData){
     Object.keys(ITEM_NUMBERS).forEach(t=>{
@@ -814,21 +996,28 @@ async function init(){
   renderAll();setInterval(tick,1000);tick();
   // 1시간마다 자동 미납 체크
   setInterval(autoUnpaidUmbrella,1000*60*60);
+  // 의약품 초기화
+  await initMedicine();
 }
 
 // 약속우산 대여 후 7일 경과 시 자동으로 미납 처리
 async function autoUnpaidUmbrella(){
   const now=Date.now();
   const SEVEN_DAYS=7*24*60*60*1000;
-  const targets=rentals.filter(r=>r.item==='umbrella'&&r.status==='renting'&&now-new Date(r.date).getTime()>SEVEN_DAYS);
-  if(!targets.length) return;
-  saveSnapshot(`약속우산 자동 미납 처리 (${targets.length}건)`);
-  for(const r of targets){
-    r.status='unpaid';
-    r.note=(r.note?r.note+' / ':'')+'7일 경과 자동 미납 처리';
-    fbPut(`/rentals/${r.id}`,r);
+  let changed=false;
+  for(const r of rentals){
+    if(r.item==='umbrella'&&r.status==='renting'){
+      if(now-new Date(r.date).getTime()>SEVEN_DAYS){
+        r.status='unpaid';
+        r.note=(r.note?r.note+' / ':'')+'7일 경과 자동 미납 처리';
+        fbPut(`/rentals/${r.id}`,r);
+        changed=true;
+      }
+    }
   }
-  toast('약속우산 7일 경과 — 자동 미납 처리되었습니다','inf');
+  if(changed){
+    toast('약속우산 7일 경과 — 자동 미납 처리되었습니다','inf');
+  }
 }
 function renderAll(){updateStats();renderRecent();renderRentals();renderInventory();renderUnpaid();renderBlacklist();}
 
@@ -868,8 +1057,6 @@ function updateStats(){
   const bad=rentalBad+directBad;
   document.getElementById('st-unpaid').textContent=bad;
   document.getElementById('badge-unpaid').textContent=bad;
-  document.getElementById('banner-cnt').textContent=bad;
-  document.getElementById('unpaid-banner').style.display=bad>0?'flex':'none';
   const mu=document.getElementById('mbadge-unpaid');if(mu){mu.textContent=bad;mu.style.display=bad>0?'block':'none';}
   const blCnt=new Set(rentals.filter(r=>BL_STATUS.includes(r.status)).map(r=>`${r.name}_${r.phone}`)).size;
   const bb=document.getElementById('badge-bl'),mb=document.getElementById('mbadge-bl');
@@ -915,9 +1102,12 @@ function renderRecent(){
 function renderRentals(){
   const q=(document.getElementById('s-search').value||'').toLowerCase();
   const fi=document.getElementById('s-item').value,fs=document.getElementById('s-status').value;
+  const fd=document.getElementById('s-day').value;
   let list=[...rentals].sort((a,b)=>new Date(b.date)-new Date(a.date));
   if(q)list=list.filter(r=>r.name.includes(q)||r.phone.includes(q));
-  if(fi)list=list.filter(r=>r.item===fi);if(fs)list=list.filter(r=>r.status===fs);
+  if(fi)list=list.filter(r=>r.item===fi);
+  if(fs)list=list.filter(r=>r.status===fs);
+  if(fd!=='')list=list.filter(r=>r.date&&new Date(r.date).getDay()===parseInt(fd));
   document.getElementById('tbl-rentals').innerHTML=
     list.length?list.map((r,i)=>makeRowIdx(r,i,['idx','name','phone','dept','item','num','date','returnDate','status','actions'])).join(''):emptyRow(10);
 }
@@ -1022,7 +1212,6 @@ async function applyInvCond(){
   if(!sel){toast('상태를 선택해주세요','err');return;}
   const val=sel.dataset.v;
   const note=document.getElementById('f-inv-note').value.trim();
-  saveSnapshot(`물품현황 ${ITEM_LABELS[invType]||invType} ${invNum} → ${val==='available'?'대여가능':sInfo(val).l}`);
   const key=fbKey(invType,invNum);
   if(val==='available'){
     delete itemStatus[key];fbDel(`/itemStatus/${key}`);
@@ -1087,7 +1276,6 @@ function submitRental(){
   if(!name||!phone||!dept||!selItemType||!itemNum){toast('모든 필수 항목을 입력해주세요','err');return;}
   const bl=rentals.find(r=>r.name===name&&r.phone===phone&&BL_STATUS.includes(r.status));
   if(bl){toast(`⛔ ${name}님은 "${sInfo(bl.status).l}" 상태로 대여가 제한됩니다.`,'err');return;}
-  saveSnapshot(`${name} ${ITEM_LABELS[selItemType]} 대여 등록`);
   const id=Date.now();
   const rec={id,name,phone,dept,item:selItemType,itemNum,date:new Date().toISOString(),returnDate:null,status:'renting',note};
   rentals.unshift(rec);
@@ -1118,7 +1306,6 @@ function pickStatus(v){
 }
 function applyStatus(){
   const r=rentals.find(x=>x.id===editId);if(!r)return;
-  saveSnapshot(`${r.name} 상태변경 → ${sInfo(selStatus).l}`);
   r.status=selStatus;
   r.note=document.getElementById('f-status-note').value.trim();
   const key=fbKey(r.item,r.itemNum);
@@ -1139,7 +1326,6 @@ function applyStatus(){
 }
 function quickReturn(id){
   const r=rentals.find(x=>x.id===id);if(!r)return;
-  saveSnapshot(`${r.name} ${ITEM_LABELS[r.item]} 반납`);
   r.status='returned';r.returnDate=new Date().toISOString();
   const key=fbKey(r.item,r.itemNum);
   delete itemStatus[key];fbDel(`/itemStatus/${key}`);
@@ -1148,18 +1334,18 @@ function quickReturn(id){
 }
 function deleteRental(id){
   if(!confirm('이 내역을 삭제하시겠습니까?'))return;
-  const r=rentals.find(x=>x.id===id);
-  saveSnapshot(`${r?r.name+' ':''} 대여 기록 삭제`);
   rentals=rentals.filter(x=>x.id!==id);renderAll();toast('삭제되었습니다','inf');fbDel(`/rentals/${id}`);
 }
 
 // ══ BLACKLIST ══
+function smsKey(name,phone){return `${name}__${phone.replace(/-/g,'')}`;}
+
 function renderBlacklist(){
   const q=(document.getElementById('bl-search')?.value||'').toLowerCase();
   const sf=document.getElementById('bl-filter')?.value||'';
   const map={};
   rentals.filter(r=>BL_STATUS.includes(r.status)).forEach(r=>{
-    const k=`${r.name}__${r.phone}`;
+    const k=smsKey(r.name,r.phone);
     if(!map[k])map[k]={name:r.name,phone:r.phone,dept:r.dept||'',records:[]};
     map[k].records.push(r);
   });
@@ -1169,29 +1355,140 @@ function renderBlacklist(){
   const grid=document.getElementById('bl-grid');
   if(!persons.length){grid.innerHTML=`<div class="empty-state"><div class="ico">🎉</div><p>블랙리스트 대상자가 없습니다</p></div>`;return;}
   grid.innerHTML=persons.map(p=>{
+    const key=smsKey(p.name,p.phone);
+    const logs=getSmsLogs(key).sort((a,b)=>new Date(b.sentAt)-new Date(a.sentAt));
+    const lastSent=logs[0]||null;
+
     const tags=p.records.map(r=>`<span class="sbadge ${sInfo(r.status).cl}" style="font-size:10px">${sInfo(r.status).l} · ${ITEM_LABELS[r.item]||r.item} ${r.itemNum}</span>`).join('');
+
     const hasU=p.records.some(r=>r.status==='unpaid');
     const hasL=p.records.some(r=>r.status==='lost');
     const payBtns=[
       hasU?`<button class="btn btn-orange btn-sm" onclick="blPay('${p.name}','${p.phone}','unpaid')">연체료 납부</button>`:'',
       hasL?`<button class="btn btn-purple btn-sm" onclick="blPay('${p.name}','${p.phone}','lost')">분실비 납부</button>`:''
     ].filter(Boolean).join('');
+
+    // 문자 발송 상태
+    const smsBadge=lastSent
+      ?`<span class="sms-badge sms-sent">✉️ 발송완료</span><span class="sms-last-time">${fmtDate(lastSent.sentAt)}</span>${logs.length>1?`<span style="font-size:10px;color:var(--text-muted)">총 ${logs.length}회</span>`:''}`
+      :`<span class="sms-badge sms-none">✉️ 미발송</span>`;
+
+    // 발송 이력 (최근 3건, 펼치기)
+    const logHtml=logs.slice(0,5).map(l=>`
+      <div class="sms-log-item">
+        <span class="sli-time">${fmtDate(l.sentAt)}</span>
+        ${l.note?`<span class="sli-note">· ${l.note}</span>`:''}
+      </div>`).join('');
+    const logSection=logs.length?`
+      <div style="margin-top:6px">
+        <button class="btn btn-ghost btn-sm" style="font-size:10px;padding:3px 8px" onclick="toggleSmsLog('smslog-${key}')">
+          이력 ${logs.length}건 보기/숨기기
+        </button>
+        <div class="sms-log-wrap" id="smslog-${key}" style="display:none;margin-top:6px">${logHtml}</div>
+      </div>`:'';
+
     return `<div class="bl-card">
-      <div class="bl-avatar">${p.name.charAt(0)}</div>
-      <div class="bl-info">
-        <div class="bl-name">${p.name}</div>
-        <div class="bl-meta">${p.phone} · ${p.dept}</div>
-        <div class="bl-tags">${tags}</div>
+      <div class="bl-card-top">
+        <div class="bl-avatar">${p.name.charAt(0)}</div>
+        <div class="bl-info">
+          <div class="bl-name">${p.name}</div>
+          <div class="bl-meta">${p.phone} · ${p.dept}</div>
+          <div class="bl-tags">${tags}</div>
+        </div>
+        <div class="bl-actions">
+          ${payBtns}
+          <button class="btn btn-ghost btn-sm" onclick="goRentals('${p.name}')">내역 보기</button>
+        </div>
       </div>
-      <div class="bl-actions">
-        ${payBtns}
-        <button class="btn btn-ghost btn-sm" onclick="goRentals('${p.name}')">내역 보기</button>
+      <div class="bl-sms-section">
+        <div class="bl-sms-top">
+          ${smsBadge}
+          <button class="btn btn-primary btn-sm" style="margin-left:auto" onclick="openSmsModal('${p.name}','${p.phone}')">✉️ 문자 발송</button>
+        </div>
+        ${logSection}
       </div>
     </div>`;
   }).join('');
 }
+
+function toggleSmsLog(id){
+  const el=document.getElementById(id);
+  if(el) el.style.display=el.style.display==='none'?'flex':'none';
+}
+
+// 문자 발송 모달 열기
+let _smsName='',_smsPhone='';
+function openSmsModal(name,phone){
+  _smsName=name; _smsPhone=phone;
+  document.getElementById('sms-modal-sub').textContent=`${phone}`;
+  document.getElementById('sms-modal-info').innerHTML=`<strong>${name}</strong>님에게 문자 발송 후 아래 기록을 저장하세요.`;
+  document.getElementById('sms-note-input').value='';
+  renderSmsModalLog();
+  openModal('modal-sms');
+  setTimeout(()=>document.getElementById('sms-note-input').focus(),100);
+}
+
+// Firebase는 배열을 객체로 저장하므로 항상 배열로 변환
+function getSmsLogs(key){
+  const raw=smsLog[key];
+  if(!raw) return [];
+  if(Array.isArray(raw)) return [...raw];
+  return Object.values(raw); // Firebase 객체 → 배열 변환
+}
+
+function renderSmsModalLog(){
+  const key=smsKey(_smsName,_smsPhone);
+  const logs=getSmsLogs(key).sort((a,b)=>new Date(b.sentAt)-new Date(a.sentAt));
+  const sec=document.getElementById('sms-log-section');
+  const items=document.getElementById('sms-log-items');
+  if(logs.length){
+    sec.style.display='block';
+    items.innerHTML=logs.map((l,i)=>`
+      <div class="sms-log-item" style="justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0">
+          <span class="sli-time">${fmtDate(l.sentAt)}</span>
+          ${l.note?`<span class="sli-note">· ${l.note}</span>`:''}
+        </div>
+        <button onclick="deleteSmsLog(${i})"
+          style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:13px;padding:2px 4px;flex-shrink:0;line-height:1;border-radius:4px"
+          title="이 기록 삭제">✕</button>
+      </div>`).join('');
+  }else{
+    sec.style.display='none';
+  }
+}
+
+function deleteSmsLog(idx){
+  if(!confirm('이 발송 기록을 삭제하시겠습니까?')) return;
+  const key=smsKey(_smsName,_smsPhone);
+  const logs=getSmsLogs(key).sort((a,b)=>new Date(b.sentAt)-new Date(a.sentAt));
+  logs.splice(idx,1);
+  if(logs.length===0){
+    delete smsLog[key];
+    fbDel(`/smsLog/${key}`);
+  }else{
+    smsLog[key]=logs;
+    fbPut(`/smsLog/${key}`,logs);
+  }
+  renderSmsModalLog();
+  renderBlacklist();
+  toast('발송 기록이 삭제되었습니다','inf');
+}
+
+function confirmSmsSent(){
+  const note=document.getElementById('sms-note-input').value.trim();
+  const key=smsKey(_smsName,_smsPhone);
+  const logs=getSmsLogs(key);
+  const entry={sentAt:new Date().toISOString(),note};
+  logs.unshift(entry);
+  smsLog[key]=logs;
+  fbPut(`/smsLog/${key}`,logs);
+  document.getElementById('sms-note-input').value='';
+  renderSmsModalLog();
+  renderBlacklist();
+  toast(`✉️ ${_smsName}님 문자 발송 기록 완료!`,'ok');
+}
 async function blPay(name,phone,status){
-  saveSnapshot(`${name} ${status==='unpaid'?'연체료':'분실비'} 납부`);
   const targets=rentals.filter(r=>r.name===name&&r.phone===phone&&r.status===status);
   for(const r of targets){
     r.status='returned';r.returnDate=r.returnDate||new Date().toISOString();
@@ -1252,10 +1549,10 @@ function addItemNum(){
   const input=document.getElementById('manage-new-num');
   const val=input.value.trim();
   if(!val){toast('번호를 입력해주세요','err');return;}
+  // 중복 확인
   if(ITEM_NUMBERS[manageTab].some(n=>String(n)===val)){
     toast(`이미 존재하는 번호입니다: ${val}`,'err');return;
   }
-  saveSnapshot(`물품 추가: ${ITEM_LABELS[manageTab]} ${val}`);
   ITEM_NUMBERS[manageTab].push(val);
   saveItemNumbers();
   input.value='';
@@ -1266,11 +1563,12 @@ function addItemNum(){
 }
 
 function deleteItemNum(numStr){
+  // 대여 기록 있으면 삭제 불가
   const hasRecord=rentals.some(r=>r.item===manageTab&&String(r.itemNum)===numStr);
   if(hasRecord){toast('대여 기록이 있는 물품은 삭제할 수 없습니다','err');return;}
   if(!confirm(`${ITEM_LABELS[manageTab]} ${numStr}를 목록에서 삭제하시겠습니까?`))return;
-  saveSnapshot(`물품 삭제: ${ITEM_LABELS[manageTab]} ${numStr}`);
   ITEM_NUMBERS[manageTab]=ITEM_NUMBERS[manageTab].filter(n=>String(n)!==numStr);
+  // itemStatus에서도 제거
   const key=fbKey(manageTab,numStr);
   if(itemStatus[key]){delete itemStatus[key];fbDel(`/itemStatus/${key}`);}
   saveItemNumbers();
@@ -1325,7 +1623,7 @@ function showPage(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item,.mnav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
-  const L={dashboard:'대시보드',rentals:'대여 현황',inventory:'물품 현황',unpaid:'물품 관리',blacklist:'블랙리스트',stats:'통계'};
+  const L={dashboard:'대시보드',rentals:'대여 현황',inventory:'물품 현황',unpaid:'물품 관리',blacklist:'블랙리스트',stats:'통계',medicine:'의약품 관리'};
   [...document.querySelectorAll('.nav-item')].find(n=>n.textContent.includes(L[id]||''))?.classList.add('active');
   const mn=document.getElementById('mnav-'+id);if(mn)mn.classList.add('active');
   if(id==='rentals')renderRentals();
@@ -1333,6 +1631,7 @@ function showPage(id){
   if(id==='unpaid')renderUnpaid();
   if(id==='blacklist')renderBlacklist();
   if(id==='stats')renderStats();
+  if(id==='medicine'){renderMedicine();renderMedLog();renderMedStats();}
   updateStats();
 }
 function openModal(id){document.getElementById(id).classList.add('open');}
@@ -1344,7 +1643,7 @@ function toast(msg,type='inf'){
   c.appendChild(el);setTimeout(()=>el.remove(),3500);
 }
 function tick(){const e=document.getElementById('clock-time');if(e){const n=new Date();e.textContent=`${p2(n.getHours())}:${p2(n.getMinutes())}:${p2(n.getSeconds())}`; }}
-['modal-rental','modal-status','modal-inv','modal-manage'].forEach(id=>{
+['modal-rental','modal-status','modal-inv','modal-manage','modal-sms'].forEach(id=>{
   document.getElementById(id).addEventListener('click',e=>{if(e.target.id===id)closeModal(id);});
 });
 // ══ STATS ══
@@ -1587,6 +1886,402 @@ function togglePwVis(){
     });
   }
 })();
+
+// ══ 의약품 관리 ══
+const MED_CATEGORIES=['진통제','지사제','소화제','알레르기 완화제','기침 가래 약','제산제','종합감기약','연고','밴드','드레싱 밴드','모기약','소독제','파스'];
+const MED_CAT_UNIT={
+  '진통제':'정','지사제':'정','소화제':'정','알레르기 완화제':'정','기침 가래 약':'정','제산제':'정',
+  '종합감기약':'정','연고':'개','밴드':'개','드레싱 밴드':'개','모기약':'개','소독제':'개','파스':'개'
+};
+const MED_LOW_THRESHOLD={
+  '진통제':5,'지사제':3,'소화제':3,'알레르기 완화제':3,'기침 가래 약':1,'제산제':2,
+  '종합감기약':2,'연고':1,'밴드':10,'드레싱 밴드':2,'모기약':2,'소독제':2,'파스':2
+};
+
+const MED_DEFAULT=[
+  {id:'med_001',cat:'진통제',name:'페인엔펠프로',qty:23},
+  {id:'med_002',cat:'진통제',name:'타이레놀',qty:28},
+  {id:'med_003',cat:'지사제',name:'볼리아린에프',qty:11},
+  {id:'med_004',cat:'소화제',name:'큐지민',qty:14},
+  {id:'med_005',cat:'소화제',name:'속엔롤',qty:5},
+  {id:'med_006',cat:'알레르기 완화제',name:'로리딘',qty:9},
+  {id:'med_007',cat:'알레르기 완화제',name:'페르데',qty:9},
+  {id:'med_008',cat:'기침 가래 약',name:'(미구비)',qty:0},
+  {id:'med_009',cat:'제산제',name:'원로겔',qty:4},
+  {id:'med_010',cat:'종합감기약',name:'판대원(핵강·종합감기약)',qty:3},
+  {id:'med_011',cat:'종합감기약',name:'판대원(초코·콧물&재채기)',qty:0},
+  {id:'med_012',cat:'종합감기약',name:'판대원(파랑·기침&가래)',qty:0},
+  {id:'med_013',cat:'연고',name:'후시딘',qty:1},
+  {id:'med_014',cat:'연고',name:'마데카솔',qty:1},
+  {id:'med_015',cat:'밴드',name:'이쿠이 밴드',qty:60},
+  {id:'med_016',cat:'밴드',name:'맬론 밴드',qty:0},
+  {id:'med_017',cat:'드레싱 밴드',name:'피스',qty:0},
+  {id:'med_018',cat:'모기약',name:'모스방 에이드프로',qty:9},
+  {id:'med_019',cat:'모기약',name:'버블 이카리딘 케어',qty:3},
+  {id:'med_020',cat:'모기약',name:'모스켓',qty:3},
+  {id:'med_021',cat:'소독제',name:'포비돈 (1회용 스틱)',qty:9},
+  {id:'med_022',cat:'소독제',name:'구린솔트에프',qty:1},
+  {id:'med_023',cat:'파스',name:'맨소래담 스프레이',qty:3},
+  {id:'med_024',cat:'파스',name:'신신파프',qty:7}
+];
+
+let medItems=[];   // [{id,cat,name,qty}, ...]
+let medLog=[];     // [{at,cat,name,delta,reason,after}, ...]
+let _medId='';     // 조정 중인 의약품 id
+let _medDeltaTemp=0; // 모달 내 임시 delta
+
+async function initMedicine(){
+  const [mData,lData]=await Promise.all([fbGet('/medicine'),fbGet('/medLog')]);
+  if(mData){
+    medItems=Object.values(mData);
+    // 새 품목 시딩 (Firebase에 없는 품목만 추가)
+    const existIds=new Set(medItems.map(m=>m.id));
+    let added=false;
+    for(const d of MED_DEFAULT){
+      if(!existIds.has(d.id)){medItems.push({...d});fbPut(`/medicine/${d.id}`,{...d});added=true;}
+    }
+  } else {
+    // 최초 시딩
+    medItems=MED_DEFAULT.map(d=>({...d}));
+    const obj={};medItems.forEach(m=>obj[m.id]=m);
+    fbPut('/medicine',obj);
+  }
+  medLog=lData?Object.values(lData).sort((a,b)=>new Date(b.at)-new Date(a.at)):[];
+  buildMedFilters();
+  renderMedicine();
+  renderMedLog();
+  renderMedStats();
+  updateMedBadge();
+}
+
+function buildMedFilters(){
+  const cats=[...new Set(medItems.map(m=>m.cat))];
+  const sel=document.getElementById('med-cat-filter');
+  sel.innerHTML='<option value="">전체 종류</option>'+cats.map(c=>`<option value="${c}">${c}</option>`).join('');
+  const lsel=document.getElementById('med-log-filter');
+  lsel.innerHTML='<option value="">전체</option>'+medItems.map(m=>`<option value="${m.id}">${m.cat} · ${m.name}</option>`).join('');
+}
+
+function renderMedicine(){
+  const cat=document.getElementById('med-cat-filter').value;
+  const list=cat?medItems.filter(m=>m.cat===cat):medItems;
+  const low=MED_LOW_THRESHOLD;
+  document.getElementById('med-grid').innerHTML=list.length?list.map(m=>{
+    const thr=low[m.cat]||2;
+    const st=m.qty===0?'empty':m.qty<=thr?'low':'';
+    const unit=MED_CAT_UNIT[m.cat]||'개';
+    return `<div class="med-card ${st}" onclick="openMedModal('${m.id}')">
+      <div class="med-status-dot ${st}"></div>
+      <div class="med-card-top">
+        <div class="med-card-name">${m.name}</div>
+        <div class="med-cat-badge">${m.cat}</div>
+      </div>
+      <div class="med-qty ${st}">${m.qty}</div>
+      <div class="med-unit">${unit} 남음</div>
+    </div>`;
+  }).join(''):`<div style="padding:30px;text-align:center;color:var(--text-muted);grid-column:1/-1">해당 카테고리 없음</div>`;
+  updateMedBadge();
+}
+
+function updateMedBadge(){
+  const low=MED_LOW_THRESHOLD;
+  const lowItems=medItems.filter(m=>m.qty<=(low[m.cat]||2));
+  const cnt=lowItems.length;
+  // nav badge
+  const b=document.getElementById('badge-med');
+  const mb=document.getElementById('mbadge-med');
+  if(b){b.textContent=cnt;b.style.display=cnt>0?'inline-flex':'none';}
+  if(mb){mb.textContent=cnt;mb.style.display=cnt>0?'block':'none';}
+  const unit=m=>MED_CAT_UNIT[m.cat]||'개';
+  const tagsHtml=lowItems.map(m=>`<span class="med-banner-tag">${m.name} ${m.qty}${unit(m)} 남음</span>`).join('');
+  // 의약품 페이지 배너 (id: med-page-banner)
+  const pb=document.getElementById('med-page-banner');
+  const pbi=document.getElementById('med-page-banner-items');
+  if(pb){
+    if(cnt>0){pb.style.display='flex';if(pbi)pbi.innerHTML=tagsHtml;}
+    else pb.style.display='none';
+  }
+}
+
+function renderMedLog(){
+  const fid=document.getElementById('med-log-filter').value;
+  const list=fid?medLog.filter(l=>l.medId===fid):medLog;
+  const tb=document.getElementById('tbl-med-log');
+  if(!list.length){
+    tb.innerHTML=`<tr><td colspan="6"><div class="empty-state"><div class="ico">📋</div><p>이력 없음</p></div></td></tr>`;
+    return;
+  }
+  tb.innerHTML=list.slice(0,100).map((l,i)=>{
+    const sign=l.delta>=0?'+':'';
+    const cls=l.delta>=0?'plus':'minus';
+    const realIdx=medLog.indexOf(l);
+    return `<tr>
+      <td class="td-mono" style="font-size:10px;white-space:nowrap">${fmtDate(l.at)}</td>
+      <td class="td-name" style="font-size:11px">${l.name}</td>
+      <td class="med-log-change ${cls}">${sign}${l.delta}</td>
+      <td class="td-sub" style="font-size:11px">${l.reason}</td>
+      <td class="td-mono" style="font-weight:700">${l.after}</td>
+      <td><button class="btn btn-danger btn-sm" style="padding:2px 6px;font-size:10px" onclick="deleteMedLog(${realIdx})">✕</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// ── 의약품 사용 통계 ──────────────────────────────────────────
+let _medStatCharts={};
+function _destroyMedCharts(){
+  Object.values(_medStatCharts).forEach(c=>{try{c.destroy();}catch(e){}});
+  _medStatCharts={};
+}
+
+function renderMedStats(){
+  _destroyMedCharts();
+  const period=document.getElementById('med-stat-period')?.value||'30';
+  // 기간 필터: 차감(사용) 이력만
+  const now=Date.now();
+  const ms=period==='all'?Infinity:parseInt(period)*86400000;
+  const usageLogs=medLog.filter(l=>l.delta<0&&(period==='all'||(now-new Date(l.at).getTime())<=ms));
+
+  // ── TOP 8 바 차트 ──
+  const useMap={};
+  usageLogs.forEach(l=>{useMap[l.name]=(useMap[l.name]||0)+Math.abs(l.delta);});
+  const sorted=Object.entries(useMap).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const maxVal=sorted[0]?sorted[0][1]:1;
+  const barColors=['#2d5016','#4a7c2a','#6aad3a','#8fcf56','#b5e07a','#d4eda0','#e8f5c4','#f4fce3'];
+  document.getElementById('med-stat-bars').innerHTML=sorted.length
+    ? sorted.map(([name,cnt],i)=>`
+        <div style="display:flex;align-items:center;gap:7px">
+          <div style="font-size:10px;color:var(--text-muted);width:90px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${name}</div>
+          <div style="flex:1;height:10px;background:var(--surface2);border-radius:20px;overflow:hidden">
+            <div style="height:100%;width:${Math.round(cnt/maxVal*100)}%;background:${barColors[i]||barColors[7]};border-radius:20px;transition:width .6s cubic-bezier(.34,1.56,.64,1)"></div>
+          </div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:var(--accent);min-width:22px;text-align:right">${cnt}</div>
+        </div>`)
+        .join('')
+    : '<div style="font-size:12px;color:var(--text-muted);padding:8px 0">사용 이력 없음</div>';
+
+  // ── 사유별 도넛 ──
+  const reasonMap={};
+  medLog.filter(l=>period==='all'||(now-new Date(l.at).getTime())<=ms)
+    .forEach(l=>{reasonMap[l.reason]=(reasonMap[l.reason]||0)+1;});
+  const reasons=Object.entries(reasonMap).sort((a,b)=>b[1]-a[1]);
+  const donutColors=['#2d5016','#4a7c2a','#f59e0b','#ef4444','#8b5cf6','#06b6d4'];
+  const dCtx=document.getElementById('med-stat-donut')?.getContext('2d');
+  if(dCtx&&reasons.length){
+    _medStatCharts.donut=new Chart(dCtx,{
+      type:'doughnut',
+      data:{
+        labels:reasons.map(r=>r[0]),
+        datasets:[{data:reasons.map(r=>r[1]),backgroundColor:donutColors,borderWidth:0,hoverOffset:4}]
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.raw}건`}}}
+      }
+    });
+  } else if(dCtx){
+    // 빈 상태
+    _medStatCharts.donut=new Chart(dCtx,{
+      type:'doughnut',
+      data:{labels:['없음'],datasets:[{data:[1],backgroundColor:['#e2e0d8'],borderWidth:0}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false}}}
+    });
+  }
+  document.getElementById('med-stat-legend').innerHTML=reasons.length
+    ? reasons.map(([r,cnt],i)=>`
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px">
+          <span style="width:8px;height:8px;border-radius:50%;background:${donutColors[i]||'#ccc'};flex-shrink:0"></span>
+          <span style="color:var(--text-muted)">${r}</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-weight:700;margin-left:auto">${cnt}</span>
+        </div>`).join('')
+    : '<div style="font-size:11px;color:var(--text-muted)">데이터 없음</div>';
+
+  // ── 일별 사용 추이 라인 ──
+  const days=period==='all'?30:Math.min(parseInt(period),30);
+  const dateArr=[];
+  for(let i=days-1;i>=0;i--){
+    const d=new Date();d.setDate(d.getDate()-i);
+    dateArr.push(d.toISOString().slice(0,10));
+  }
+  const lineData=dateArr.map(d=>usageLogs.filter(l=>l.at?.slice(0,10)===d).reduce((s,l)=>s+Math.abs(l.delta),0));
+  const lCtx=document.getElementById('med-stat-line')?.getContext('2d');
+  if(lCtx){
+    _medStatCharts.line=new Chart(lCtx,{
+      type:'line',
+      data:{
+        labels:dateArr.map(d=>{const[,m,dd]=d.split('-');return `${m}/${dd}`;}),
+        datasets:[{
+          data:lineData,
+          borderColor:'#2d5016',backgroundColor:'rgba(45,80,22,.08)',
+          borderWidth:2,pointRadius:2,pointHoverRadius:4,fill:true,tension:.4
+        }]
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.raw}개 사용`}}},
+        scales:{
+          x:{grid:{display:false},ticks:{font:{size:9},maxTicksLimit:10}},
+          y:{beginAtZero:true,ticks:{stepSize:1,font:{size:9}},grid:{color:'#f0efe9'}}
+        }
+      }
+    });
+  }
+}
+
+function deleteMedLog(idx){
+  if(!confirm('이 이력을 삭제하시겠습니까?'))return;
+  const entry=medLog[idx];
+  if(!entry)return;
+  medLog.splice(idx,1);
+  // logId가 있으면 개별 삭제, 없으면 전체 재저장
+  if(entry.logId){
+    fbDel(`/medLog/${entry.logId}`);
+  } else {
+    const obj={};medLog.forEach((l,i)=>{obj['log_r'+i]=l;});
+    fbPut('/medLog',obj);
+  }
+  renderMedLog();
+  toast('이력이 삭제되었습니다','inf');
+}
+
+function openMedModal(id){
+  const m=medItems.find(x=>x.id===id);if(!m)return;
+  _medId=id;_medDeltaTemp=0;
+  const unit=MED_CAT_UNIT[m.cat]||'개';
+  document.getElementById('med-modal-title').textContent=m.name;
+  document.getElementById('med-modal-sub').textContent=m.cat;
+  document.getElementById('med-modal-cur').textContent=m.qty;
+  document.getElementById('med-modal-unit').textContent=unit;
+  document.getElementById('med-direct-qty').value='';
+  document.getElementById('med-reason').value='사용';
+  medReasonChange();
+  updateMedPreview(m,0);
+  openModal('modal-med');
+}
+
+function medReasonChange(){
+  const reason=document.getElementById('med-reason').value;
+  const label=document.getElementById('med-direct-label');
+  const quick=document.getElementById('med-adj-quick');
+  _medDeltaTemp=0;
+  document.getElementById('med-direct-qty').value='';
+  if(reason==='수량 정정'){
+    // 정정: 최종 수량을 직접 입력
+    if(label)label.textContent='정정 후 수량 (최종값 입력)';
+    if(quick)quick.style.display='none';
+  } else if(reason==='구비 추가'||reason==='기타'){
+    if(label)label.textContent='추가 수량';
+    if(quick)quick.style.display='flex';
+    // 빠른 버튼을 증가 모드로
+    _setQuickBtns(true);
+  } else {
+    // 사용, 폐기 → 차감
+    if(label)label.textContent='사용(차감) 수량';
+    if(quick)quick.style.display='flex';
+    _setQuickBtns(false);
+  }
+  const m=medItems.find(x=>x.id===_medId);
+  if(m)updateMedPreview(m,0);
+}
+
+function _setQuickBtns(isAdd){
+  const row=document.getElementById('med-adj-quick');if(!row)return;
+  if(isAdd){
+    row.innerHTML=`
+      <button class="med-adj-btn" onclick="medAdjDelta(-1)">－1</button>
+      <button class="med-adj-btn" onclick="medAdjDelta(+1)">＋1</button>
+      <button class="med-adj-btn" onclick="medAdjDelta(+5)">＋5</button>
+      <button class="med-adj-btn" onclick="medAdjDelta(+10)">＋10</button>`;
+  } else {
+    row.innerHTML=`
+      <button class="med-adj-btn minus" onclick="medAdjDelta(-5)">－5</button>
+      <button class="med-adj-btn minus" onclick="medAdjDelta(-1)">－1</button>
+      <button class="med-adj-btn" onclick="medAdjDelta(+1)">＋1</button>
+      <button class="med-adj-btn" onclick="medAdjDelta(+5)">＋5</button>`;
+  }
+}
+
+function medAdjDelta(d){
+  _medDeltaTemp+=d;
+  const reason=document.getElementById('med-reason').value;
+  const m=medItems.find(x=>x.id===_medId);if(!m)return;
+  // 사용/폐기는 delta가 음수가 돼야 하므로 절댓값 기준 처리
+  if(reason==='사용'||reason==='폐기'){
+    // 입력값이 "몇 개 사용했는지"므로 양수로 유지, 저장 시 음수 처리
+    const cur=parseInt(document.getElementById('med-direct-qty').value||'0')||0;
+    const next=Math.max(0,cur+d);
+    document.getElementById('med-direct-qty').value=next;
+    updateMedPreview(m,-(next));
+  } else {
+    const cur=parseInt(document.getElementById('med-direct-qty').value||'0')||0;
+    const next=Math.max(0,cur+d);
+    document.getElementById('med-direct-qty').value=next;
+    updateMedPreview(m,next);
+  }
+}
+
+function medSetDeltaDirect(val){
+  const n=parseInt(val);if(isNaN(n)||n<0)return;
+  const reason=document.getElementById('med-reason').value;
+  const m=medItems.find(x=>x.id===_medId);if(!m)return;
+  if(reason==='수량 정정'){
+    // 최종 수량 직접 입력
+    updateMedPreview(m,n-m.qty);
+  } else if(reason==='사용'||reason==='폐기'){
+    updateMedPreview(m,-n);
+  } else {
+    updateMedPreview(m,n);
+  }
+}
+
+function updateMedPreview(m,delta){
+  const after=Math.max(0,m.qty+delta);
+  const prev=document.getElementById('med-preview');if(!prev)return;
+  if(delta===0){prev.style.display='none';return;}
+  const sign=delta>=0?'+':'';
+  const color=delta>=0?'#16a34a':'#dc2626';
+  const bg=delta>=0?'#f0fdf4':'#fef2f2';
+  prev.style.display='block';
+  prev.style.background=bg;
+  prev.style.color=color;
+  prev.style.border=`1px solid ${delta>=0?'#bbf7d0':'#fecaca'}`;
+  prev.innerHTML=`${m.qty} <span style="opacity:.5;font-size:11px">현재</span> → <strong style="font-size:15px">${after}</strong> <span style="font-size:11px">(${sign}${delta})</span>`;
+}
+
+function saveMedAdj(){
+  const m=medItems.find(x=>x.id===_medId);if(!m)return;
+  const reason=document.getElementById('med-reason').value;
+  const rawVal=parseInt(document.getElementById('med-direct-qty').value||'0')||0;
+  let delta;
+  if(reason==='수량 정정'){
+    delta=rawVal-m.qty;
+  } else if(reason==='사용'||reason==='폐기'){
+    delta=-rawVal;
+  } else {
+    delta=rawVal;
+  }
+  if(delta===0){toast('변경량이 0입니다. 수량을 입력해주세요','err');return;}
+  const newQty=Math.max(0,m.qty+delta);
+  m.qty=newQty;
+  fbPut(`/medicine/${m.id}`,m);
+  // 이력 저장 (logId를 entry에 포함해서 삭제 시 Firebase key 추적 가능하게)
+  const logId='log_'+Date.now();
+  const logEntry={logId,at:new Date().toISOString(),medId:m.id,cat:m.cat,name:m.name,delta,reason,after:m.qty};
+  medLog.unshift(logEntry);
+  fbPut(`/medLog/${logId}`,logEntry);
+  closeModal('modal-med');
+  renderMedicine();
+  renderMedLog();
+  buildMedFilters();
+  toast(`${m.name} ${delta>=0?'+'+delta:delta} → ${m.qty}${MED_CAT_UNIT[m.cat]||'개'}`,'ok');
+}
+
+function clearMedLog(){
+  if(!confirm('이력을 모두 삭제하시겠습니까?'))return;
+  medLog=[];
+  fbPut('/medLog',{});
+  renderMedLog();
+  toast('이력이 삭제되었습니다','inf');
+}
 
 init();
 </script>
