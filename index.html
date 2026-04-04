@@ -199,12 +199,23 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 .empty-state{padding:46px 20px;text-align:center;color:var(--text-muted);}
 .empty-state .ico{font-size:38px;margin-bottom:11px;opacity:.4;}.empty-state p{font-size:13px;}
 
+/* 페이지네이션 */
+.pg-num{padding:4px 9px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);font-size:12px;font-weight:600;cursor:pointer;font-family:'JetBrains Mono',monospace;color:var(--text-muted);transition:all .15s;}
+.pg-num:hover{border-color:var(--accent);color:var(--accent);}
+.pg-num.active{background:var(--accent);color:white;border-color:var(--accent);}
 /* 물품 목록 관리 */
-.inv-manage-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:6px;padding:14px;max-height:300px;overflow-y:auto;}
-.inv-manage-item{border:1px solid var(--border);border-radius:7px;padding:8px 6px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:space-between;gap:4px;background:white;}
+.inv-manage-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:6px;padding:14px;max-height:320px;overflow-y:auto;}
+.inv-manage-item{border:1px solid var(--border);border-radius:7px;padding:8px 6px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:space-between;gap:4px;background:white;transition:all .15s;}
 .inv-manage-item .imn{flex:1;text-align:left;}
 .inv-manage-item .del-btn{width:18px;height:18px;border-radius:50%;background:#fee2e2;color:#dc2626;border:none;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;line-height:1;transition:all .15s;}
 .inv-manage-item .del-btn:hover{background:#fecaca;}
+/* 드래그 모드 */
+.inv-manage-item.drag-mode{cursor:grab;border-color:var(--accent);background:#f0fdf4;}
+.inv-manage-item.drag-mode:active{cursor:grabbing;}
+.inv-manage-item.dragging{opacity:.35;border:2px dashed var(--accent);}
+.inv-manage-item.drop-before{border-left:3px solid var(--accent);box-shadow:-2px 0 0 0 var(--accent);}
+.inv-manage-item.drop-after{border-right:3px solid var(--accent);box-shadow:2px 0 0 0 var(--accent);}
+.drag-mode-banner{display:none;background:#e8f0e0;border:1px solid var(--accent);border-radius:7px;padding:8px 12px;font-size:12px;color:var(--accent);font-weight:600;margin-bottom:10px;text-align:center;}
 .inv-add-row{display:flex;gap:8px;align-items:center;padding:0 14px 14px;}
 .inv-add-row input{flex:1;}
 .toast-wrap{position:fixed;bottom:22px;right:22px;z-index:9999;display:flex;flex-direction:column;gap:6px;}
@@ -385,11 +396,12 @@ tbody td{padding:10px 13px;vertical-align:middle;}
     <div class="nav-item" onclick="showPage('blacklist')">🚫 블랙리스트 <span class="nav-badge" id="badge-bl" style="display:none">0</span></div>
     <div class="nav-item" onclick="showPage('stats')">📈 통계</div>
     <div class="nav-item" onclick="showPage('medicine')">💊 의약품 관리 <span class="nav-badge" id="badge-med" style="display:none">0</span></div>
-    <div class="nav-item" onclick="openRentalModal()">＋ 대여 등록</div>
+    <div class="nav-item" id="nav-rental-btn" onclick="openRentalModal()">＋ 대여 등록</div>
   </nav>
   <div class="sidebar-clock">
     <span id="sync-dot" style="width:6px;height:6px;border-radius:50%;background:#9ca3af;flex-shrink:0;transition:background .5s"></span>
     <span id="clock-time">--:--:--</span>
+    <span id="offline-label" style="display:none;margin-left:auto;font-size:10px;background:#dc2626;color:white;padding:1px 6px;border-radius:10px;font-weight:700">오프라인</span>
   </div>
   <div style="padding:0 10px 12px;display:flex;gap:6px">
     <button id="undo-btn" onclick="undoAction()"
@@ -443,18 +455,22 @@ tbody td{padding:10px 13px;vertical-align:middle;}
     <div class="section-header">
       <div class="section-title">📋 전체 내역</div>
       <div class="section-actions">
-        <div class="search-wrap">🔍<input type="text" id="s-search" placeholder="이름, 연락처 검색" oninput="renderRentals()"></div>
-        <select class="flt" id="s-item" onchange="renderRentals()">
+        <div class="search-wrap">🔍<input type="text" id="s-search" placeholder="이름, 연락처 검색" oninput="renderRentals(true)"></div>
+        <select class="flt" id="s-item" onchange="renderRentals(true)">
           <option value="">전체 물품</option>
           <option value="umbrella">약속우산</option><option value="charger">충전기</option>
           <option value="calculator">공학용 계산기</option><option value="multitap">멀티탭</option><option value="heatpack">찜질팩</option>
         </select>
-        <select class="flt" id="s-status" onchange="renderRentals()">
+        <select class="flt" id="s-status" onchange="renderRentals(true)">
+          <option value="active" selected>반납완료 제외</option>
           <option value="">전체 상태</option>
-          <option value="renting">대여중</option><option value="returned">반납완료</option>
-          <option value="unpaid">미납</option><option value="broken">고장</option><option value="lost">분실</option>
+          <option value="renting">대여중</option>
+          <option value="returned">반납완료</option>
+          <option value="unpaid">미납</option>
+          <option value="broken">고장</option>
+          <option value="lost">분실</option>
         </select>
-        <select class="flt" id="s-day" onchange="renderRentals()">
+        <select class="flt" id="s-day" onchange="renderRentals(true)">
           <option value="">전체 요일</option>
           <option value="0">일요일</option><option value="1">월요일</option><option value="2">화요일</option>
           <option value="3">수요일</option><option value="4">목요일</option><option value="5">금요일</option><option value="6">토요일</option>
@@ -466,6 +482,15 @@ tbody td{padding:10px 13px;vertical-align:middle;}
       <thead><tr><th>#</th><th>이름</th><th>연락처</th><th>학부</th><th>물품</th><th>번호</th><th>대여일시</th><th>반납일시</th><th>상태</th><th>처리</th></tr></thead>
       <tbody id="tbl-rentals"></tbody>
     </table></div>
+    <!-- 페이지네이션 -->
+    <div id="rentals-pagination" style="display:none;padding:12px 18px;border-top:1px solid var(--border);display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+      <span id="rentals-page-info" style="font-size:12px;color:var(--text-muted);margin-right:4px"></span>
+      <button class="btn btn-ghost btn-sm" id="pg-first" onclick="goPage(1)">«</button>
+      <button class="btn btn-ghost btn-sm" id="pg-prev" onclick="goPage(currentPage-1)">‹</button>
+      <div id="pg-nums" style="display:flex;gap:4px"></div>
+      <button class="btn btn-ghost btn-sm" id="pg-next" onclick="goPage(currentPage+1)">›</button>
+      <button class="btn btn-ghost btn-sm" id="pg-last" onclick="goPage(totalPages)">»</button>
+    </div>
   </div>
 </div>
 
@@ -580,6 +605,7 @@ tbody td{padding:10px 13px;vertical-align:middle;}
         <select class="flt" id="med-cat-filter" onchange="renderMedicine()">
           <option value="" id="med-cat-all">전체 종류</option>
         </select>
+        <button class="btn btn-ghost btn-sm" onclick="openMedManageModal()">⚙️ 품목 관리</button>
       </div>
     </div>
     <div class="med-grid" id="med-grid"></div>
@@ -720,7 +746,11 @@ tbody td{padding:10px 13px;vertical-align:middle;}
     <!-- 물품 종류 탭 -->
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px" id="manage-tabs"></div>
     <!-- 현재 목록 -->
-    <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);font-family:'JetBrains Mono',monospace;margin-bottom:8px">현재 목록 <span id="manage-count" style="color:var(--accent)"></span></div>
+    <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);font-family:'JetBrains Mono',monospace;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
+      <span>현재 목록 <span id="manage-count" style="color:var(--accent)"></span></span>
+      <button id="drag-mode-btn" class="btn btn-ghost btn-sm" onclick="toggleDragMode()" style="font-size:11px">⇅ 순서 변경</button>
+    </div>
+    <div class="drag-mode-banner" id="drag-mode-banner">✋ 드래그로 순서를 바꾸세요 — 완료 후 "순서 변경 완료" 클릭</div>
     <div class="inv-manage-grid" id="manage-list"></div>
     <!-- 추가 입력 -->
     <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:14px">
@@ -733,6 +763,53 @@ tbody td{padding:10px 13px;vertical-align:middle;}
   </div>
   <div class="modal-footer">
     <button class="btn btn-ghost" onclick="closeModal('modal-manage')">닫기</button>
+  </div>
+</div>
+</div>
+
+<!-- 의약품 품목 관리 모달 -->
+<div class="modal-overlay" id="modal-med-manage">
+<div class="modal" style="width:520px">
+  <div class="modal-header">
+    <div>
+      <div class="modal-title">⚙️ 의약품 품목 관리</div>
+      <div class="modal-sub">품목 추가 · 삭제 (사용 이력이 있는 품목은 삭제 불가)</div>
+    </div>
+    <button class="modal-close" onclick="closeModal('modal-med-manage')">✕</button>
+  </div>
+  <div class="modal-body" style="padding:16px 20px">
+    <!-- 현재 품목 목록 -->
+    <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);font-family:'JetBrains Mono',monospace;margin-bottom:8px">
+      현재 품목 <span id="med-manage-count" style="color:var(--accent)"></span>
+    </div>
+    <div id="med-manage-list" style="display:flex;flex-direction:column;gap:4px;max-height:280px;overflow-y:auto;margin-bottom:14px"></div>
+    <!-- 새 품목 추가 -->
+    <div style="border-top:1px solid var(--border);padding-top:14px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);font-family:'JetBrains Mono',monospace;margin-bottom:10px">새 품목 추가</div>
+      <div class="form-grid">
+        <div class="fg">
+          <label>종류 *</label>
+          <input class="fi" id="med-add-cat" placeholder="예: 진통제, 소화제" list="med-cat-datalist">
+          <datalist id="med-cat-datalist"></datalist>
+        </div>
+        <div class="fg">
+          <label>품명 *</label>
+          <input class="fi" id="med-add-name" placeholder="예: 타이레놀">
+        </div>
+        <div class="fg">
+          <label>초기 수량</label>
+          <input class="fi" id="med-add-qty" type="number" min="0" value="0" placeholder="0">
+        </div>
+        <div class="fg">
+          <label>단위</label>
+          <input class="fi" id="med-add-unit" placeholder="예: 정, 개, 매" value="정">
+        </div>
+      </div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:10px" onclick="submitMedAdd()">＋ 품목 추가</button>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" onclick="closeModal('modal-med-manage')">닫기</button>
   </div>
 </div>
 </div>
@@ -810,7 +887,11 @@ tbody td{padding:10px 13px;vertical-align:middle;}
     </div>
     <!-- 결과 미리보기 -->
     <div id="med-preview" style="margin-top:10px;padding:9px 13px;border-radius:7px;font-size:13px;text-align:center;display:none;"></div>
-  </div>
+    <!-- 메모 -->
+    <div class="fg" style="margin-top:12px">
+      <label>메모 <span style="font-weight:400;opacity:.6">(선택)</span></label>
+      <input class="fi" id="med-memo" placeholder="메모 (선택)">
+    </div>
   <div class="modal-footer">
     <button class="btn btn-ghost" onclick="closeModal('modal-med')">취소</button>
     <button class="btn btn-primary" onclick="saveMedAdj()">💾 저장</button>
@@ -878,7 +959,9 @@ function saveSnapshot(label){
   undoStack.push({label,
     rentals:JSON.parse(JSON.stringify(rentals)),
     itemStatus:JSON.parse(JSON.stringify(itemStatus)),
-    ITEM_NUMBERS:JSON.parse(JSON.stringify(ITEM_NUMBERS))
+    ITEM_NUMBERS:JSON.parse(JSON.stringify(ITEM_NUMBERS)),
+    medItems:JSON.parse(JSON.stringify(medItems)),
+    medLog:JSON.parse(JSON.stringify(medLog))
   });
   if(undoStack.length>UNDO_LIMIT) undoStack.shift();
   redoStack=[];
@@ -888,7 +971,9 @@ function captureNow(label){
   return {label,
     rentals:JSON.parse(JSON.stringify(rentals)),
     itemStatus:JSON.parse(JSON.stringify(itemStatus)),
-    ITEM_NUMBERS:JSON.parse(JSON.stringify(ITEM_NUMBERS))
+    ITEM_NUMBERS:JSON.parse(JSON.stringify(ITEM_NUMBERS)),
+    medItems:JSON.parse(JSON.stringify(medItems)),
+    medLog:JSON.parse(JSON.stringify(medLog))
   };
 }
 async function undoAction(){
@@ -905,17 +990,26 @@ async function redoAction(){
 }
 async function applySnapshot(snap,prefix){
   rentals=snap.rentals; itemStatus=snap.itemStatus; ITEM_NUMBERS=snap.ITEM_NUMBERS;
+  medItems=snap.medItems||medItems; medLog=snap.medLog||medLog;
   setHistoryLoading(true);
   try{
     const ro={};rentals.forEach(r=>{ro[r.id]=r;});
-    await fetch(`${FB}/rentals.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(ro)});
-    await fetch(`${FB}/itemStatus.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(itemStatus)});
-    await fetch(`${FB}/itemNumbers.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(ITEM_NUMBERS)});
+    const mo={};medItems.forEach(m=>{mo[m.id]=m;});
+    const lo={};medLog.forEach(l=>{if(l.logId)lo[l.logId]=l;});
+    await Promise.all([
+      fetch(`${FB}/rentals.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(ro)}),
+      fetch(`${FB}/itemStatus.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(itemStatus)}),
+      fetch(`${FB}/itemNumbers.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(ITEM_NUMBERS)}),
+      fetch(`${FB}/medicine.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(mo)}),
+      fetch(`${FB}/medLog.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(lo)})
+    ]);
     dot(true);
   }catch(e){dot(false);toast('동기화 실패','err');}
   setHistoryLoading(false);
   updateHistoryBtns();
   renderAll();
+  // 의약품 화면도 갱신
+  buildMedFilters();renderMedicine();renderMedLog();updateMedBadge();
   toast(`${prefix} "${snap.label}" 완료`,'ok');
 }
 function updateHistoryBtns(){
@@ -961,8 +1055,40 @@ function fbDel(path){fetch(`${FB}${path}.json`,{method:'DELETE'}).then(()=>dot(t
 function dot(ok){
   const el=document.getElementById('sync-dot');if(!el)return;
   el.style.background=ok?'#16a34a':'#dc2626';
-  setTimeout(()=>el.style.background='#9ca3af',2000);
+  setTimeout(()=>el.style.background=navigator.onLine?'#9ca3af':'#dc2626',2000);
 }
+
+function updateOnlineStatus(){
+  const online=navigator.onLine;
+  const label=document.getElementById('offline-label');
+  const dot=document.getElementById('sync-dot');
+  const rentalBtn=document.getElementById('nav-rental-btn');
+  const fabBtn=document.querySelector('.fab');
+  if(label) label.style.display=online?'none':'inline-block';
+  if(dot) dot.style.background=online?'#9ca3af':'#dc2626';
+  // 대여 등록 버튼 비활성화/활성화
+  if(rentalBtn){
+    rentalBtn.style.opacity=online?'1':'0.4';
+    rentalBtn.style.pointerEvents=online?'auto':'none';
+    rentalBtn.title=online?'':'오프라인 상태에서는 대여 등록이 불가합니다';
+  }
+  if(fabBtn){
+    fabBtn.style.opacity=online?'1':'0.4';
+    fabBtn.style.pointerEvents=online?'auto':'none';
+  }
+}
+
+function isOnline(){
+  if(!navigator.onLine){
+    toast('오프라인 상태입니다. 인터넷 연결을 확인해주세요.','err');
+    return false;
+  }
+  return true;
+}
+
+// 온라인/오프라인 이벤트 감지
+window.addEventListener('online', ()=>{updateOnlineStatus();toast('인터넷에 연결되었습니다.','ok');});
+window.addEventListener('offline',()=>{updateOnlineStatus();toast('인터넷 연결이 끊겼습니다. 대여 등록이 제한됩니다.','err');});
 
 // ══ STATE ══
 let rentals=[];
@@ -994,6 +1120,7 @@ async function init(){
   // 우산 7일 자동 미납 처리
   await autoUnpaidUmbrella();
   renderAll();setInterval(tick,1000);tick();
+  updateOnlineStatus();
   // 1시간마다 자동 미납 체크
   setInterval(autoUnpaidUmbrella,1000*60*60);
   // 의약품 초기화
@@ -1004,20 +1131,15 @@ async function init(){
 async function autoUnpaidUmbrella(){
   const now=Date.now();
   const SEVEN_DAYS=7*24*60*60*1000;
-  let changed=false;
-  for(const r of rentals){
-    if(r.item==='umbrella'&&r.status==='renting'){
-      if(now-new Date(r.date).getTime()>SEVEN_DAYS){
-        r.status='unpaid';
-        r.note=(r.note?r.note+' / ':'')+'7일 경과 자동 미납 처리';
-        fbPut(`/rentals/${r.id}`,r);
-        changed=true;
-      }
-    }
+  const targets=rentals.filter(r=>r.item==='umbrella'&&r.status==='renting'&&now-new Date(r.date).getTime()>SEVEN_DAYS);
+  if(!targets.length) return;
+  saveSnapshot(`약속우산 자동 미납 처리 (${targets.length}건)`);
+  for(const r of targets){
+    r.status='unpaid';
+    r.note=(r.note?r.note+' / ':'')+'7일 경과 자동 미납 처리';
+    fbPut(`/rentals/${r.id}`,r);
   }
-  if(changed){
-    toast('약속우산 7일 경과 — 자동 미납 처리되었습니다','inf');
-  }
+  toast('약속우산 7일 경과 — 자동 미납 처리되었습니다','inf');
 }
 function renderAll(){updateStats();renderRecent();renderRentals();renderInventory();renderUnpaid();renderBlacklist();}
 
@@ -1099,17 +1221,56 @@ function renderRecent(){
   document.getElementById('tbl-recent').innerHTML=
     list.length?list.map(r=>makeRow(r,['name','phone','dept','item','num','date','status','actions'])).join(''):emptyRow(8);
 }
-function renderRentals(){
+const PAGE_SIZE=20;
+let currentPage=1;
+let totalPages=1;
+
+function renderRentals(resetPage=false){
+  if(resetPage) currentPage=1;
   const q=(document.getElementById('s-search').value||'').toLowerCase();
   const fi=document.getElementById('s-item').value,fs=document.getElementById('s-status').value;
   const fd=document.getElementById('s-day').value;
   let list=[...rentals].sort((a,b)=>new Date(b.date)-new Date(a.date));
   if(q)list=list.filter(r=>r.name.includes(q)||r.phone.includes(q));
   if(fi)list=list.filter(r=>r.item===fi);
-  if(fs)list=list.filter(r=>r.status===fs);
+  if(fs==='active')list=list.filter(r=>r.status!=='returned');
+  else if(fs)list=list.filter(r=>r.status===fs);
   if(fd!=='')list=list.filter(r=>r.date&&new Date(r.date).getDay()===parseInt(fd));
+
+  totalPages=Math.max(1,Math.ceil(list.length/PAGE_SIZE));
+  if(currentPage>totalPages) currentPage=totalPages;
+  const start=(currentPage-1)*PAGE_SIZE;
+  const paged=list.slice(start,start+PAGE_SIZE);
+
   document.getElementById('tbl-rentals').innerHTML=
-    list.length?list.map((r,i)=>makeRowIdx(r,i,['idx','name','phone','dept','item','num','date','returnDate','status','actions'])).join(''):emptyRow(10);
+    paged.length?paged.map((r,i)=>makeRowIdx(r,start+i,['idx','name','phone','dept','item','num','date','returnDate','status','actions'])).join(''):emptyRow(10,'해당 조건의 대여 내역이 없습니다');
+
+  // 페이지네이션 UI
+  const pg=document.getElementById('rentals-pagination');
+  const info=document.getElementById('rentals-page-info');
+  const nums=document.getElementById('pg-nums');
+  if(!pg) return;
+  if(totalPages<=1){pg.style.display='none';return;}
+  pg.style.display='flex';
+  info.textContent=`${list.length}건 중 ${start+1}–${Math.min(start+PAGE_SIZE,list.length)}`;
+  // 페이지 번호 버튼 (최대 5개)
+  const range=[];
+  let s=Math.max(1,currentPage-2),e=Math.min(totalPages,s+4);
+  if(e-s<4) s=Math.max(1,e-4);
+  for(let i=s;i<=e;i++) range.push(i);
+  nums.innerHTML=range.map(n=>`<button class="pg-num${n===currentPage?' active':''}" onclick="goPage(${n})">${n}</button>`).join('');
+  document.getElementById('pg-first').disabled=currentPage===1;
+  document.getElementById('pg-prev').disabled=currentPage===1;
+  document.getElementById('pg-next').disabled=currentPage===totalPages;
+  document.getElementById('pg-last').disabled=currentPage===totalPages;
+}
+
+function goPage(p){
+  if(p<1||p>totalPages) return;
+  currentPage=p;
+  renderRentals();
+  // 테이블 상단으로 스크롤
+  document.getElementById('tbl-rentals')?.closest('.tbl-wrap')?.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 function renderUnpaid(){
   // 섹션 1: 대여 기록 기반 (사람 정보 있음)
@@ -1210,8 +1371,10 @@ function pickCond(v){
 async function applyInvCond(){
   const sel=document.querySelector('#inv-cond-opts .cond-opt[class*="sel-"]');
   if(!sel){toast('상태를 선택해주세요','err');return;}
+  if(!isOnline()) return;
   const val=sel.dataset.v;
   const note=document.getElementById('f-inv-note').value.trim();
+  saveSnapshot(`물품현황 ${ITEM_LABELS[invType]||invType} ${invNum} → ${val==='available'?'대여가능':sInfo(val).l}`);
   const key=fbKey(invType,invNum);
   if(val==='available'){
     delete itemStatus[key];fbDel(`/itemStatus/${key}`);
@@ -1276,6 +1439,8 @@ function submitRental(){
   if(!name||!phone||!dept||!selItemType||!itemNum){toast('모든 필수 항목을 입력해주세요','err');return;}
   const bl=rentals.find(r=>r.name===name&&r.phone===phone&&BL_STATUS.includes(r.status));
   if(bl){toast(`⛔ ${name}님은 "${sInfo(bl.status).l}" 상태로 대여가 제한됩니다.`,'err');return;}
+  if(!isOnline()) return;
+  saveSnapshot(`${name} ${ITEM_LABELS[selItemType]} 대여 등록`);
   const id=Date.now();
   const rec={id,name,phone,dept,item:selItemType,itemNum,date:new Date().toISOString(),returnDate:null,status:'renting',note};
   rentals.unshift(rec);
@@ -1306,6 +1471,8 @@ function pickStatus(v){
 }
 function applyStatus(){
   const r=rentals.find(x=>x.id===editId);if(!r)return;
+  if(!isOnline()) return;
+  saveSnapshot(`${r.name} 상태변경 → ${sInfo(selStatus).l}`);
   r.status=selStatus;
   r.note=document.getElementById('f-status-note').value.trim();
   const key=fbKey(r.item,r.itemNum);
@@ -1326,6 +1493,8 @@ function applyStatus(){
 }
 function quickReturn(id){
   const r=rentals.find(x=>x.id===id);if(!r)return;
+  if(!isOnline()) return;
+  saveSnapshot(`${r.name} ${ITEM_LABELS[r.item]} 반납`);
   r.status='returned';r.returnDate=new Date().toISOString();
   const key=fbKey(r.item,r.itemNum);
   delete itemStatus[key];fbDel(`/itemStatus/${key}`);
@@ -1334,6 +1503,9 @@ function quickReturn(id){
 }
 function deleteRental(id){
   if(!confirm('이 내역을 삭제하시겠습니까?'))return;
+  if(!isOnline()) return;
+  const r=rentals.find(x=>x.id===id);
+  saveSnapshot(`${r?r.name+' ':''} 대여 기록 삭제`);
   rentals=rentals.filter(x=>x.id!==id);renderAll();toast('삭제되었습니다','inf');fbDel(`/rentals/${id}`);
 }
 
@@ -1375,9 +1547,12 @@ function renderBlacklist(){
 
     // 발송 이력 (최근 3건, 펼치기)
     const logHtml=logs.slice(0,5).map(l=>`
-      <div class="sms-log-item">
-        <span class="sli-time">${fmtDate(l.sentAt)}</span>
-        ${l.note?`<span class="sli-note">· ${l.note}</span>`:''}
+      <div class="sms-log-item" style="flex-direction:column;gap:3px;align-items:stretch">
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="sli-time">${fmtDate(l.sentAt)}</span>
+          ${l.note?`<span class="sli-note">· ${l.note}</span>`:''}
+        </div>
+        ${l.reply?`<div style="font-size:10px;color:var(--accent);padding-left:2px">📝 ${l.reply}</div>`:''}
       </div>`).join('');
     const logSection=logs.length?`
       <div style="margin-top:6px">
@@ -1444,18 +1619,67 @@ function renderSmsModalLog(){
   if(logs.length){
     sec.style.display='block';
     items.innerHTML=logs.map((l,i)=>`
-      <div class="sms-log-item" style="justify-content:space-between">
-        <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0">
+      <div class="sms-log-item" style="flex-direction:column;gap:5px;align-items:stretch">
+        <div style="display:flex;align-items:center;gap:6px">
           <span class="sli-time">${fmtDate(l.sentAt)}</span>
           ${l.note?`<span class="sli-note">· ${l.note}</span>`:''}
+          <button onclick="deleteSmsLog(${i})"
+            style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:12px;padding:2px 4px;line-height:1;border-radius:4px;margin-left:auto"
+            title="삭제">✕</button>
         </div>
-        <button onclick="deleteSmsLog(${i})"
-          style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:13px;padding:2px 4px;flex-shrink:0;line-height:1;border-radius:4px"
-          title="이 기록 삭제">✕</button>
+        <!-- 메모 -->
+        ${l.reply
+          ?`<div style="display:flex;align-items:center;gap:6px;background:white;border-radius:5px;padding:5px 8px;border:1px solid var(--border)">
+              <span style="font-size:10px;color:var(--accent);font-weight:700;flex-shrink:0">📝 메모</span>
+              <span id="sms-reply-view-${i}" style="font-size:11px;color:var(--text);flex:1">${l.reply}</span>
+              <input id="sms-reply-input-${i}" class="fi" style="display:none;flex:1;padding:3px 7px;font-size:11px" value="${l.reply}"
+                onkeydown="if(event.key==='Enter')saveSmsReply(${i});if(event.key==='Escape')cancelSmsReply(${i})">
+              <button id="sms-reply-edit-${i}" onclick="startSmsReplyEdit(${i})"
+                style="background:none;border:none;cursor:pointer;font-size:11px;color:var(--text-muted);padding:1px 3px;flex-shrink:0">✏️</button>
+              <button id="sms-reply-save-${i}" onclick="saveSmsReply(${i})"
+                style="display:none;background:var(--accent);color:white;border:none;border-radius:4px;font-size:10px;padding:2px 7px;cursor:pointer;flex-shrink:0">저장</button>
+            </div>`
+          :`<div style="display:flex;gap:6px;align-items:center">
+              <input id="sms-reply-input-${i}" class="fi" placeholder="메모 추가..." style="flex:1;padding:4px 8px;font-size:11px"
+                onkeydown="if(event.key==='Enter')saveSmsReply(${i})">
+              <button onclick="saveSmsReply(${i})"
+                style="background:var(--accent);color:white;border:none;border-radius:5px;font-size:11px;padding:4px 9px;cursor:pointer;white-space:nowrap;font-family:'Noto Sans KR',sans-serif;font-weight:600">추가</button>
+            </div>`
+        }
       </div>`).join('');
   }else{
     sec.style.display='none';
   }
+}
+
+function startSmsReplyEdit(i){
+  document.getElementById(`sms-reply-view-${i}`).style.display='none';
+  document.getElementById(`sms-reply-input-${i}`).style.display='block';
+  document.getElementById(`sms-reply-edit-${i}`).style.display='none';
+  document.getElementById(`sms-reply-save-${i}`).style.display='block';
+  setTimeout(()=>document.getElementById(`sms-reply-input-${i}`)?.focus(),50);
+}
+function cancelSmsReply(i){
+  const key=smsKey(_smsName,_smsPhone);
+  const logs=getSmsLogs(key).sort((a,b)=>new Date(b.sentAt)-new Date(a.sentAt));
+  const orig=logs[i]?.reply||'';
+  document.getElementById(`sms-reply-input-${i}`).value=orig;
+  document.getElementById(`sms-reply-view-${i}`).style.display='';
+  document.getElementById(`sms-reply-input-${i}`).style.display='none';
+  document.getElementById(`sms-reply-edit-${i}`).style.display='';
+  document.getElementById(`sms-reply-save-${i}`).style.display='none';
+}
+function saveSmsReply(i){
+  const key=smsKey(_smsName,_smsPhone);
+  const logs=getSmsLogs(key).sort((a,b)=>new Date(b.sentAt)-new Date(a.sentAt));
+  const reply=document.getElementById(`sms-reply-input-${i}`)?.value.trim();
+  if(!reply) return;
+  logs[i].reply=reply;
+  smsLog[key]=logs;
+  fbPut(`/smsLog/${key}`,logs);
+  closeModal('modal-sms');
+  renderBlacklist();
+  toast('메모 저장 완료','ok');
 }
 
 function deleteSmsLog(idx){
@@ -1489,7 +1713,12 @@ function confirmSmsSent(){
   toast(`✉️ ${_smsName}님 문자 발송 기록 완료!`,'ok');
 }
 async function blPay(name,phone,status){
+  if(!isOnline()) return;
+  const label=status==='unpaid'?'연체료':'분실비';
   const targets=rentals.filter(r=>r.name===name&&r.phone===phone&&r.status===status);
+  const items=targets.map(r=>`${ITEM_LABELS[r.item]} ${r.itemNum}`).join(', ');
+  if(!confirm(`${name}님의 ${label} 납부를 처리하시겠습니까?\n\n대상 물품: ${items}\n\n납부 확인 후 블랙리스트에서 자동 해제됩니다.`)) return;
+  saveSnapshot(`${name} ${label} 납부`);
   for(const r of targets){
     r.status='returned';r.returnDate=r.returnDate||new Date().toISOString();
     const key=fbKey(r.item,r.itemNum);
@@ -1497,7 +1726,7 @@ async function blPay(name,phone,status){
     fbPut(`/rentals/${r.id}`,r);
   }
   renderAll();
-  toast(`${name}님 ${status==='unpaid'?'연체료':'분실비'} 납부 → 블랙리스트 해제!`,'ok');
+  toast(`${name}님 ${label} 납부 → 블랙리스트 해제!`,'ok');
 }
 function goRentals(name){showPage('rentals');document.getElementById('s-search').value=name;renderRentals();}
 
@@ -1520,29 +1749,125 @@ function renderManageTabs(){
 
 function switchManageTab(t){
   manageTab=t;
+  _dragMode=false;
+  const btn=document.getElementById('drag-mode-btn');
+  const banner=document.getElementById('drag-mode-banner');
+  if(btn){btn.textContent='⇅ 순서 변경';btn.style.background='';btn.style.color='';btn.style.borderColor='';}
+  if(banner) banner.style.display='none';
   renderManageTabs();
   renderManageList();
   document.getElementById('manage-new-num').value='';
 }
 
+let _dragMode=false;
+let _dragSrcIdx=null;
+
+function toggleDragMode(){
+  _dragMode=!_dragMode;
+  const btn=document.getElementById('drag-mode-btn');
+  const banner=document.getElementById('drag-mode-banner');
+  if(_dragMode){
+    btn.textContent='✅ 순서 변경 완료';
+    btn.style.background='var(--accent)';btn.style.color='white';btn.style.borderColor='var(--accent)';
+    if(banner) banner.style.display='block';
+  }else{
+    btn.textContent='⇅ 순서 변경';
+    btn.style.background='';btn.style.color='';btn.style.borderColor='';
+    if(banner) banner.style.display='none';
+    saveSnapshot(`${ITEM_LABELS[manageTab]} 순서 변경`);
+    saveItemNumbers();
+    renderInventory();
+    toast('순서가 저장되었습니다','ok');
+  }
+  renderManageList();
+}
+
 function renderManageList(){
   const nums=ITEM_NUMBERS[manageTab];
   document.getElementById('manage-count').textContent=`(${nums.length}개)`;
-  // 대여 기록 있는 번호 (삭제 불가)
   const hasRecord=new Set(rentals.filter(r=>r.item===manageTab).map(r=>String(r.itemNum)));
-  document.getElementById('manage-list').innerHTML=nums.length
-    ? nums.map(n=>{
-        const key=String(n);
-        const locked=hasRecord.has(key);
-        const lockIcon=locked?'<span title="대여 기록 있어 삭제 불가" style="font-size:10px;opacity:.5">🔒</span>':'';
-        const delBtn=locked
-          ?`<span style="width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;opacity:.3;font-size:11px">✕</span>`
-          :`<button class="del-btn" onclick="deleteItemNum('${key}')" title="삭제">✕</button>`;
-        return `<div class="inv-manage-item">
-          <span class="imn">${n}</span>${lockIcon}${delBtn}
-        </div>`;
-      }).join('')
-    : '<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:13px">등록된 물품 없음</div>';
+
+  if(!nums.length){
+    document.getElementById('manage-list').innerHTML='<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:13px">등록된 물품 없음</div>';
+    return;
+  }
+
+  document.getElementById('manage-list').innerHTML=nums.map((n,i)=>{
+    const key=String(n);
+    const locked=hasRecord.has(key);
+    if(_dragMode){
+      // 드래그 모드: 삭제 버튼 숨기고 드래그 핸들 표시
+      return `<div class="inv-manage-item drag-mode" draggable="true"
+        data-idx="${i}"
+        ondragstart="onDragStart(event,${i})"
+        ondragover="onDragOver(event)"
+        ondrop="onDrop(event,${i})"
+        ondragend="onDragEnd(event)"
+        ondragleave="onDragLeave(event)">
+        <span style="font-size:14px;opacity:.5;cursor:grab">⠿</span>
+        <span class="imn">${n}</span>
+      </div>`;
+    }
+    const lockIcon=locked?'<span title="대여 기록 있어 삭제 불가" style="font-size:10px;opacity:.5">🔒</span>':'';
+    const delBtn=locked
+      ?`<span style="width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;opacity:.3;font-size:11px">✕</span>`
+      :`<button class="del-btn" onclick="deleteItemNum('${key}')" title="삭제">✕</button>`;
+    return `<div class="inv-manage-item">
+      <span class="imn">${n}</span>${lockIcon}${delBtn}
+    </div>`;
+  }).join('');
+}
+
+// 드래그 이벤트 핸들러
+function onDragStart(e,idx){
+  _dragSrcIdx=idx;
+  e.currentTarget.classList.add('dragging');
+  e.dataTransfer.effectAllowed='move';
+}
+function _clearDropIndicators(){
+  document.querySelectorAll('.inv-manage-item').forEach(el=>{
+    el.classList.remove('drop-before','drop-after');
+  });
+}
+function onDragOver(e){
+  e.preventDefault();
+  e.dataTransfer.dropEffect='move';
+  _clearDropIndicators();
+  const el=e.currentTarget;
+  const rect=el.getBoundingClientRect();
+  const midX=rect.left+rect.width/2;
+  if(e.clientX<midX){
+    el.classList.add('drop-before');
+  }else{
+    el.classList.add('drop-after');
+  }
+}
+function onDragLeave(e){
+  if(e.currentTarget.contains(e.relatedTarget)) return;
+  e.currentTarget.classList.remove('drop-before','drop-after');
+}
+function onDrop(e,toIdx){
+  e.preventDefault();
+  _clearDropIndicators();
+  if(_dragSrcIdx===null) return;
+
+  const rect=e.currentTarget.getBoundingClientRect();
+  const midX=rect.left+rect.width/2;
+  let insertIdx=e.clientX<midX?toIdx:toIdx+1;
+
+  if(_dragSrcIdx===insertIdx||_dragSrcIdx===insertIdx-1){_dragSrcIdx=null;return;}
+
+  const arr=ITEM_NUMBERS[manageTab];
+  const [moved]=arr.splice(_dragSrcIdx,1);
+  if(insertIdx>_dragSrcIdx) insertIdx--;
+  arr.splice(insertIdx,0,moved);
+  _dragSrcIdx=null;
+  renderManageList();
+}
+function onDragEnd(e){
+  e.currentTarget.classList.remove('dragging');
+  _clearDropIndicators();
+  _dragSrcIdx=null;
 }
 
 function addItemNum(){
@@ -1553,6 +1878,7 @@ function addItemNum(){
   if(ITEM_NUMBERS[manageTab].some(n=>String(n)===val)){
     toast(`이미 존재하는 번호입니다: ${val}`,'err');return;
   }
+  saveSnapshot(`물품 추가: ${ITEM_LABELS[manageTab]} ${val}`);
   ITEM_NUMBERS[manageTab].push(val);
   saveItemNumbers();
   input.value='';
@@ -1567,6 +1893,7 @@ function deleteItemNum(numStr){
   const hasRecord=rentals.some(r=>r.item===manageTab&&String(r.itemNum)===numStr);
   if(hasRecord){toast('대여 기록이 있는 물품은 삭제할 수 없습니다','err');return;}
   if(!confirm(`${ITEM_LABELS[manageTab]} ${numStr}를 목록에서 삭제하시겠습니까?`))return;
+  saveSnapshot(`물품 삭제: ${ITEM_LABELS[manageTab]} ${numStr}`);
   ITEM_NUMBERS[manageTab]=ITEM_NUMBERS[manageTab].filter(n=>String(n)!==numStr);
   // itemStatus에서도 제거
   const key=fbKey(manageTab,numStr);
@@ -1643,7 +1970,7 @@ function toast(msg,type='inf'){
   c.appendChild(el);setTimeout(()=>el.remove(),3500);
 }
 function tick(){const e=document.getElementById('clock-time');if(e){const n=new Date();e.textContent=`${p2(n.getHours())}:${p2(n.getMinutes())}:${p2(n.getSeconds())}`; }}
-['modal-rental','modal-status','modal-inv','modal-manage','modal-sms'].forEach(id=>{
+['modal-rental','modal-status','modal-inv','modal-manage','modal-sms','modal-med-manage'].forEach(id=>{
   document.getElementById(id).addEventListener('click',e=>{if(e.target.id===id)closeModal(id);});
 });
 // ══ STATS ══
@@ -1906,11 +2233,11 @@ const MED_DEFAULT=[
   {id:'med_005',cat:'소화제',name:'속엔쿨',qty:5},
   {id:'med_006',cat:'알레르기 완화제',name:'로라딘',qty:9},
   {id:'med_007',cat:'알레르기 완화제',name:'쎄로테',qty:9},
-  {id:'med_008',cat:'기침 가래 약',name:'(미구비)',qty:0},
+  {id:'med_008',cat:'기침 가래 약',name:'-',qty:0},
   {id:'med_009',cat:'제산제',name:'윌로겔',qty:4},
-  {id:'med_010',cat:'종합감기약',name:'콜대원 (빨강·종합감기약)',qty:3},
-  {id:'med_011',cat:'종합감기약',name:'콜대원 (초록·콧물&재채기)',qty:0},
-  {id:'med_012',cat:'종합감기약',name:'콜대원 (파랑·기침&가래)',qty:0},
+  {id:'med_010',cat:'종합감기약',name:'콜대원(빨강:종합감기약)',qty:3},
+  {id:'med_011',cat:'종합감기약',name:'콜대원(초록:콧물&재채기)',qty:0},
+  {id:'med_012',cat:'종합감기약',name:'콜대원(파랑:기침&가래)',qty:0},
   {id:'med_013',cat:'연고',name:'후시딘',qty:1},
   {id:'med_014',cat:'연고',name:'마데카솔',qty:1},
   {id:'med_015',cat:'밴드',name:'아쿠아 밴드',qty:60},
@@ -2015,15 +2342,28 @@ function renderMedLog(){
     const sign=l.delta>=0?'+':'';
     const cls=l.delta>=0?'plus':'minus';
     const realIdx=medLog.indexOf(l);
-    return `<tr>
+    const hasMemo=l.memo&&l.memo.trim();
+    const memoRow=hasMemo
+      ?`<tr id="memo-row-${realIdx}" style="display:none;background:var(--surface2)">
+          <td colspan="6" style="padding:6px 14px 8px 32px;font-size:11px;color:var(--text-muted)">
+            💬 ${l.memo}
+          </td>
+        </tr>`
+      :'';
+    return `<tr style="cursor:${hasMemo?'pointer':'default'}" onclick="${hasMemo?`toggleMedMemo(${realIdx})`:''}">
       <td class="td-mono" style="font-size:10px;white-space:nowrap">${fmtDate(l.at)}</td>
       <td class="td-name" style="font-size:11px">${l.name}</td>
       <td class="med-log-change ${cls}">${sign}${l.delta}</td>
-      <td class="td-sub" style="font-size:11px">${l.reason}</td>
+      <td class="td-sub" style="font-size:11px">${l.reason}${hasMemo?` <span style="font-size:9px;color:var(--accent);font-weight:700">💬</span>`:''}</td>
       <td class="td-mono" style="font-weight:700">${l.after}</td>
-      <td><button class="btn btn-danger btn-sm" style="padding:2px 6px;font-size:10px" onclick="deleteMedLog(${realIdx})">✕</button></td>
-    </tr>`;
+      <td><button class="btn btn-danger btn-sm" style="padding:2px 6px;font-size:10px" onclick="event.stopPropagation();deleteMedLog(${realIdx})">✕</button></td>
+    </tr>${memoRow}`;
   }).join('');
+}
+
+function toggleMedMemo(idx){
+  const row=document.getElementById(`memo-row-${idx}`);
+  if(row) row.style.display=row.style.display==='none'?'table-row':'none';
 }
 
 // ── 의약품 사용 통계 ──────────────────────────────────────────
@@ -2129,6 +2469,8 @@ function renderMedStats(){
 
 function deleteMedLog(idx){
   if(!confirm('이 이력을 삭제하시겠습니까?'))return;
+  if(!isOnline()) return;
+  saveSnapshot('의약품 이력 삭제');
   const entry=medLog[idx];
   if(!entry)return;
   medLog.splice(idx,1);
@@ -2153,6 +2495,7 @@ function openMedModal(id){
   document.getElementById('med-modal-unit').textContent=unit;
   document.getElementById('med-direct-qty').value='';
   document.getElementById('med-reason').value='사용';
+  document.getElementById('med-memo').value='';
   medReasonChange();
   updateMedPreview(m,0);
   openModal('modal-med');
@@ -2249,6 +2592,8 @@ function updateMedPreview(m,delta){
 
 function saveMedAdj(){
   const m=medItems.find(x=>x.id===_medId);if(!m)return;
+  if(!isOnline()) return;
+  saveSnapshot(`의약품 재고 조정: ${m.name}`);
   const reason=document.getElementById('med-reason').value;
   const rawVal=parseInt(document.getElementById('med-direct-qty').value||'0')||0;
   let delta;
@@ -2261,11 +2606,11 @@ function saveMedAdj(){
   }
   if(delta===0){toast('변경량이 0입니다. 수량을 입력해주세요','err');return;}
   const newQty=Math.max(0,m.qty+delta);
+  const memo=document.getElementById('med-memo').value.trim();
   m.qty=newQty;
   fbPut(`/medicine/${m.id}`,m);
-  // 이력 저장 (logId를 entry에 포함해서 삭제 시 Firebase key 추적 가능하게)
   const logId='log_'+Date.now();
-  const logEntry={logId,at:new Date().toISOString(),medId:m.id,cat:m.cat,name:m.name,delta,reason,after:m.qty};
+  const logEntry={logId,at:new Date().toISOString(),medId:m.id,cat:m.cat,name:m.name,delta,reason,after:m.qty,...(memo&&{memo})};
   medLog.unshift(logEntry);
   fbPut(`/medLog/${logId}`,logEntry);
   closeModal('modal-med');
@@ -2275,8 +2620,124 @@ function saveMedAdj(){
   toast(`${m.name} ${delta>=0?'+'+delta:delta} → ${m.qty}${MED_CAT_UNIT[m.cat]||'개'}`,'ok');
 }
 
+function openMedManageModal(){
+  renderMedManageList();
+  // 종류 datalist 업데이트
+  const cats=[...new Set(medItems.map(m=>m.cat))].sort();
+  document.getElementById('med-cat-datalist').innerHTML=cats.map(c=>`<option value="${c}">`).join('');
+  // 입력 초기화
+  ['med-add-cat','med-add-name'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('med-add-qty').value='0';
+  document.getElementById('med-add-unit').value='정';
+  openModal('modal-med-manage');
+}
+
+function renderMedManageList(){
+  const list=[...medItems].sort((a,b)=>a.cat.localeCompare(b.cat,'ko')||a.name.localeCompare(b.name,'ko'));
+  document.getElementById('med-manage-count').textContent=`(${list.length}개)`;
+  const hasLog=new Set(medLog.map(l=>l.medId));
+  document.getElementById('med-manage-list').innerHTML=list.length
+    ? list.map(m=>{
+        const locked=hasLog.has(m.id);
+        const delBtn=locked
+          ?`<span style="display:inline-flex;align-items:center;gap:3px;font-size:10px;opacity:.4">🔒 이력 있음</span>`
+          :`<button class="btn btn-danger btn-sm" onclick="deleteMedItem('${m.id}')">삭제</button>`;
+        return `<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border);border-radius:7px;background:white;font-size:12px;">
+          <span style="background:var(--surface2);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:600;color:var(--text-muted);white-space:nowrap;flex-shrink:0">${m.cat}</span>
+          <span id="med-name-view-${m.id}" style="font-weight:600;flex:1">${m.name}</span>
+          <input id="med-name-edit-${m.id}" class="fi" style="display:none;flex:1;padding:4px 8px;font-size:12px" value="${m.name}"
+            onkeydown="if(event.key==='Enter')saveMedName('${m.id}');if(event.key==='Escape')cancelMedName('${m.id}')">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);flex-shrink:0">${m.qty}${m.unit||'정'}</span>
+          <button class="btn btn-ghost btn-sm" onclick="startMedNameEdit('${m.id}')" id="med-edit-btn-${m.id}" title="이름 변경">✏️</button>
+          <button class="btn btn-primary btn-sm" onclick="saveMedName('${m.id}')" id="med-save-btn-${m.id}" style="display:none">저장</button>
+          ${delBtn}
+        </div>`;
+      }).join('')
+    : '<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:13px">등록된 품목 없음</div>';
+}
+
+function startMedNameEdit(id){
+  document.getElementById(`med-name-view-${id}`).style.display='none';
+  document.getElementById(`med-name-edit-${id}`).style.display='block';
+  document.getElementById(`med-edit-btn-${id}`).style.display='none';
+  document.getElementById(`med-save-btn-${id}`).style.display='';
+  setTimeout(()=>document.getElementById(`med-name-edit-${id}`)?.focus(),50);
+}
+function cancelMedName(id){
+  const m=medItems.find(x=>x.id===id);if(!m)return;
+  document.getElementById(`med-name-edit-${id}`).value=m.name;
+  document.getElementById(`med-name-view-${id}`).style.display='';
+  document.getElementById(`med-name-edit-${id}`).style.display='none';
+  document.getElementById(`med-edit-btn-${id}`).style.display='';
+  document.getElementById(`med-save-btn-${id}`).style.display='none';
+}
+function saveMedName(id){
+  if(!isOnline()) return;
+  const m=medItems.find(x=>x.id===id);if(!m)return;
+  const newName=document.getElementById(`med-name-edit-${id}`).value.trim();
+  if(!newName){toast('품명을 입력해주세요','err');return;}
+  if(newName===m.name){cancelMedName(id);return;}
+  if(medItems.some(x=>x.id!==id&&x.name===newName&&x.cat===m.cat)){toast('이미 동일한 품목이 있습니다','err');return;}
+  saveSnapshot(`의약품 이름 변경: ${m.name} → ${newName}`);
+  m.name=newName;
+  fbPut(`/medicine/${id}`,m);
+  renderMedManageList();
+  buildMedFilters();
+  renderMedicine();
+  toast(`이름 변경 완료: ${newName}`,'ok');
+}
+
+function submitMedAdd(){
+  if(!isOnline()) return;
+  const cat=document.getElementById('med-add-cat').value.trim();
+  const name=document.getElementById('med-add-name').value.trim();
+  const qty=Math.max(0,parseInt(document.getElementById('med-add-qty').value)||0);
+  const unit=document.getElementById('med-add-unit').value.trim()||'정';
+  if(!cat||!name){toast('종류와 품명은 필수입니다','err');return;}
+  if(medItems.some(m=>m.name===name&&m.cat===cat)){toast('이미 동일한 품목이 있습니다','err');return;}
+  saveSnapshot(`의약품 품목 추가: ${name}`);
+  const id='med_'+Date.now();
+  const newItem={id,cat,name,qty,unit};
+  // 같은 종류의 마지막 위치 다음에 삽입
+  const lastIdx=medItems.map((m,i)=>m.cat===cat?i:-1).reduce((a,b)=>Math.max(a,b),-1);
+  if(lastIdx>=0) medItems.splice(lastIdx+1,0,newItem);
+  else medItems.push(newItem);
+  fbPut(`/medicine/${id}`,newItem);
+  if(qty>0){
+    const logId='log_'+Date.now();
+    const logEntry={logId,at:new Date().toISOString(),medId:id,cat,name,delta:qty,reason:'구비 추가',after:qty,unit};
+    medLog.unshift(logEntry);
+    fbPut(`/medLog/${logId}`,logEntry);
+  }
+  renderMedManageList();
+  buildMedFilters();
+  renderMedicine();
+  renderMedLog();
+  updateMedBadge();
+  ['med-add-cat','med-add-name'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('med-add-qty').value='0';
+  toast(`💊 ${name} 품목 추가 완료!`,'ok');
+}
+
+function deleteMedItem(id){
+  if(!isOnline()) return;
+  const m=medItems.find(x=>x.id===id);if(!m)return;
+  if(medLog.some(l=>l.medId===id)){toast('사용 이력이 있는 품목은 삭제할 수 없습니다','err');return;}
+  if(!confirm(`${m.name}을(를) 삭제하시겠습니까?`))return;
+  saveSnapshot(`의약품 품목 삭제: ${m.name}`);
+  medItems=medItems.filter(x=>x.id!==id);
+  fbDel(`/medicine/${id}`);
+  renderMedManageList();
+  buildMedFilters();
+  renderMedicine();
+  updateMedBadge();
+  toast(`${m.name} 삭제 완료`,'inf');
+}
+
 function clearMedLog(){
   if(!confirm('이력을 모두 삭제하시겠습니까?'))return;
+  if(!isOnline()) return;
+  saveSnapshot('의약품 이력 전체 삭제');
   medLog=[];
   fbPut('/medLog',{});
   renderMedLog();
