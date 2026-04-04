@@ -1502,7 +1502,7 @@ function quickReturn(id){
   fbPut(`/rentals/${r.id}`,r);
 }
 function deleteRental(id){
-  if(!confirm('이 내역을 삭제하시겠습니까?'))return;
+  if(!confirm('이 내역을 삭제하시겠습니까?\n\n이 내역이 통계에서 제외됩니다.'))return;
   if(!isOnline()) return;
   const r=rentals.find(x=>x.id===id);
   saveSnapshot(`${r?r.name+' ':''} 대여 기록 삭제`);
