@@ -219,7 +219,7 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 .inv-add-row{display:flex;gap:8px;align-items:center;padding:0 14px 14px;}
 .inv-add-row input{flex:1;}
 .toast-wrap{position:fixed;bottom:22px;right:22px;z-index:9999;display:flex;flex-direction:column;gap:6px;}
-.toast{background:white;border:1px solid var(--border);border-radius:9px;padding:10px 15px;font-size:12px;display:flex;align-items:center;gap:8px;box-shadow:0 6px 20px rgba(0,0,0,.1);min-width:240px;animation:tIn .25s ease;}
+.toast{background:white;border:1px solid var(--border);border-radius:9px;padding:10px 15px;font-size:12px;display:flex;align-items:center;gap:8px;box-shadow:0 6px 20px rgba(0,0,0,.1);min-width:240px;animation:tIn .25s ease forwards;opacity:1;}
 @keyframes tIn{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
 .toast.ok{border-left:3px solid var(--s-returned);}.toast.err{border-left:3px solid var(--s-unpaid);}.toast.inf{border-left:3px solid var(--s-renting);}
 .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid var(--border);z-index:300;padding:4px 0 env(safe-area-inset-bottom,4px);}
@@ -693,7 +693,7 @@ tbody td{padding:10px 13px;vertical-align:middle;}
       <div class="fg full"><label>메모</label><input class="fi" id="f-note" placeholder="특이사항"></div>
     </div>
   </div>
-  <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-rental')">취소</button><button class="btn btn-primary" onclick="submitRental()">✅ 등록</button></div>
+  <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-rental')">취소</button><button class="btn btn-primary" id="rental-submit-btn" onclick="submitRental()">✅ 등록</button></div>
 </div>
 </div>
 
@@ -892,6 +892,7 @@ tbody td{padding:10px 13px;vertical-align:middle;}
       <label>메모 <span style="font-weight:400;opacity:.6">(선택)</span></label>
       <input class="fi" id="med-memo" placeholder="메모 (선택)">
     </div>
+  </div>
   <div class="modal-footer">
     <button class="btn btn-ghost" onclick="closeModal('modal-med')">취소</button>
     <button class="btn btn-primary" onclick="saveMedAdj()">💾 저장</button>
@@ -912,7 +913,6 @@ tbody td{padding:10px 13px;vertical-align:middle;}
   </div>
 </nav>
 <button class="fab" onclick="openRentalModal()">＋</button>
-<div class="toast-wrap" id="toasts"></div>
 
 <script>
 // ══ DATA ══
@@ -1434,7 +1434,7 @@ function submitRental(){
   const name=document.getElementById('f-name').value.trim();
   const phone=document.getElementById('f-phone').value.trim();
   const dept=document.getElementById('f-dept').value;
-  const itemNum=document.getElementById('f-item-num').value;
+  const itemNum=(document.getElementById('f-item-num')||{value:''}).value;
   const note=document.getElementById('f-note').value.trim();
   if(!name||!phone||!dept||!selItemType||!itemNum){toast('모든 필수 항목을 입력해주세요','err');return;}
   const bl=rentals.find(r=>r.name===name&&r.phone===phone&&BL_STATUS.includes(r.status));
@@ -2775,5 +2775,6 @@ document.getElementById('pwa-install-btn').addEventListener('click',async()=>{
 });
 window.addEventListener('appinstalled',()=>{document.getElementById('pwa-banner').style.display='none';});
 </script>
+<div class="toast-wrap" id="toasts"></div>
 </body>
 </html>
