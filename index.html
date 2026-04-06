@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#2d5016">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -157,9 +157,9 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 .inv-tab{padding:5px 13px;border-radius:20px;cursor:pointer;font-size:12px;font-weight:600;border:1px solid var(--border);background:var(--surface2);transition:all .15s;}
 .inv-tab.active{background:var(--accent);color:white;border-color:var(--accent);}
 .inv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;padding:14px;}
-.inv-item{border:1px solid var(--border);border-radius:8px;padding:10px 7px;text-align:center;font-size:11px;cursor:pointer;transition:all .15s;background:white;}
+.inv-item{border:1px solid var(--border);border-radius:8px;padding:8px 4px;text-align:center;font-size:11px;cursor:pointer;transition:all .15s;background:white;min-width:0;overflow:hidden;word-break:break-all;}
 .inv-item:hover{border-color:var(--accent);transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,0,0,.06);}
-.inv-item .inv-num{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;margin-bottom:5px;}
+.inv-item .inv-num{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:11px;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .inv-item.st-available{background:#f0fdf4;border-color:#bbf7d0;}
 .inv-item.st-renting{background:#eff6ff;border-color:#bfdbfe;}
 .inv-item.st-unpaid{background:#fef9c3;border-color:#fde68a;}
@@ -224,32 +224,51 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 .toast.ok{border-left:3px solid var(--s-returned);}.toast.err{border-left:3px solid var(--s-unpaid);}.toast.inf{border-left:3px solid var(--s-renting);}
 .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid var(--border);z-index:300;padding:4px 0 env(safe-area-inset-bottom,4px);}
 .mobile-nav-inner{display:flex;justify-content:space-around;}
-.mnav-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 6px;cursor:pointer;border-radius:7px;font-size:9px;font-weight:600;color:var(--text-muted);transition:all .15s;min-width:46px;text-align:center;background:none;border:none;font-family:'Noto Sans KR',sans-serif;position:relative;}
-.mnav-item .mico{font-size:18px;}.mnav-item.active{color:var(--accent);}
+.mnav-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 4px;cursor:pointer;border-radius:7px;font-size:10px;font-weight:600;color:var(--text-muted);transition:all .15s;min-width:48px;text-align:center;background:none;border:none;font-family:'Noto Sans KR',sans-serif;position:relative;}
+.mnav-item .mico{font-size:20px;}.mnav-item.active{color:var(--accent);}
 .mnav-item .mbadge{position:absolute;top:1px;right:2px;background:#ef4444;color:white;font-size:8px;font-weight:700;padding:1px 3px;border-radius:8px;}
 .fab{display:none;position:fixed;bottom:68px;right:16px;width:50px;height:50px;border-radius:50%;background:var(--accent);color:white;font-size:22px;border:none;cursor:pointer;box-shadow:0 4px 16px rgba(45,80,22,.4);align-items:center;justify-content:center;z-index:290;transition:transform .15s;}
 .fab:active{transform:scale(.92);}
 @media(max-width:768px){
   .sidebar{display:none;}.mobile-nav{display:block;}.fab{display:flex;}
-  .main{margin-left:0;padding:14px 11px 78px;}
-  .page-title{font-size:19px;}
-  .stats-row{grid-template-columns:repeat(2,1fr);gap:8px;}
-  .stat-value{font-size:22px;}
-  .section-header{flex-direction:column;align-items:flex-start;}
-  .section-actions{width:100%;}
-  .modal{width:calc(100vw - 18px);max-height:88vh;}
+  .main{margin-left:0;padding:12px 10px 80px;}
+  .page-title{font-size:17px;}.page-sub{font-size:11px;}
+  .page-header{flex-direction:column;gap:8px;margin-bottom:16px;}
+  .stats-row{grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px;}
+  .stat-card{padding:10px;}.stat-value{font-size:20px;}.stat-label{font-size:9px;}.stat-avail{font-size:10px;}
+  .section-header{flex-direction:column;align-items:flex-start;gap:6px;}
+  .section-actions{width:100%;flex-wrap:wrap;}
+  .search-wrap input{width:100%;}
+  .modal{width:calc(100vw - 16px);max-height:92vh;}
   .form-grid{grid-template-columns:1fr;}.fg.full{grid-column:1;}
   .item-type-grid{grid-template-columns:repeat(3,1fr);}
   .s5-grid{grid-template-columns:repeat(3,1fr);}
   .cond-grid{grid-template-columns:repeat(2,1fr);}
-  .modal-body{padding:14px 16px;}.modal-footer{padding:10px 16px 16px;}
-  thead th{padding:7px 9px;font-size:8px;}tbody td{padding:8px 9px;}
-  .btn-sm{padding:4px 7px;font-size:10px;}.td-actions{flex-direction:column;gap:3px;}
-  .inv-grid{grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:6px;padding:10px;}
-  .toast-wrap{left:11px;right:11px;bottom:70px;}.toast{min-width:unset;}
-  .page-header{flex-direction:column;gap:9px;}.bl-card{flex-direction:column;}.bl-actions{flex-direction:row;}
+  .modal-body{padding:12px 14px;}.modal-footer{padding:10px 14px 14px;}
+  thead th{padding:6px 8px;font-size:8px;}tbody td{padding:7px 8px;font-size:11px;}
+  .btn-sm{padding:4px 7px;font-size:10px;}.td-actions{flex-direction:row;gap:4px;flex-wrap:nowrap;}.m-card-actions{flex-direction:row!important;flex-wrap:nowrap!important;}
+  .inv-grid{grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:6px;padding:10px;}
+  .inv-tabs{display:none!important;}
+  .inv-mobile-select{display:block;padding:10px 10px 0;}
+  .toast-wrap{left:11px;right:11px;bottom:80px;}.toast{min-width:unset;}
+  .bl-card{flex-direction:column;}.bl-actions{flex-direction:row;}
+  .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
 }
-@media(max-width:400px){.stats-row{grid-template-columns:1fr 1fr;}.item-type-grid{grid-template-columns:repeat(2,1fr);}}
+@media(min-width:769px){.inv-mobile-select{display:none;}}
+@media(max-width:400px){.stats-row{grid-template-columns:repeat(3,1fr);}.item-type-grid{grid-template-columns:repeat(2,1fr);}}
+
+/* ══ 물품관리 모바일 탭 ══ */
+.unpaid-mobile-tabs{display:none;}
+@media(max-width:768px){
+  .unpaid-mobile-tabs{display:flex;gap:6px;margin-bottom:12px;}
+  .unpaid-tab{flex:1;padding:8px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface2);font-size:12px;font-weight:600;cursor:pointer;font-family:'Noto Sans KR',sans-serif;color:var(--text-muted);transition:all .15s;}
+  .unpaid-tab.active{background:var(--accent);color:white;border-color:var(--accent);}
+  .unpaid-section{display:none;}
+  .unpaid-section.active{display:block;}
+}
+@media(min-width:769px){
+  .unpaid-section{display:block!important;}
+}
 
 /* ══ STATS PAGE ══ */
 .sp-period{display:flex;gap:5px;}
@@ -327,13 +346,14 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 .med-qty.low{color:#d97706;}
 .med-qty.empty{color:#dc2626;}
 .med-unit{font-size:10px;color:var(--text-muted);margin-top:1px;}
-.med-status-dot{position:absolute;top:8px;right:8px;width:6px;height:6px;border-radius:50%;background:#16a34a;}
+.med-status-dot{width:7px;height:7px;border-radius:50%;background:#16a34a;flex-shrink:0;margin-top:3px;}
 .med-status-dot.low{background:#f59e0b;animation:bl 1.5s ease infinite;}
 .med-status-dot.empty{background:#dc2626;animation:bl .8s ease infinite;}
 
 /* 카테고리 탭 */
-.med-cat-tabs{display:flex;gap:6px;padding:13px 13px 0;flex-wrap:wrap;}
-.med-cat-tab{padding:5px 13px;border-radius:20px;cursor:pointer;font-size:12px;font-weight:600;border:1px solid var(--border);background:var(--surface2);transition:all .15s;}
+.med-cat-tabs{display:flex;gap:6px;padding:13px 13px 0;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.med-cat-tabs::-webkit-scrollbar{display:none;}
+.med-cat-tab{padding:5px 13px;border-radius:20px;cursor:pointer;font-size:12px;font-weight:600;border:1px solid var(--border);background:var(--surface2);transition:all .15s;white-space:nowrap;flex-shrink:0;}
 .med-cat-tab.active{background:var(--accent);color:white;border-color:var(--accent);}
 
 /* 의약품 조정 모달 */
@@ -358,6 +378,43 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 }
 @media(max-width:400px){
   .med-grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));}
+}
+
+/* ══ 모바일 카드형 테이블 ══ */
+@media(max-width:768px){
+  .mobile-card-list{display:flex;flex-direction:column;gap:8px;padding:10px;}
+  .m-card{background:white;border:1px solid var(--border);border-radius:9px;padding:11px 13px;font-size:12px;}
+  .m-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+  .m-card-name{font-weight:700;font-size:14px;}
+  .m-card-row{display:flex;align-items:center;gap:6px;margin-bottom:3px;color:var(--text-muted);font-size:11px;}
+  .m-card-row b{color:var(--text);font-weight:600;}
+  .m-card-actions{display:flex;gap:5px;margin-top:8px;flex-wrap:nowrap;overflow-x:auto;}
+  .tbl-wrap table{display:none;}
+  .tbl-wrap .mobile-card-list{display:flex;}
+}
+@media(min-width:769px){
+  .mobile-card-list{display:none!important;}
+}
+
+/* ══ 모바일 페이지 히스토리 버튼 ══ */
+#hist-back:disabled, #hist-fwd:disabled{opacity:0.3;pointer-events:none;}
+
+/* ══ 모바일 되돌리기/앞으로 버튼 ══ */
+.mobile-undo-btns{display:none;}
+@media(max-width:768px){
+  .mobile-undo-btns{
+    display:flex;align-items:center;gap:5px;
+    position:fixed;top:10px;right:11px;z-index:400;
+  }
+  .mob-undo-btn{
+    background:#6b7280;border:1px solid #4b5563;border-radius:8px;
+    height:32px;padding:0 10px;display:flex;align-items:center;justify-content:center;
+    font-size:11px;font-weight:600;cursor:pointer;
+    box-shadow:0 2px 8px rgba(0,0,0,.15);color:white;
+    font-family:'Noto Sans KR',sans-serif;transition:all .15s;gap:3px;
+  }
+  .mob-undo-btn:disabled{opacity:0.3;pointer-events:none;}
+  .mob-undo-btn:active{background:var(--surface2);}
 }
 </style>
 </head>
@@ -500,15 +557,27 @@ tbody td{padding:10px 13px;vertical-align:middle;}
     <div><div class="page-title">물품 현황</div><div class="page-sub">물품 클릭 → 상태 변경</div></div>
     <button class="btn btn-ghost" onclick="openManageModal()">⚙️ 물품 목록 관리</button>
   </div>
-  <div class="section"><div class="inv-tabs" id="inv-tabs"></div><div class="inv-grid" id="inv-grid"></div></div>
+  <div class="section">
+    <div class="inv-tabs" id="inv-tabs"></div>
+    <div class="inv-mobile-select" id="inv-mobile-select">
+      <select class="flt" style="width:100%;padding:9px 12px;font-size:13px;font-weight:600;" onchange="switchInvTab(this.value)" id="inv-select"></select>
+    </div>
+    <div class="inv-grid" id="inv-grid"></div>
+  </div>
 </div>
 
 <!-- UNPAID / 물품관리 -->
 <div class="page" id="page-unpaid">
   <div class="page-header"><div><div class="page-title">물품 관리</div><div class="page-sub">미납 · 고장 · 분실 내역 및 물품 이상 현황</div></div></div>
 
+  <!-- 모바일 섹션 탭 -->
+  <div class="unpaid-mobile-tabs">
+    <button class="unpaid-tab active" id="utab-1" onclick="switchUnpaidTab(1)">👤 대여 이상 내역</button>
+    <button class="unpaid-tab" id="utab-2" onclick="switchUnpaidTab(2)">🔧 물품 자체 이상</button>
+  </div>
+
   <!-- 섹션 1: 대여 기록 기반 이상 목록 (사람 정보 있음) -->
-  <div class="section" style="margin-bottom:16px">
+  <div class="section unpaid-section" id="unpaid-sec-1" style="margin-bottom:16px">
     <div class="section-header"><div class="section-title">👤 대여 이상 내역 (미납·고장·분실)</div></div>
     <div class="tbl-wrap"><table>
       <thead><tr><th>이름</th><th>연락처</th><th>학부</th><th>물품</th><th>번호</th><th>대여일시</th><th>경과일</th><th>상태</th><th>처리</th></tr></thead>
@@ -517,7 +586,7 @@ tbody td{padding:10px 13px;vertical-align:middle;}
   </div>
 
   <!-- 섹션 2: 물품현황에서 직접 처리한 고장/분실 (사람 정보 없음) -->
-  <div class="section">
+  <div class="section unpaid-section" id="unpaid-sec-2">
     <div class="section-header"><div class="section-title">🔧 물품 자체 이상 (직접 처리)</div></div>
     <div class="tbl-wrap"><table>
       <thead><tr><th>물품</th><th>번호</th><th>상태</th><th>처리</th></tr></thead>
@@ -901,6 +970,10 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 </div>
 
 <!-- MOBILE NAV -->
+<div class="mobile-undo-btns">
+  <button class="mob-undo-btn" id="mob-undo-btn" onclick="undoAction()" disabled>↩ 되돌리기</button>
+  <button class="mob-undo-btn" id="mob-redo-btn" onclick="redoAction()" disabled>앞으로 ↪</button>
+</div>
 <nav class="mobile-nav">
   <div class="mobile-nav-inner">
     <button class="mnav-item active" id="mnav-dashboard" onclick="showPage('dashboard')"><span class="mico">📊</span>대시보드</button>
@@ -1014,6 +1087,8 @@ async function applySnapshot(snap,prefix){
 }
 function updateHistoryBtns(){
   _updateBtn('undo-btn',undoStack,'↩ 되돌리기');
+  _updateBtn('mob-undo-btn',undoStack,'↩ 되돌리기');
+  _updateBtn('mob-redo-btn',redoStack,'앞으로 ↪');
   _updateBtn('redo-btn',redoStack,'앞으로 ↪');
 }
 function _updateBtn(id,stack,def){
@@ -1213,13 +1288,38 @@ function makeRowIdx(r,idx,cols){
   };
   return `<tr>${cols.map(c=>c==='idx'?cells.idx():cells[c]).join('')}</tr>`;
 }
+function makeMobileCard(r,cols){
+  const hasActions=cols.includes('actions');
+  const hasDays=cols.includes('days');
+  const hasReturnDate=cols.includes('returnDate');
+  return `<div class="m-card">
+    <div class="m-card-top">
+      <span class="m-card-name">${r.name}</span>
+      ${sBadge(r.status)}
+    </div>
+    <div class="m-card-row">📞 <b>${r.phone}</b></div>
+    <div class="m-card-row">🏫 <b>${r.dept||''}</b></div>
+    <div class="m-card-row">${itemBadge(r.item)} <b>${r.itemNum}</b></div>
+    <div class="m-card-row">📅 <b>${fmtDate(r.date)}</b></div>
+    ${hasReturnDate&&r.returnDate?`<div class="m-card-row">↩️ <b>${fmtDate(r.returnDate)}</b></div>`:''}
+    ${hasDays?`<div class="m-card-row">⏱ <b style="color:var(--s-unpaid)">${daysSince(r.date)}일 경과</b></div>`:''}
+    ${hasActions?`<div class="m-card-actions">${actionBtns(r)}</div>`:''}
+  </div>`;
+}
 function emptyRow(n,msg='내역이 없습니다'){return `<tr><td colspan="${n}"><div class="empty-state"><div class="ico">📭</div><p>${msg}</p></div></td></tr>`;}
 
 // ══ RENDER TABLES ══
 function renderRecent(){
   const list=[...rentals].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,10);
+  const cols=['name','phone','dept','item','num','date','status','actions'];
   document.getElementById('tbl-recent').innerHTML=
-    list.length?list.map(r=>makeRow(r,['name','phone','dept','item','num','date','status','actions'])).join(''):emptyRow(8);
+    list.length?list.map(r=>makeRow(r,cols)).join(''):emptyRow(8);
+  const mw=document.getElementById('tbl-recent').closest('.tbl-wrap');
+  if(mw){
+    let ml=mw.querySelector('.mobile-card-list');
+    if(!ml){ml=document.createElement('div');ml.className='mobile-card-list';mw.appendChild(ml);}
+    ml.innerHTML=list.length?list.map(r=>makeMobileCard(r,cols)).join(''):'<div style="padding:20px;text-align:center;color:var(--text-muted)">내역이 없습니다</div>';
+  }
 }
 const PAGE_SIZE=20;
 let currentPage=1;
@@ -1242,8 +1342,15 @@ function renderRentals(resetPage=false){
   const start=(currentPage-1)*PAGE_SIZE;
   const paged=list.slice(start,start+PAGE_SIZE);
 
+  const rcols=['idx','name','phone','dept','item','num','date','returnDate','status','actions'];
   document.getElementById('tbl-rentals').innerHTML=
-    paged.length?paged.map((r,i)=>makeRowIdx(r,start+i,['idx','name','phone','dept','item','num','date','returnDate','status','actions'])).join(''):emptyRow(10,'해당 조건의 대여 내역이 없습니다');
+    paged.length?paged.map((r,i)=>makeRowIdx(r,start+i,rcols)).join(''):emptyRow(10,'해당 조건의 대여 내역이 없습니다');
+  const rmw=document.getElementById('tbl-rentals').closest('.tbl-wrap');
+  if(rmw){
+    let rml=rmw.querySelector('.mobile-card-list');
+    if(!rml){rml=document.createElement('div');rml.className='mobile-card-list';rmw.appendChild(rml);}
+    rml.innerHTML=paged.length?paged.map(r=>makeMobileCard(r,rcols)).join(''):'<div style="padding:20px;text-align:center;color:var(--text-muted)">해당 조건의 대여 내역이 없습니다</div>';
+  }
 
   // 페이지네이션 UI
   const pg=document.getElementById('rentals-pagination');
@@ -1272,11 +1379,22 @@ function goPage(p){
   // 테이블 상단으로 스크롤
   document.getElementById('tbl-rentals')?.closest('.tbl-wrap')?.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
+function switchUnpaidTab(n){
+  document.querySelectorAll('.unpaid-tab').forEach((t,i)=>t.classList.toggle('active',i+1===n));
+  document.querySelectorAll('.unpaid-section').forEach((s,i)=>s.classList.toggle('active',i+1===n));
+}
 function renderUnpaid(){
   // 섹션 1: 대여 기록 기반 (사람 정보 있음)
   const list=rentals.filter(r=>['unpaid','broken','lost'].includes(r.status)).sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const ucols=['name','phone','dept','item','num','date','days','status','actions'];
   document.getElementById('tbl-unpaid').innerHTML=
-    list.length?list.map(r=>makeRow(r,['name','phone','dept','item','num','date','days','status','actions'])).join(''):emptyRow(9,'대여 이상 내역 없음');
+    list.length?list.map(r=>makeRow(r,ucols)).join(''):emptyRow(9,'대여 이상 내역 없음');
+  const umw=document.getElementById('tbl-unpaid').closest('.tbl-wrap');
+  if(umw){
+    let uml=umw.querySelector('.mobile-card-list');
+    if(!uml){uml=document.createElement('div');uml.className='mobile-card-list';umw.appendChild(uml);}
+    uml.innerHTML=list.length?list.map(r=>makeMobileCard(r,ucols)).join(''):'<div style="padding:20px;text-align:center;color:var(--text-muted)">대여 이상 내역 없음</div>';
+  }
 
   // 섹션 2: 물품현황에서 직접 처리한 고장/분실 (대여 기록과 무관한 것만)
   // itemStatus 중 현재 대여 기록으로 이미 표시된 물품은 제외
@@ -1301,6 +1419,9 @@ function renderUnpaid(){
   const tb2=document.getElementById('tbl-item-cond');
   if(!directItems.length){
     tb2.innerHTML=emptyRow(4,'물품 자체 이상 없음');
+    // 모바일 카드도 비움
+    const sec2=document.getElementById('unpaid-sec-2');
+    if(sec2){let ml=sec2.querySelector('.mobile-card-list');if(!ml){ml=document.createElement('div');ml.className='mobile-card-list';sec2.querySelector('.tbl-wrap').appendChild(ml);}ml.innerHTML='<div style="padding:20px;text-align:center;color:var(--text-muted)">물품 자체 이상 없음</div>';}
     return;
   }
   tb2.innerHTML=directItems.map(({key,type,num,val})=>`<tr>
@@ -1311,6 +1432,19 @@ function renderUnpaid(){
       <button class="btn btn-green btn-sm" onclick="restoreItemFromUnpaid('${key}','${type}','${num}')">복구</button>
     </div></td>
   </tr>`).join('');
+  // 모바일 카드 렌더링
+  const sec2=document.getElementById('unpaid-sec-2');
+  if(sec2){
+    let ml=sec2.querySelector('.mobile-card-list');
+    if(!ml){ml=document.createElement('div');ml.className='mobile-card-list';sec2.querySelector('.tbl-wrap').appendChild(ml);}
+    ml.innerHTML=directItems.map(({key,type,num,val})=>`
+      <div class="m-card">
+        <div class="m-card-top">${itemBadge(type)}<span class="td-mono" style="font-weight:700">${num}</span>${sBadge(val)}</div>
+        <div class="m-card-actions"><button class="btn btn-green btn-sm" onclick="restoreItemFromUnpaid('${key}','${type}','${num}')">복구</button></div>
+      </div>`).join('');
+  }
+  // 기본 섹션1 활성화 (초기 렌더시)
+  switchUnpaidTab(1);
 }
 
 function restoreItemFromUnpaid(key,type,num){
@@ -1325,16 +1459,20 @@ function renderInventory(){
   document.getElementById('inv-tabs').innerHTML=Object.keys(ITEM_NUMBERS).map(t=>
     `<div class="inv-tab${t===currentInvTab?' active':''}" onclick="switchInvTab('${t}')">${ITEM_ICONS[t]} ${ITEM_LABELS[t]}</div>`
   ).join('');
+  const sel=document.getElementById('inv-select');
+  if(sel){sel.innerHTML=Object.keys(ITEM_NUMBERS).map(t=>`<option value="${t}"${t===currentInvTab?' selected':''}>${ITEM_ICONS[t]} ${ITEM_LABELS[t]}</option>`).join('');}
   const nums=ITEM_NUMBERS[currentInvTab];
   const stMap={available:'st-available',renting:'st-renting',unpaid:'st-unpaid',broken:'st-broken',lost:'st-lost'};
   const lbMap={
-    available:`<span class="sbadge sb-available" style="font-size:10px">가능</span>`,
-    renting:`<span class="sbadge sb-renting" style="font-size:10px">대여중</span>`,
-    unpaid:`<span class="sbadge sb-unpaid" style="font-size:10px">미납</span>`,
-    broken:`<span class="sbadge sb-broken" style="font-size:10px">고장</span>`,
-    lost:`<span class="sbadge sb-lost" style="font-size:10px">분실</span>`
+    available:`<span class="sbadge sb-available" style="font-size:9px;padding:2px 4px;gap:3px">가능</span>`,
+    renting:`<span class="sbadge sb-renting" style="font-size:9px;padding:2px 4px;gap:3px">대여중</span>`,
+    unpaid:`<span class="sbadge sb-unpaid" style="font-size:9px;padding:2px 4px;gap:3px">미납</span>`,
+    broken:`<span class="sbadge sb-broken" style="font-size:9px;padding:2px 4px;gap:3px">고장</span>`,
+    lost:`<span class="sbadge sb-lost" style="font-size:9px;padding:2px 4px;gap:3px">분실</span>`
   };
-  document.getElementById('inv-grid').innerHTML=nums.map(num=>{
+  const grid=document.getElementById('inv-grid');
+  grid.style.gridTemplateColumns='';
+  grid.innerHTML=nums.map(num=>{
     const st=getItemState(currentInvTab,num);
     const rec=rentals.filter(r=>r.item===currentInvTab&&String(r.itemNum)===String(num))
       .sort((a,b)=>new Date(b.date)-new Date(a.date))[0];
@@ -1502,7 +1640,7 @@ function quickReturn(id){
   fbPut(`/rentals/${r.id}`,r);
 }
 function deleteRental(id){
-  if(!confirm('이 내역을 삭제하시겠습니까?\n\n이 내역이 통계에서 제외됩니다.'))return;
+  if(!confirm('이 내역을 삭제하시겠습니까?'))return;
   if(!isOnline()) return;
   const r=rentals.find(x=>x.id===id);
   saveSnapshot(`${r?r.name+' ':''} 대여 기록 삭제`);
@@ -1946,7 +2084,36 @@ function exportCSV(){
 }
 
 // ══ UTILS ══
-function showPage(id){
+
+// ══ 모바일 페이지 히스토리 ══
+let _pageHist=['dashboard'];
+let _pageHistIdx=0;
+function histBack(){
+  if(_pageHistIdx<=0) return;
+  _pageHistIdx--;
+  showPage(_pageHist[_pageHistIdx], true);
+}
+function histFwd(){
+  if(_pageHistIdx>=_pageHist.length-1) return;
+  _pageHistIdx++;
+  showPage(_pageHist[_pageHistIdx], true);
+}
+function updateHistBtns(){
+  const b=document.getElementById('hist-back');
+  const f=document.getElementById('hist-fwd');
+  if(b) b.disabled=_pageHistIdx<=0;
+  if(f) f.disabled=_pageHistIdx>=_pageHist.length-1;
+}
+function showPage(id, fromHist=false){
+  if(!fromHist && window.innerWidth<=768){
+    // 현재 위치 이후 히스토리 제거 후 추가
+    _pageHist=_pageHist.slice(0,_pageHistIdx+1);
+    if(_pageHist[_pageHistIdx]!==id){
+      _pageHist.push(id);
+      _pageHistIdx=_pageHist.length-1;
+    }
+    updateHistBtns();
+  }
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item,.mnav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
@@ -1955,7 +2122,7 @@ function showPage(id){
   const mn=document.getElementById('mnav-'+id);if(mn)mn.classList.add('active');
   if(id==='rentals')renderRentals();
   if(id==='inventory')renderInventory();
-  if(id==='unpaid')renderUnpaid();
+  if(id==='unpaid'){renderUnpaid();switchUnpaidTab(1);}
   if(id==='blacklist')renderBlacklist();
   if(id==='stats')renderStats();
   if(id==='medicine'){renderMedicine();renderMedLog();renderMedStats();}
@@ -2298,10 +2465,11 @@ function renderMedicine(){
     const st=m.qty===0?'empty':m.qty<=thr?'low':'';
     const unit=MED_CAT_UNIT[m.cat]||'개';
     return `<div class="med-card ${st}" onclick="openMedModal('${m.id}')">
-      <div class="med-status-dot ${st}"></div>
       <div class="med-card-top">
-        <div class="med-card-name">${m.name}</div>
-        <div class="med-cat-badge">${m.cat}</div>
+        <div>
+          <div class="med-card-name">${m.name}</div>
+          <div class="med-cat-badge" style="margin-top:3px;display:inline-flex;align-items:center;gap:3px">${m.cat}<span class="med-status-dot ${st}" style="display:inline-block"></span></div>
+        </div>
       </div>
       <div class="med-qty ${st}">${m.qty}</div>
       <div class="med-unit">${unit} 남음</div>
