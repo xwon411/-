@@ -460,7 +460,7 @@ tbody td{padding:10px 13px;vertical-align:middle;}
     <span id="clock-time">--:--:--</span>
     <span id="offline-label" style="display:none;margin-left:auto;font-size:10px;background:#dc2626;color:white;padding:1px 6px;border-radius:10px;font-weight:700">오프라인</span>
   </div>
-  <div style="padding:0 10px 12px;display:flex;gap:6px">
+  <div style="padding:0 10px 4px;display:flex;gap:6px">
     <button id="undo-btn" onclick="undoAction()"
       style="flex:1;padding:8px 4px;border-radius:7px;border:1px solid rgba(255,255,255,.2);
              background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);font-size:11px;font-weight:600;
@@ -474,6 +474,15 @@ tbody td{padding:10px 13px;vertical-align:middle;}
              cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .15s;display:flex;
              align-items:center;justify-content:center;gap:4px;" disabled>
       앞으로 ↪
+    </button>
+  </div>
+  <div style="padding:0 10px 12px">
+    <button id="refresh-btn" onclick="refreshData()"
+      style="width:100%;padding:8px 4px;border-radius:7px;border:1px solid rgba(255,255,255,.2);
+             background:rgba(255,255,255,.08);color:rgba(255,255,255,.6);font-size:11px;font-weight:600;
+             cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .15s;display:flex;
+             align-items:center;justify-content:center;gap:5px;">
+      🔄 새로고침
     </button>
   </div>
 </aside>
@@ -1123,8 +1132,8 @@ async function fbGet(path){
   try{const r=await fetch(`${FB}${path}.json`);const d=await r.json();return d||null;}catch(e){return null;}
 }
 function fbPut(path,data){
-  fetch(`${FB}${path}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})
-    .then(()=>dot(true)).catch(()=>{dot(false);toast('동기화 실패','err');});
+  return fetch(`${FB}${path}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})
+    .then(r=>{dot(true);return r;}).catch(e=>{dot(false);throw e;});
 }
 function fbDel(path){fetch(`${FB}${path}.json`,{method:'DELETE'}).then(()=>dot(true)).catch(()=>dot(false));}
 function dot(ok){
@@ -1217,6 +1226,29 @@ async function autoUnpaidUmbrella(){
   toast('약속우산 7일 경과 — 자동 미납 처리되었습니다','inf');
 }
 function renderAll(){updateStats();renderRecent();renderRentals();renderInventory();renderUnpaid();renderBlacklist();}
+async function refreshData(){
+  const btn=document.getElementById('refresh-btn');
+  if(btn){btn.disabled=true;btn.textContent='⏳ 불러오는 중...';}
+  try{
+    const [rData,iData,nData,sData,mData,lData]=await Promise.all([
+      fbGet('/rentals'),fbGet('/itemStatus'),fbGet('/itemNumbers'),
+      fbGet('/smsLog'),fbGet('/medicine'),fbGet('/medLog')
+    ]);
+    rentals=rData?Object.values(rData).sort((a,b)=>new Date(b.date)-new Date(a.date)):[];
+    itemStatus=iData||{};
+    smsLog=sData||{};
+    if(nData){Object.keys(ITEM_NUMBERS).forEach(t=>{if(nData[t])ITEM_NUMBERS[t]=nData[t];});}
+    if(mData)medItems=Object.values(mData);
+    medLog=lData?Object.values(lData).sort((a,b)=>new Date(b.at)-new Date(a.at)):[];
+    renderAll();
+    buildMedFilters();renderMedicine();renderMedLog();renderMedStats();updateMedBadge();
+    toast('최신 데이터를 불러왔습니다','ok');
+  }catch(e){
+    toast('데이터 불러오기 실패. 인터넷 연결을 확인해주세요.','err');
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='🔄 새로고침';}
+  }
+}
 
 // ══ 물품 실질 상태 계산 ══
 // 우선순위: itemStatus(고장/분실) > 대여기록 상태 > available
@@ -1568,7 +1600,7 @@ function fmtPhone(el){
   else if(v.length>=4)v=v.replace(/(\d{3})(\d+)/,'$1-$2');
   el.value=v;
 }
-function submitRental(){
+async function submitRental(){
   const name=document.getElementById('f-name').value.trim();
   const phone=document.getElementById('f-phone').value.trim();
   const dept=document.getElementById('f-dept').value;
@@ -1578,13 +1610,25 @@ function submitRental(){
   const bl=rentals.find(r=>r.name===name&&r.phone===phone&&BL_STATUS.includes(r.status));
   if(bl){toast(`⛔ ${name}님은 "${sInfo(bl.status).l}" 상태로 대여가 제한됩니다.`,'err');return;}
   if(!isOnline()) return;
+  const btn=document.getElementById('rental-submit-btn');
+  if(btn){btn.disabled=true;btn.textContent='저장 중...';}
   saveSnapshot(`${name} ${ITEM_LABELS[selItemType]} 대여 등록`);
   const id=Date.now();
   const rec={id,name,phone,dept,item:selItemType,itemNum,date:new Date().toISOString(),returnDate:null,status:'renting',note};
   rentals.unshift(rec);
-  closeModal('modal-rental');renderAll();
-  toast(`${name}님 ${ITEM_LABELS[selItemType]} ${itemNum} 대여 등록!`,'ok');
-  fbPut(`/rentals/${id}`,rec);
+  try{
+    await fbPut(`/rentals/${id}`,rec);
+    closeModal('modal-rental');renderAll();
+    toast(`${name}님 ${ITEM_LABELS[selItemType]} ${itemNum} 대여 등록!`,'ok');
+  }catch(e){
+    // Firebase 저장 실패 시 로컬 상태 롤백
+    rentals.shift();
+    undoStack.pop();
+    updateHistoryBtns();
+    toast('저장에 실패했습니다. 인터넷 연결을 확인 후 다시 시도해주세요.','err');
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='✅ 등록';}
+  }
 }
 
 // ══ STATUS MODAL (대여현황) ══
@@ -1599,7 +1643,7 @@ function openStatusModal(id){
     </div>`).join('');
   document.getElementById('f-status-note').value=r.note||'';
   document.getElementById('return-date-wrap').style.display=r.status==='returned'?'block':'none';
-  if(r.returnDate)document.getElementById('f-return-date').value=r.returnDate.slice(0,16);
+  if(r.returnDate){const _d=new Date(r.returnDate);document.getElementById('f-return-date').value=new Date(_d.getTime()-_d.getTimezoneOffset()*60000).toISOString().slice(0,16);}
   openModal('modal-status');
 }
 function pickStatus(v){
@@ -1607,9 +1651,14 @@ function pickStatus(v){
   document.querySelectorAll('.s5-opt').forEach(el=>el.className='s5-opt'+(el.dataset.v===v?' sel-'+v:''));
   document.getElementById('return-date-wrap').style.display=v==='returned'?'block':'none';
 }
-function applyStatus(){
+async function applyStatus(){
   const r=rentals.find(x=>x.id===editId);if(!r)return;
   if(!isOnline()) return;
+  const prevStatus=r.status;
+  const prevNote=r.note;
+  const prevReturnDate=r.returnDate;
+  const btn=document.querySelector('#modal-status .btn-primary');
+  if(btn){btn.disabled=true;btn.textContent='저장 중...';}
   saveSnapshot(`${r.name} 상태변경 → ${sInfo(selStatus).l}`);
   r.status=selStatus;
   r.note=document.getElementById('f-status-note').value.trim();
@@ -1617,27 +1666,42 @@ function applyStatus(){
   if(selStatus==='returned'){
     const rd=document.getElementById('f-return-date').value;
     r.returnDate=rd?new Date(rd).toISOString():new Date().toISOString();
-    // 반납 → itemStatus 초기화 (물품 다시 대여가능)
     delete itemStatus[key];fbDel(`/itemStatus/${key}`);
   }else if(selStatus==='broken'||selStatus==='lost'){
-    // 고장/분실 → itemStatus 업데이트
     itemStatus[key]=selStatus;fbPut(`/itemStatus/${key}`,selStatus);
-  }else if(selStatus==='unpaid'){
-    // 미납 → 물품은 대여기록 기반으로 막힘 (itemStatus 변경 안함)
   }
-  closeModal('modal-status');renderAll();
-  toast(`상태: ${sInfo(selStatus).l}`,'ok');
-  fbPut(`/rentals/${r.id}`,r);
+  try{
+    await fbPut(`/rentals/${r.id}`,r);
+    closeModal('modal-status');renderAll();
+    toast(`상태: ${sInfo(selStatus).l}`,'ok');
+  }catch(e){
+    // 실패 시 롤백
+    r.status=prevStatus;r.note=prevNote;r.returnDate=prevReturnDate;
+    if(selStatus==='returned'){itemStatus[key]=prevStatus==='broken'||prevStatus==='lost'?prevStatus:undefined;if(itemStatus[key]===undefined)delete itemStatus[key];}
+    else if(selStatus==='broken'||selStatus==='lost'){delete itemStatus[key];}
+    undoStack.pop();updateHistoryBtns();
+    toast('저장에 실패했습니다. 다시 시도해주세요.','err');
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='✅ 적용';}
+  }
 }
-function quickReturn(id){
+async function quickReturn(id){
   const r=rentals.find(x=>x.id===id);if(!r)return;
   if(!isOnline()) return;
+  const prevStatus=r.status;
+  const prevReturnDate=r.returnDate;
   saveSnapshot(`${r.name} ${ITEM_LABELS[r.item]} 반납`);
   r.status='returned';r.returnDate=new Date().toISOString();
   const key=fbKey(r.item,r.itemNum);
   delete itemStatus[key];fbDel(`/itemStatus/${key}`);
-  renderAll();toast(`${r.name}님 ${ITEM_LABELS[r.item]} 반납 완료!`,'ok');
-  fbPut(`/rentals/${r.id}`,r);
+  try{
+    await fbPut(`/rentals/${r.id}`,r);
+    renderAll();toast(`${r.name}님 ${ITEM_LABELS[r.item]} 반납 완료!`,'ok');
+  }catch(e){
+    r.status=prevStatus;r.returnDate=prevReturnDate;
+    undoStack.pop();updateHistoryBtns();
+    toast('저장에 실패했습니다. 다시 시도해주세요.','err');
+  }
 }
 function deleteRental(id){
   if(!confirm('이 내역을 삭제하시겠습니까?'))return;
@@ -1856,15 +1920,23 @@ async function blPay(name,phone,status){
   const targets=rentals.filter(r=>r.name===name&&r.phone===phone&&r.status===status);
   const items=targets.map(r=>`${ITEM_LABELS[r.item]} ${r.itemNum}`).join(', ');
   if(!confirm(`${name}님의 ${label} 납부를 처리하시겠습니까?\n\n대상 물품: ${items}\n\n납부 확인 후 블랙리스트에서 자동 해제됩니다.`)) return;
+  const prevStates=targets.map(r=>({r,status:r.status,returnDate:r.returnDate}));
   saveSnapshot(`${name} ${label} 납부`);
   for(const r of targets){
     r.status='returned';r.returnDate=r.returnDate||new Date().toISOString();
     const key=fbKey(r.item,r.itemNum);
     delete itemStatus[key];fbDel(`/itemStatus/${key}`);
-    fbPut(`/rentals/${r.id}`,r);
   }
-  renderAll();
-  toast(`${name}님 ${label} 납부 → 블랙리스트 해제!`,'ok');
+  try{
+    await Promise.all(targets.map(r=>fbPut(`/rentals/${r.id}`,r)));
+    renderAll();
+    toast(`${name}님 ${label} 납부 → 블랙리스트 해제!`,'ok');
+  }catch(e){
+    // 실패 시 롤백
+    prevStates.forEach(({r,status:s,returnDate:rd})=>{r.status=s;r.returnDate=rd;});
+    undoStack.pop();updateHistoryBtns();
+    toast('저장에 실패했습니다. 다시 시도해주세요.','err');
+  }
 }
 function goRentals(name){showPage('rentals');document.getElementById('s-search').value=name;renderRentals();}
 
