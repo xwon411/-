@@ -1211,11 +1211,16 @@ async function init(){
   await initMedicine();
 }
 
-// 약속우산 대여 후 7일 경과 시 자동으로 미납 처리
+// 약속우산 대여 후 7일째 오후 6시 기준 자동 미납 처리
 async function autoUnpaidUmbrella(){
   const now=Date.now();
-  const SEVEN_DAYS=7*24*60*60*1000;
-  const targets=rentals.filter(r=>r.item==='umbrella'&&r.status==='renting'&&now-new Date(r.date).getTime()>SEVEN_DAYS);
+  const targets=rentals.filter(r=>{
+    if(r.item!=='umbrella'||r.status!=='renting') return false;
+    const cutoff=new Date(r.date);
+    cutoff.setDate(cutoff.getDate()+7);
+    cutoff.setHours(18,0,0,0); // 7일 후 오후 6시 (로컬 시간)
+    return now>=cutoff.getTime();
+  });
   if(!targets.length) return;
   saveSnapshot(`약속우산 자동 미납 처리 (${targets.length}건)`);
   for(const r of targets){
