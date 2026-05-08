@@ -354,6 +354,11 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 .mnav-item .mbadge{position:absolute;top:1px;right:2px;background:#ef4444;color:white;font-size:8px;font-weight:700;padding:1px 3px;border-radius:8px;}
 .fab{display:none;position:fixed;bottom:68px;right:16px;width:50px;height:50px;border-radius:50%;background:var(--accent);color:white;font-size:22px;border:none;cursor:pointer;box-shadow:0 4px 16px rgba(45,80,22,.4);align-items:center;justify-content:center;z-index:290;transition:transform .15s;}
 .fab:active{transform:scale(.92);}
+/* 모바일 유틸 버튼 (새로고침 + 테마) */
+.mob-util-btn{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.12);transition:all .15s;font-family:'Noto Sans KR',sans-serif;flex-shrink:0;}
+.mob-util-btn:active{transform:scale(.88);}
+.mob-util-btn:disabled{opacity:.5;pointer-events:none;}
+[data-theme="dark"] .mob-util-btn{box-shadow:0 2px 6px rgba(0,0,0,.4);}
 @media(max-width:768px){
   .sidebar{display:none;}.mobile-nav{display:block;}.fab{display:flex;}
   .main{margin-left:0;padding:12px 10px 80px;}
@@ -631,6 +636,12 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 [data-theme="dark"] .med-card.empty:hover {
   border-color:#5a5a6e;
 }
+/* 의약품 카드 종류 배지 — 다크모드: 액센트가 너무 어두워 안보이므로 오버라이드 */
+[data-theme="dark"] .med-cat-badge {
+  background:var(--surface2);
+  color:var(--text-muted);
+  border:1px solid var(--border);
+}
 /* 토스트 */
 [data-theme="dark"] .toast{
   box-shadow:0 8px 24px rgba(0,0,0,.5);
@@ -902,7 +913,10 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 
     <!-- 일별 추이 (전체 너비) -->
     <div class="sc sc-full">
-      <div class="sc-title">📅 일별 대여 추이 <span id="st-line-range" style="font-size:9px;font-weight:400;color:var(--text-muted);text-transform:none;letter-spacing:0;margin-left:4px"></span></div>
+      <div class="sc-title" style="display:flex;align-items:center;justify-content:space-between">
+        <span>📅 일별 대여 추이 <span id="st-line-range" style="font-size:9px;font-weight:400;color:var(--text-muted);text-transform:none;letter-spacing:0;margin-left:4px"></span></span>
+        <button class="btn btn-ghost btn-sm" onclick="openChartDetail()" style="font-size:11px;padding:4px 10px;">🔍 자세히 보기</button>
+      </div>
       <div class="ch120"><canvas id="chart-daily"></canvas></div>
     </div>
 
@@ -1262,8 +1276,23 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 </div>
 </div>
 
+<!-- 일별 추이 자세히 보기 모달 -->
+<div class="modal-overlay" id="modal-chart-detail" onclick="closeChartDetail()">
+  <div class="modal" style="max-width:860px;width:calc(100vw - 32px);" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">📅 일별 대여 추이 <span id="chart-detail-range" style="font-size:11px;font-weight:400;color:var(--text-muted);margin-left:6px"></span></div>
+      <button class="modal-close" onclick="closeChartDetail()">✕</button>
+    </div>
+    <div class="modal-body" style="padding:20px;">
+      <div style="position:relative;height:360px"><canvas id="chart-daily-detail"></canvas></div>
+    </div>
+  </div>
+</div>
+
 <!-- MOBILE NAV -->
 <div class="mobile-undo-btns">
+  <button class="mob-util-btn" id="mob-refresh-btn" onclick="refreshData()" title="새로고침">🔄</button>
+  <button class="mob-util-btn" id="mob-theme-btn" onclick="toggleTheme()" title="테마 변경">🌙</button>
   <button class="mob-undo-btn" id="mob-undo-btn" onclick="undoAction()" disabled>↩ 되돌리기</button>
   <button class="mob-undo-btn" id="mob-redo-btn" onclick="redoAction()" disabled>앞으로 ↪</button>
 </div>
@@ -1530,7 +1559,9 @@ async function autoUnpaidUmbrella(){
 function renderAll(){updateStats();renderRecent();renderRentals();renderInventory();renderUnpaid();renderBlacklist();}
 async function refreshData(){
   const btn=document.getElementById('refresh-btn');
+  const mobBtn=document.getElementById('mob-refresh-btn');
   if(btn){btn.disabled=true;btn.textContent='⏳ 불러오는 중...';}
+  if(mobBtn){mobBtn.disabled=true;mobBtn.textContent='⏳';}
   try{
     const [rData,iData,nData,sData,mData,lData]=await Promise.all([
       fbGet('/rentals'),fbGet('/itemStatus'),fbGet('/itemNumbers'),
@@ -1549,6 +1580,7 @@ async function refreshData(){
     toast('데이터 불러오기 실패. 인터넷 연결을 확인해주세요.','err');
   }finally{
     if(btn){btn.disabled=false;btn.textContent='🔄 새로고침';}
+    if(mobBtn){mobBtn.disabled=false;mobBtn.textContent='🔄';}
   }
 }
 
@@ -3011,6 +3043,59 @@ function renderDailyChart(list){
   });
 }
 
+// ── 일별 추이 자세히 보기 ──────────────────────────────────────
+function openChartDetail(){
+  document.getElementById('modal-chart-detail').classList.add('open');
+  document.body.style.overflow='hidden';
+  renderDailyDetailChart();
+}
+function closeChartDetail(){
+  document.getElementById('modal-chart-detail').classList.remove('open');
+  document.body.style.overflow='';
+  _charts['daily-detail']?.destroy();
+  delete _charts['daily-detail'];
+}
+function renderDailyDetailChart(){
+  _charts['daily-detail']?.destroy();
+  const ctx=document.getElementById('chart-daily-detail')?.getContext('2d');
+  if(!ctx)return;
+  const list=_filtered();
+  const days=_period==='all'?30:parseInt(_period);
+  const dateArr=[];
+  for(let i=days-1;i>=0;i--){
+    const d=new Date();d.setDate(d.getDate()-i);
+    dateArr.push(d.toISOString().slice(0,10));
+  }
+  document.getElementById('chart-detail-range').textContent=`(최근 ${days}일)`;
+  const types=Object.keys(ITEM_NUMBERS);
+  _charts['daily-detail']=new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:dateArr.map(d=>{const[,m,dd]=d.split('-');return `${m}/${dd}`;}),
+      datasets:types.map(t=>({
+        label:`${ITEM_ICONS[t]} ${ITEM_LABELS[t]}`,
+        data:dateArr.map(d=>list.filter(r=>r.item===t&&r.date?.slice(0,10)===d).length),
+        borderColor:getItemClr()[t],
+        backgroundColor:getItemClr()[t]+'28',
+        borderWidth:2.5,pointRadius:3,pointHoverRadius:6,
+        fill:false,tension:.4
+      }))
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{position:'bottom',labels:{color:cssVar('--text-muted'),font:{size:12},padding:16,boxWidth:12,boxHeight:12}},
+        tooltip:{mode:'index',intersect:false}
+      },
+      scales:{
+        x:{grid:{color:cssVar('--border')},ticks:{color:cssVar('--text-muted'),font:{size:11},maxTicksLimit:20}},
+        y:{beginAtZero:true,ticks:{color:cssVar('--text-muted'),stepSize:1,font:{size:12}},grid:{color:cssVar('--border')}}
+      },
+      interaction:{mode:'nearest',axis:'x',intersect:false}
+    }
+  });
+}
+
 // ── 전체 렌더 진입점 ──────────────────────────────────────────
 function renderStats(){
   _destroyAll();
@@ -3675,7 +3760,9 @@ function toggleTheme(){
 }
 function updateThemeBtn(isDark){
   const btn=document.getElementById('theme-btn');
+  const mobBtn=document.getElementById('mob-theme-btn');
   if(btn){btn.textContent=isDark?'☀️':'🌙';}
+  if(mobBtn){mobBtn.textContent=isDark?'☀️':'🌙';}
 }
 initTheme();
 init();
