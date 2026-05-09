@@ -83,11 +83,11 @@
 }
 [data-theme="dark"]{
   /* ── 구조 ── */
-  --bg:#0e0e10;--surface:#18181c;--surface2:#222228;--border:#3a3a44;
+  --bg:#1a1a1f;--surface:#2a2a32;--surface2:#32323c;--border:#4a4a58;
   --text:#f0f0f2;--text-muted:#9898a6;--text-light:#6b6b7a;
   --tr-hover:#1f1f26;
   /* ── 액센트 ── */
-  --accent:#0d2410;--accent-light:#132e15;--accent-pale:#08150a;
+  --accent:#1e7a34;--accent-light:#228c3c;--accent-pale:#0d2914;
   /* ── 상태 색 (선명하되 과하지 않게) ── */
   --s-renting:#5b9ff5;--s-returned:#3fcf72;--s-unpaid:#f56565;
   --s-broken:#f27299;--s-lost:#a07af5;
@@ -164,11 +164,13 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .pw-box{
   background:var(--surface);border-radius:16px;padding:36px 40px;width:340px;
   box-shadow:0 32px 80px rgba(0,0,0,.25);text-align:center;
+  border:1px solid var(--border);
 }
 .pw-logo{font-size:11px;font-family:'JetBrains Mono',monospace;letter-spacing:.18em;
   color:var(--text-muted);text-transform:uppercase;margin-bottom:10px;}
 .pw-title{font-size:18px;font-weight:900;letter-spacing:-.03em;margin-bottom:4px;}
 .pw-sub{font-size:12px;color:var(--text-muted);margin-bottom:24px;}
+.pw-divider{border:none;border-top:1px solid var(--border);margin:0 0 24px;opacity:.6;}
 .pw-input-wrap{position:relative;margin-bottom:12px;}
 .pw-input{width:100%;padding:11px 40px 11px 14px;border:1.5px solid var(--border);
   background:var(--surface2);color:var(--text);
@@ -180,13 +182,13 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .pw-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);
   background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:14px;padding:4px;}
 .pw-err{font-size:12px;color:var(--c-danger);font-weight:600;min-height:18px;margin-bottom:10px;}
-.pw-btn{width:100%;padding:11px;background:var(--accent);color:white;border:none;
+.pw-btn{width:100%;padding:11px;background:var(--accent);color:white;border:1px solid rgba(255,255,255,.2);
   border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;
   font-family:'Noto Sans KR',sans-serif;transition:background .15s;}
 .pw-btn:hover{background:var(--accent-light);}
 .pw-hint{font-size:10px;color:var(--text-light);margin-top:14px;}
 .layout{display:flex;min-height:100vh;}
-.sidebar{width:220px;background:var(--accent);color:white;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:200;}
+.sidebar{width:220px;background:var(--accent);color:white;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:200;border-right:1px solid rgba(0,0,0,.15);}
 .sidebar-logo{padding:24px 20px 18px;border-bottom:1px solid rgba(255,255,255,.12);}
 .sidebar-logo .tag{font-size:9px;font-family:'JetBrains Mono',monospace;letter-spacing:.15em;opacity:.55;text-transform:uppercase;margin-bottom:5px;}
 .sidebar-logo h1{font-size:16px;font-weight:700;line-height:1.3;}
@@ -197,6 +199,10 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .nav-item.active{background:rgba(255,255,255,.18);color:white;border-color:rgba(255,255,255,.15);}
 .nav-badge{margin-left:auto;background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;font-family:'JetBrains Mono',monospace;min-width:20px;text-align:center;}
 .sidebar-clock{padding:12px 16px;border-top:1px solid rgba(255,255,255,.1);font-family:'JetBrains Mono',monospace;font-size:11px;opacity:.45;display:flex;align-items:center;gap:6px;}
+.sidebar-util-btn{flex:1;padding:8px 4px;border-radius:7px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);font-size:11px;font-weight:600;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:4px;}
+.sidebar-util-btn:hover:not(:disabled){background:rgba(255,255,255,.18);color:rgba(255,255,255,.9);border-color:rgba(255,255,255,.35);}
+.sidebar-util-btn:active:not(:disabled){background:rgba(255,255,255,.25);}
+.sidebar-util-btn:disabled{opacity:.3;cursor:not-allowed;}
 .main{margin-left:220px;flex:1;padding:30px;}
 .page{display:none;}.page.active{display:block;}
 .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:26px;}
@@ -548,11 +554,20 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 }
 
 /* ══ 다크모드 Elevation / Depth ══ */
+/* 사이드바·로그인 오버레이 — 어두운 회색 / FAB·pw-btn — 어두운 초록 */
+[data-theme="dark"] .sidebar{background:#1e1e24;border-right:1px solid rgba(255,255,255,.1);}
+[data-theme="light"] .sidebar, :root:not([data-theme="dark"]) .sidebar{border-right:1px solid rgba(0,0,0,.15);}
+[data-theme="dark"] .fab{background:#0d2410;}
+[data-theme="dark"] .pw-btn{background:#0d2410;}
+[data-theme="dark"] .pw-btn:hover{background:#132e15;}
+[data-theme="dark"] #pw-overlay{background:#1e1e24;}
+
 [data-theme="dark"] .section{
   box-shadow:0 1px 3px rgba(0,0,0,.4),0 4px 12px rgba(0,0,0,.25);
 }
 [data-theme="dark"] .stat-card{
   box-shadow:0 1px 3px rgba(0,0,0,.4);
+  border-color:#55556a;
 }
 [data-theme="dark"] .modal{
   box-shadow:0 24px 60px rgba(0,0,0,.7);
@@ -561,8 +576,8 @@ tbody td{padding:10px 13px;vertical-align:middle;}
   box-shadow:0 1px 3px rgba(0,0,0,.35);
 }
 [data-theme="dark"] .inv-item{
-  background:var(--surface);
-  border-color:var(--border);
+  background:#3a3a46;
+  border-color:#5a5a6e;
   box-shadow:0 1px 3px rgba(0,0,0,.3);
 }
 [data-theme="dark"] .inv-item:hover{
@@ -577,8 +592,8 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 [data-theme="dark"] .inv-item.st-unpaid,
 [data-theme="dark"] .inv-item.st-broken,
 [data-theme="dark"] .inv-item.st-lost {
-  background:var(--surface);
-  border-color:var(--border);
+  background:#3a3a46;
+  border-color:#5a5a6e;
 }
 [data-theme="dark"] .inv-item .inv-num{
   color:var(--text);
@@ -598,11 +613,13 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 }
 /* 버튼 primary — 충분히 밝은 녹색 */
 [data-theme="dark"] .btn-primary{
-  background:var(--accent);
-  box-shadow:0 0 0 1px rgba(255,255,255,.05);
+  background:#1a4a25;
+  border:1px solid #2d7a3a;
+  box-shadow:0 0 0 1px rgba(60,200,90,.08);
 }
 [data-theme="dark"] .btn-primary:hover{
-  background:var(--accent-light);
+  background:#215c2e;
+  border-color:#3a9a4a;
 }
 /* ghost 버튼 */
 [data-theme="dark"] .btn-ghost{
@@ -660,6 +677,7 @@ tbody td{padding:10px 13px;vertical-align:middle;}
     <div class="pw-logo">SNU CALS · Student Council</div>
     <div class="pw-title">관리자 로그인</div>
     <div class="pw-sub">농업생명과학대학 학생회 대여 관리 시스템</div>
+    <hr class="pw-divider">
     <div class="pw-input-wrap">
       <input class="pw-input" type="password" id="pw-input"
         placeholder="비밀번호 입력"
@@ -669,6 +687,7 @@ tbody td{padding:10px 13px;vertical-align:middle;}
     </div>
     <div class="pw-err" id="pw-err"></div>
     <button class="pw-btn" onclick="checkPw()">🔓 로그인</button>
+    <hr class="pw-divider" style="margin-top:20px;margin-bottom:12px;">
     <div class="pw-hint">비밀번호를 모르는 경우 학생회 관리자에게 문의하세요</div>
   </div>
 </div>
@@ -695,30 +714,20 @@ tbody td{padding:10px 13px;vertical-align:middle;}
     <span id="clock-time">--:--:--</span>
     <span id="offline-label" style="display:none;margin-left:auto;font-size:10px;background:#dc2626;color:white;padding:1px 6px;border-radius:10px;font-weight:700">오프라인</span>
     <button id="theme-btn" onclick="toggleTheme()" title="다크/라이트 모드"
-      style="margin-left:auto;background:none;border:none;cursor:pointer;font-size:14px;padding:2px 4px;opacity:.6;line-height:1;flex-shrink:0;">🌙</button>
+      style="margin-left:auto;background:none;border:none;cursor:pointer;font-size:14px;padding:4px 6px;opacity:.6;line-height:1;flex-shrink:0;border-radius:6px;transition:all .15s;"
+      onmouseover="this.style.opacity='1';this.style.background='rgba(255,255,255,.15)'"
+      onmouseout="this.style.opacity='.6';this.style.background='none'">🌙</button>
   </div>
   <div style="padding:0 10px 4px;display:flex;gap:6px">
-    <button id="undo-btn" onclick="undoAction()"
-      style="flex:1;padding:8px 4px;border-radius:7px;border:1px solid rgba(255,255,255,.2);
-             background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);font-size:11px;font-weight:600;
-             cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .15s;display:flex;
-             align-items:center;justify-content:center;gap:4px;" disabled>
+    <button id="undo-btn" class="sidebar-util-btn" onclick="undoAction()" disabled>
       ↩ 되돌리기
     </button>
-    <button id="redo-btn" onclick="redoAction()"
-      style="flex:1;padding:8px 4px;border-radius:7px;border:1px solid rgba(255,255,255,.2);
-             background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);font-size:11px;font-weight:600;
-             cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .15s;display:flex;
-             align-items:center;justify-content:center;gap:4px;" disabled>
+    <button id="redo-btn" class="sidebar-util-btn" onclick="redoAction()" disabled>
       앞으로 ↪
     </button>
   </div>
   <div style="padding:0 10px 12px">
-    <button id="refresh-btn" onclick="refreshData()"
-      style="width:100%;padding:8px 4px;border-radius:7px;border:1px solid rgba(255,255,255,.2);
-             background:rgba(255,255,255,.08);color:rgba(255,255,255,.6);font-size:11px;font-weight:600;
-             cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .15s;display:flex;
-             align-items:center;justify-content:center;gap:5px;">
+    <button id="refresh-btn" class="sidebar-util-btn" style="width:100%;color:rgba(255,255,255,.6);gap:5px;" onclick="refreshData()">
       🔄 새로고침
     </button>
   </div>
@@ -1851,7 +1860,7 @@ function renderInventory(){
     const st=getItemState(currentInvTab,num);
     const rec=rentals.filter(r=>r.item===currentInvTab&&String(r.itemNum)===String(num))
       .sort((a,b)=>new Date(b.date)-new Date(a.date))[0];
-    const renterStr=(rec&&rec.status==='renting')?`<div style="font-size:10px;color:var(--text-muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${rec.name}</div>`:'';
+    const renterStr=(rec&&(rec.status==='renting'||rec.status==='unpaid'))?`<div style="font-size:10px;font-weight:400;color:var(--text);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${rec.name}</div>`:'';
     return `<div class="inv-item ${stMap[st]||'st-available'}" onclick="openInvModal('${currentInvTab}','${num}')">
       <div class="inv-num">${num}</div>${lbMap[st]||lbMap.available}${renterStr}
     </div>`;
