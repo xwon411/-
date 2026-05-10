@@ -782,7 +782,7 @@ tbody td{padding:10px 13px;vertical-align:middle;}
           <option value="broken">고장</option>
           <option value="lost">분실</option>
         </select>
-        <select class="flt" id="s-day" onchange="renderRentals(true)">
+        <select class="flt" id="s-day" onchange="_invNumFilter='';renderRentals(true)">
           <option value="">전체 요일</option>
           <option value="0">일요일</option><option value="1">월요일</option><option value="2">화요일</option>
           <option value="3">수요일</option><option value="4">목요일</option><option value="5">금요일</option><option value="6">토요일</option>
@@ -1393,30 +1393,97 @@ async function redoAction(){
   await applySnapshot(redoStack.pop(),'↪ 앞으로');
 }
 async function applySnapshot(snap,prefix){
+  // 현재 상태 저장 (diff 계산용 — 전체 PUT 대신 변경된 항목만 업데이트)
+  const prevRentals=[...rentals];
+  const prevItemStatus={...itemStatus};
+  const prevItemNumbers=JSON.parse(JSON.stringify(ITEM_NUMBERS));
+  const prevMedItems=[...medItems];
+  const prevMedLog=[...medLog];
+
+  // in-memory 상태를 스냅샷으로 복원
   rentals=snap.rentals; itemStatus=snap.itemStatus; ITEM_NUMBERS=snap.ITEM_NUMBERS;
   medItems=snap.medItems||medItems; medLog=snap.medLog||medLog;
+
   setHistoryLoading(true);
   try{
-    const ro={};rentals.forEach(r=>{ro[r.id]=r;});
-    const mo={};medItems.forEach(m=>{mo[m.id]=m;});
-    const lo={};medLog.forEach(l=>{if(l.logId)lo[l.logId]=l;});
-    await Promise.all([
-      fetch(`${FB}/rentals.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(ro)}),
-      fetch(`${FB}/itemStatus.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(itemStatus)}),
-      fetch(`${FB}/itemNumbers.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(ITEM_NUMBERS)}),
-      fetch(`${FB}/medicine.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(mo)}),
-      fetch(`${FB}/medLog.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(lo)})
-    ]);
+    const writes=[];
+
+    // ── rentals diff ──
+    const snapRMap={}; snap.rentals.forEach(r=>snapRMap[r.id]=r);
+    const prevRMap={}; prevRentals.forEach(r=>prevRMap[r.id]=r);
+    // 스냅샷에 있고 현재와 다른 것 → PUT
+    for(const r of snap.rentals){
+      const p=prevRMap[r.id];
+      if(!p||JSON.stringify(p)!==JSON.stringify(r)) writes.push(fbPut(`/rentals/${r.id}`,r));
+    }
+    // 현재에 있는데 스냅샷에 없는 것 → DELETE
+    for(const r of prevRentals){
+      if(!snapRMap[r.id]) writes.push(fbDel(`/rentals/${r.id}`));
+    }
+
+    // ── itemStatus diff ──
+    const snapISKeys=new Set(Object.keys(snap.itemStatus));
+    const prevISKeys=new Set(Object.keys(prevItemStatus));
+    for(const k of snapISKeys){
+      if(!prevISKeys.has(k)||JSON.stringify(prevItemStatus[k])!==JSON.stringify(snap.itemStatus[k]))
+        writes.push(fbPut(`/itemStatus/${k}`,snap.itemStatus[k]));
+    }
+    for(const k of prevISKeys){
+      if(!snapISKeys.has(k)) writes.push(fbDel(`/itemStatus/${k}`));
+    }
+
+    // ── ITEM_NUMBERS — 변경 시에만 전체 PUT (소량 데이터) ──
+    if(JSON.stringify(prevItemNumbers)!==JSON.stringify(snap.ITEM_NUMBERS))
+      writes.push(fbPut('/itemNumbers',snap.ITEM_NUMBERS));
+
+    // ── medicine diff ──
+    if(snap.medItems){
+      const snapMMap={}; snap.medItems.forEach(m=>snapMMap[m.id]=m);
+      const prevMMap={}; prevMedItems.forEach(m=>prevMMap[m.id]=m);
+      for(const m of snap.medItems){
+        const p=prevMMap[m.id];
+        if(!p||JSON.stringify(p)!==JSON.stringify(m)) writes.push(fbPut(`/medicine/${m.id}`,m));
+      }
+      for(const m of prevMedItems){
+        if(!snapMMap[m.id]) writes.push(fbDel(`/medicine/${m.id}`));
+      }
+    }
+
+    // ── medLog diff ──
+    if(snap.medLog){
+      const snapLMap={}; snap.medLog.forEach(l=>{if(l.logId)snapLMap[l.logId]=l;});
+      const prevLMap={}; prevMedLog.forEach(l=>{if(l.logId)prevLMap[l.logId]=l;});
+      for(const l of snap.medLog){
+        if(!l.logId) continue;
+        const p=prevLMap[l.logId];
+        if(!p||JSON.stringify(p)!==JSON.stringify(l)) writes.push(fbPut(`/medLog/${l.logId}`,l));
+      }
+      for(const l of prevMedLog){
+        if(!l.logId) continue;
+        if(!snapLMap[l.logId]) writes.push(fbDel(`/medLog/${l.logId}`));
+      }
+    }
+
+    await Promise.all(writes);
     dot(true);
-  }catch(e){dot(false);toast('동기화 실패','err');}
-  setHistoryLoading(false);
-  updateHistoryBtns();
-  renderAll();
-  // 의약품 화면도 갱신
-  buildMedFilters();renderMedicine();renderMedLog();updateMedBadge();
-  // 블랙리스트 이력 탭 갱신
-  if(_blTab==='history')renderBlHistory();
-  toast(`${prefix} "${snap.label}" 완료`,'ok');
+    setHistoryLoading(false);
+    updateHistoryBtns();
+    renderAll();
+    buildMedFilters();renderMedicine();renderMedLog();updateMedBadge();
+    if(_blTab==='history')renderBlHistory();
+    toast(`${prefix} "${snap.label}" 완료`,'ok');
+  }catch(e){
+    // Firebase 실패 시 in-memory도 원상복구
+    rentals=prevRentals; itemStatus=prevItemStatus; ITEM_NUMBERS=prevItemNumbers;
+    medItems=prevMedItems; medLog=prevMedLog;
+    dot(false);
+    setHistoryLoading(false);
+    updateHistoryBtns();
+    renderAll();
+    buildMedFilters();renderMedicine();renderMedLog();updateMedBadge();
+    if(_blTab==='history')renderBlHistory();
+    toast('동기화 실패 — 되돌리기가 취소되었습니다','err');
+  }
 }
 function updateHistoryBtns(){
   _updateBtn('undo-btn',undoStack,'↩ 되돌리기');
@@ -1456,7 +1523,11 @@ const FB='https://cals-rental-default-rtdb.firebaseio.com';
 function fbKey(type,num){return `${type}_${String(num).replace(/[\.\#\$\/\[\]]/g,'_')}`;}
 
 async function fbGet(path){
-  try{const r=await fetch(`${FB}${path}.json`);const d=await r.json();return d||null;}catch(e){return null;}
+  try{
+    const r=await fetch(`${FB}${path}.json`);
+    if(!r.ok) throw new Error(`HTTP ${r.status}`);
+    const d=await r.json();return d||null;
+  }catch(e){return null;}
 }
 function fbPut(path,data){
   return fetch(`${FB}${path}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})
@@ -1518,26 +1589,32 @@ let _rentalsFiltered=false;
 async function init(){
   document.getElementById('tbl-recent').innerHTML=
     `<tr><td colspan="8" style="text-align:center;padding:28px;color:var(--text-muted);font-size:13px">⏳ 불러오는 중...</td></tr>`;
-  const [rData,iData,nData,sData]=await Promise.all([fbGet('/rentals'),fbGet('/itemStatus'),fbGet('/itemNumbers'),fbGet('/smsLog')]);
-  rentals=rData?Object.values(rData).sort((a,b)=>new Date(b.date)-new Date(a.date)):[];
-  itemStatus=iData||{};
-  smsLog=sData||{};
-  // Firebase에 저장된 물품 목록 있으면 덮어쓰기
-  if(nData){
-    Object.keys(ITEM_NUMBERS).forEach(t=>{
-      if(nData[t]) ITEM_NUMBERS[t]=nData[t];
-    });
+  try{
+    const [rData,iData,nData,sData]=await Promise.all([fbGet('/rentals'),fbGet('/itemStatus'),fbGet('/itemNumbers'),fbGet('/smsLog')]);
+    rentals=rData?Object.values(rData).sort((a,b)=>new Date(b.date)-new Date(a.date)):[];
+    itemStatus=iData||{};
+    smsLog=sData||{};
+    // Firebase에 저장된 물품 목록 있으면 덮어쓰기
+    if(nData){
+      Object.keys(ITEM_NUMBERS).forEach(t=>{
+        if(nData[t]) ITEM_NUMBERS[t]=nData[t];
+      });
+    }
+    const sel=document.getElementById('f-dept');
+    DEPTS.forEach(d=>sel.innerHTML+=`<option value="${d}">${d}</option>`);
+    // 의약품 먼저 초기화 (autoUnpaidUmbrella의 saveSnapshot이 medItems를 참조하므로)
+    await initMedicine();
+    // 우산 7일 자동 미납 처리
+    await autoUnpaidUmbrella();
+    renderAll();setInterval(tick,1000);tick();
+    updateOnlineStatus();
+    // 1시간마다 자동 미납 체크
+    setInterval(autoUnpaidUmbrella,1000*60*60);
+  }catch(e){
+    document.getElementById('tbl-recent').innerHTML=
+      `<tr><td colspan="8" style="text-align:center;padding:28px;color:var(--warn);font-size:13px">⚠️ 데이터를 불러오지 못했습니다. 새로고침 해주세요.</td></tr>`;
+    console.error('init 오류',e);
   }
-  const sel=document.getElementById('f-dept');
-  DEPTS.forEach(d=>sel.innerHTML+=`<option value="${d}">${d}</option>`);
-  // 의약품 먼저 초기화 (autoUnpaidUmbrella의 saveSnapshot이 medItems를 참조하므로)
-  await initMedicine();
-  // 우산 7일 자동 미납 처리
-  await autoUnpaidUmbrella();
-  renderAll();setInterval(tick,1000);tick();
-  updateOnlineStatus();
-  // 1시간마다 자동 미납 체크
-  setInterval(autoUnpaidUmbrella,1000*60*60);
 }
 
 // 약속우산 대여 후 7일째 오후 6시 기준 자동 미납 처리
@@ -1560,8 +1637,10 @@ async function autoUnpaidUmbrella(){
   try{
     await Promise.all(targets.map(r=>fbPut(`/rentals/${r.id}`,r)));
     toast('약속우산 7일 경과 — 자동 미납 처리되었습니다','inf');
+    renderAll();
   }catch(e){
     prevStates.forEach(({r,status:s,note:n})=>{r.status=s;r.note=n;});
+    undoStack.pop();updateHistoryBtns();
     toast('자동 미납 처리 실패 — 네트워크를 확인해주세요','err');
   }
 }
@@ -1582,6 +1661,8 @@ async function refreshData(){
     if(nData){Object.keys(ITEM_NUMBERS).forEach(t=>{if(nData[t])ITEM_NUMBERS[t]=nData[t];});}
     if(mData)medItems=Object.values(mData);
     medLog=lData?Object.values(lData).sort((a,b)=>new Date(b.at)-new Date(a.at)):[];
+    // 새로고침 후 undoStack 초기화 — 구버전 스냅샷이 최신 데이터에 덮어쓰이는 것 방지
+    undoStack=[];redoStack=[];updateHistoryBtns();
     renderAll();
     buildMedFilters();renderMedicine();renderMedLog();renderMedStats();updateMedBadge();
     toast('최신 데이터를 불러왔습니다','ok');
@@ -1779,7 +1860,7 @@ function renderUnpaid(){
     rentals.filter(r=>['broken','lost'].includes(r.status)).map(r=>fbKey(r.item,r.itemNum))
   );
   const directItems=Object.entries(itemStatus)
-    .filter(([key,val])=>['broken','lost'].includes(val))
+    .filter(([key,val])=>{const v=typeof val==='object'?val.v:val;return ['broken','lost'].includes(v);})
     .filter(([key])=>!rentedBrokenLost.has(key))
     .map(([key,val])=>{
       // key 형식: "umbrella_A-1" (특수문자를 _로 치환했을 수 있음)
@@ -1820,8 +1901,8 @@ function renderUnpaid(){
         <div class="m-card-actions"><button class="btn btn-green btn-sm" onclick="restoreItemFromUnpaid('${key}','${type}','${num}')">복구</button></div>
       </div>`).join('');
   }
-  // 기본 섹션1 활성화 (초기 렌더시)
-  switchUnpaidTab(1);
+  // 기본 섹션1 활성화 (초기 렌더시, 탭2가 활성화된 경우 강제 전환 방지)
+  if(!document.getElementById('utab-2')?.classList.contains('active')) switchUnpaidTab(1);
 }
 
 async function restoreItemFromUnpaid(key,type,num){
@@ -1925,31 +2006,38 @@ async function applyInvCond(){
   try{
     if(val==='available'){
       delete itemStatus[key];
-      await fbDel(`/itemStatus/${key}`);
       const targets=rentals.filter(r=>r.item===invType&&String(r.itemNum)===String(invNum)&&['unpaid','broken','lost'].includes(r.status));
       for(const r of targets){
         prevRentalStates.push({r,status:r.status,returnDate:r.returnDate,note:r.note});
         r.status='returned';r.returnDate=r.returnDate||new Date().toISOString();
         if(note)r.note=note;
       }
-      await Promise.all(targets.map(r=>fbPut(`/rentals/${r.id}`,r)));
+      // itemStatus 삭제와 rental PUT을 한꺼번에 처리
+      await Promise.all([fbDel(`/itemStatus/${key}`),...targets.map(r=>fbPut(`/rentals/${r.id}`,r))]);
     }else{
       const statusData=note?{v:val,note}:val;
       itemStatus[key]=statusData;
-      await fbPut(`/itemStatus/${key}`,statusData);
       const rec=rentals.find(r=>r.item===invType&&String(r.itemNum)===String(invNum)&&r.status==='renting');
       if(rec){
         prevRentalStates.push({r:rec,status:rec.status,note:rec.note});
         rec.status=val;if(note)rec.note=note;
-        await fbPut(`/rentals/${rec.id}`,rec);
+        // itemStatus PUT과 rental PUT을 한꺼번에 처리
+        await Promise.all([fbPut(`/itemStatus/${key}`,statusData),fbPut(`/rentals/${rec.id}`,rec)]);
+      }else{
+        await fbPut(`/itemStatus/${key}`,statusData);
       }
     }
     closeModal('modal-inv');renderAll();
     toast(`${ITEM_LABELS[invType]} ${invNum} → ${val==='available'?'대여가능':sInfo(val).l}`,'ok');
   }catch(e){
+    // in-memory 롤백
     if(prevStatusVal!==undefined)itemStatus[key]=prevStatusVal;else delete itemStatus[key];
     prevRentalStates.forEach(({r,status:s,returnDate:rd,note:n})=>{r.status=s;r.returnDate=rd;r.note=n;});
+    // Firebase 롤백 (best-effort)
+    if(prevStatusVal!==undefined)fbPut(`/itemStatus/${key}`,prevStatusVal);else fbDel(`/itemStatus/${key}`);
+    prevRentalStates.forEach(({r})=>fbPut(`/rentals/${r.id}`,r));
     renderAll();
+    undoStack.pop();updateHistoryBtns();
     toast('저장 실패 — 네트워크를 확인해주세요','err');
   }finally{
     if(btn){btn.disabled=false;btn.textContent='저장';}
@@ -2001,6 +2089,10 @@ async function submitRental(){
   if(!name||!phone||!dept||!selItemType||!itemNum){toast('모든 필수 항목을 입력해주세요','err');return;}
   const bl=rentals.find(r=>r.name===name&&r.phone===phone&&BL_STATUS.includes(r.status));
   if(bl){toast(`⛔ ${name}님은 "${sInfo(bl.status).l}" 상태로 대여가 제한됩니다.`,'err');return;}
+  if(!isAvailable(selItemType,itemNum)){
+    const curState=getItemState(selItemType,itemNum);
+    toast(`⛔ ${ITEM_LABELS[selItemType]} ${itemNum}은(는) 현재 "${sInfo(curState).l}" 상태로 대여할 수 없습니다.`,'err');return;
+  }
   if(!isOnline()) return;
   const btn=document.getElementById('rental-submit-btn');
   if(btn){btn.disabled=true;btn.textContent='저장 중...';}
@@ -2054,22 +2146,27 @@ async function applyStatus(){
   r.status=selStatus;
   r.note=document.getElementById('f-status-note').value.trim();
   const key=fbKey(r.item,r.itemNum);
-  if(selStatus==='returned'){
-    const rd=document.getElementById('f-return-date').value;
-    r.returnDate=rd?new Date(rd).toISOString():new Date().toISOString();
-    delete itemStatus[key];fbDel(`/itemStatus/${key}`);
-  }else if(selStatus==='broken'||selStatus==='lost'){
-    itemStatus[key]=selStatus;fbPut(`/itemStatus/${key}`,selStatus);
-  }
+  const prevItemStatusVal=itemStatus[key];
   try{
-    await fbPut(`/rentals/${r.id}`,r);
+    if(selStatus==='returned'){
+      const rd=document.getElementById('f-return-date').value;
+      r.returnDate=rd?new Date(rd).toISOString():new Date().toISOString();
+      delete itemStatus[key];
+      await Promise.all([fbDel(`/itemStatus/${key}`),fbPut(`/rentals/${r.id}`,r)]);
+    }else if(selStatus==='broken'||selStatus==='lost'){
+      itemStatus[key]=selStatus;
+      await Promise.all([fbPut(`/itemStatus/${key}`,selStatus),fbPut(`/rentals/${r.id}`,r)]);
+    }else{
+      // renting/unpaid: 이전에 broken/lost로 등록된 itemStatus가 있으면 삭제
+      delete itemStatus[key];
+      await Promise.all([fbDel(`/itemStatus/${key}`),fbPut(`/rentals/${r.id}`,r)]);
+    }
     closeModal('modal-status');renderAll();
     toast(`상태: ${sInfo(selStatus).l}`,'ok');
   }catch(e){
     // 실패 시 롤백
     r.status=prevStatus;r.note=prevNote;r.returnDate=prevReturnDate;
-    if(selStatus==='returned'){itemStatus[key]=prevStatus==='broken'||prevStatus==='lost'?prevStatus:undefined;if(itemStatus[key]===undefined)delete itemStatus[key];}
-    else if(selStatus==='broken'||selStatus==='lost'){delete itemStatus[key];}
+    if(prevItemStatusVal!==undefined)itemStatus[key]=prevItemStatusVal;else delete itemStatus[key];
     undoStack.pop();updateHistoryBtns();
     toast('저장에 실패했습니다. 다시 시도해주세요.','err');
   }finally{
@@ -2081,15 +2178,17 @@ async function quickReturn(id){
   if(!isOnline()) return;
   const prevStatus=r.status;
   const prevReturnDate=r.returnDate;
+  const key=fbKey(r.item,r.itemNum);
+  const prevItemStatusVal=itemStatus[key];
   saveSnapshot(`${r.name} ${ITEM_LABELS[r.item]} 반납`);
   r.status='returned';r.returnDate=new Date().toISOString();
-  const key=fbKey(r.item,r.itemNum);
-  delete itemStatus[key];fbDel(`/itemStatus/${key}`);
+  delete itemStatus[key];
   try{
-    await fbPut(`/rentals/${r.id}`,r);
+    await Promise.all([fbDel(`/itemStatus/${key}`),fbPut(`/rentals/${r.id}`,r)]);
     renderAll();toast(`${r.name}님 ${ITEM_LABELS[r.item]} 반납 완료!`,'ok');
   }catch(e){
     r.status=prevStatus;r.returnDate=prevReturnDate;
+    if(prevItemStatusVal!==undefined)itemStatus[key]=prevItemStatusVal;else delete itemStatus[key];
     undoStack.pop();updateHistoryBtns();
     toast('저장에 실패했습니다. 다시 시도해주세요.','err');
   }
@@ -2154,19 +2253,37 @@ async function saveEditRental(){
   const note=document.getElementById('e-note').value.trim();
   if(!name||!phone||!dept||!editSelItemType||!itemNum){toast('필수 항목을 모두 입력해주세요','err');return;}
   if(!isOnline()) return;
-  // 스냅샷 저장 (undo용)
   const prev={...r};
+  const prevKey=fbKey(r.item,r.itemNum);
+  const newKey=fbKey(editSelItemType,itemNum);
+  const keyChanged=prevKey!==newKey;
+  const prevItemStatusVal=itemStatus[prevKey];
   saveSnapshot(`${r.name} 대여 기록 편집`);
   r.name=name; r.phone=phone; r.dept=dept;
   r.item=editSelItemType; r.itemNum=itemNum;
   if(dateVal) r.date=new Date(dateVal).toISOString();
   r.note=note||'';
+  // 물품 번호/종류가 바뀌면 itemStatus도 이동
+  if(keyChanged){
+    delete itemStatus[prevKey];
+    if(prevItemStatusVal!==undefined) itemStatus[newKey]=prevItemStatusVal;
+  }
   try{
-    await fbPut(`/rentals/${r.id}`,r);
+    const writes=[fbPut(`/rentals/${r.id}`,r)];
+    if(keyChanged){
+      writes.push(fbDel(`/itemStatus/${prevKey}`));
+      if(prevItemStatusVal!==undefined) writes.push(fbPut(`/itemStatus/${newKey}`,prevItemStatusVal));
+    }
+    await Promise.all(writes);
     closeModal('modal-edit');renderAll();
     toast(`${name}님 대여 기록이 수정되었습니다`,'ok');
   }catch(e){
-    Object.assign(r,prev);undoStack.pop();updateHistoryBtns();
+    Object.assign(r,prev);
+    if(keyChanged){
+      if(prevItemStatusVal!==undefined)itemStatus[prevKey]=prevItemStatusVal;else delete itemStatus[prevKey];
+      delete itemStatus[newKey];
+    }
+    undoStack.pop();updateHistoryBtns();
     toast('저장에 실패했습니다. 다시 시도해주세요.','err');
   }
 }
@@ -2201,6 +2318,7 @@ async function deleteRental(id){
     rentals=prevRentals;
     if(statusKey&&prevStatusVal!==undefined)itemStatus[statusKey]=prevStatusVal;
     renderAll();
+    undoStack.pop();updateHistoryBtns();
     toast('삭제 실패 — 네트워크를 확인해주세요','err');
   }
 }
@@ -2441,31 +2559,48 @@ async function blPay(name,phone,status){
   const targets=rentals.filter(r=>r.name===name&&r.phone===phone&&r.status===status);
   const items=targets.map(r=>`${ITEM_LABELS[r.item]} ${r.itemNum}`).join(', ');
   if(!confirm(`${name}님의 ${label} 납부를 처리하시겠습니까?\n\n대상 물품: ${items}\n\n납부 확인 후 블랙리스트에서 자동 해제됩니다.`)) return;
-  const prevStates=targets.map(r=>({r,status:r.status,returnDate:r.returnDate,wasBlacklisted:r.wasBlacklisted,resolvedAt:r.resolvedAt}));
+  const prevStates=targets.map(r=>{
+    const k=fbKey(r.item,r.itemNum);
+    return {r,status:r.status,returnDate:r.returnDate,wasBlacklisted:r.wasBlacklisted,resolvedAt:r.resolvedAt,isKey:k,isVal:itemStatus[k]};
+  });
   saveSnapshot(`${name} ${label} 납부`);
   const resolvedAt=new Date().toISOString();
   for(const r of targets){
     r.wasBlacklisted=true;r.resolvedAt=resolvedAt;
     r.status='returned';r.returnDate=r.returnDate||resolvedAt;
-    const key=fbKey(r.item,r.itemNum);
-    delete itemStatus[key];fbDel(`/itemStatus/${key}`);
+    delete itemStatus[fbKey(r.item,r.itemNum)];
   }
   try{
-    await Promise.all(targets.map(r=>fbPut(`/rentals/${r.id}`,r)));
+    // rental PUT + itemStatus DELETE를 한꺼번에 처리
+    const writes=[
+      ...targets.map(r=>fbPut(`/rentals/${r.id}`,r)),
+      ...targets.map(r=>fbDel(`/itemStatus/${fbKey(r.item,r.itemNum)}`))
+    ];
+    await Promise.all(writes);
     renderAll();
     toast(`${name}님 ${label} 납부 → 블랙리스트 해제!`,'ok');
   }catch(e){
-    // 실패 시 전체 롤백 (wasBlacklisted/resolvedAt 포함)
-    prevStates.forEach(({r,status:s,returnDate:rd,wasBlacklisted:wb,resolvedAt:ra})=>{
+    // 실패 시 전체 롤백 (wasBlacklisted/resolvedAt/itemStatus 포함)
+    prevStates.forEach(({r,status:s,returnDate:rd,wasBlacklisted:wb,resolvedAt:ra,isKey:k,isVal:v})=>{
       r.status=s;r.returnDate=rd;
       if(wb===undefined)delete r.wasBlacklisted;else r.wasBlacklisted=wb;
       if(ra===undefined)delete r.resolvedAt;else r.resolvedAt=ra;
+      if(v!==undefined)itemStatus[k]=v;else delete itemStatus[k];
     });
     undoStack.pop();updateHistoryBtns();
     toast('저장에 실패했습니다. 다시 시도해주세요.','err');
   }
 }
-function goRentals(name){_rentalsFiltered=true;showPage('rentals');document.getElementById('s-search').value=name;renderRentals();}
+function goRentals(name){
+  _rentalsFiltered=true;
+  document.getElementById('s-search').value=name;
+  const si=document.getElementById('s-item');if(si)si.value='';
+  const ss=document.getElementById('s-status');if(ss)ss.value='';
+  const sd=document.getElementById('s-day');if(sd)sd.value='';
+  _invNumFilter='';
+  showPage('rentals');
+  renderRentals(true);
+}
 
 // ── 블랙리스트 탭 전환 ──
 let _blTab='active';
@@ -2717,6 +2852,7 @@ async function addItemNum(){
     renderManageList();
     renderInventory();
     updateStats();
+    undoStack.pop();updateHistoryBtns();
     toast('저장 실패 — 네트워크를 확인해주세요','err');
   }
 }
@@ -2751,6 +2887,7 @@ async function deleteItemNum(numStr){
     renderManageList();
     renderInventory();
     updateStats();
+    undoStack.pop();updateHistoryBtns();
     toast('삭제 실패 — 네트워크를 확인해주세요','err');
   }
 }
@@ -3023,7 +3160,8 @@ function renderDailyChart(list){
   const dateArr=[];
   for(let i=days-1;i>=0;i--){
     const d=new Date();d.setDate(d.getDate()-i);
-    dateArr.push(d.toISOString().slice(0,10));
+    const local=new Date(d.getTime()-d.getTimezoneOffset()*60000);
+    dateArr.push(local.toISOString().slice(0,10));
   }
   document.getElementById('st-line-range').textContent=
     `(최근 ${days}일)`;
@@ -3034,7 +3172,7 @@ function renderDailyChart(list){
       labels:dateArr.map(d=>{const[,m,dd]=d.split('-');return `${m}/${dd}`;}),
       datasets:types.map(t=>({
         label:`${ITEM_ICONS[t]} ${ITEM_LABELS[t]}`,
-        data:dateArr.map(d=>list.filter(r=>r.item===t&&r.date?.slice(0,10)===d).length),
+        data:dateArr.map(d=>list.filter(r=>{const rLocal=new Date(new Date(r.date).getTime()-new Date(r.date).getTimezoneOffset()*60000);return r.item===t&&rLocal.toISOString().slice(0,10)===d;}).length),
         borderColor:getItemClr()[t],
         backgroundColor:getItemClr()[t]+'30',
         borderWidth:2,pointRadius:2.5,pointHoverRadius:5,
@@ -3073,7 +3211,8 @@ function renderDailyDetailChart(){
   const dateArr=[];
   for(let i=days-1;i>=0;i--){
     const d=new Date();d.setDate(d.getDate()-i);
-    dateArr.push(d.toISOString().slice(0,10));
+    const local=new Date(d.getTime()-d.getTimezoneOffset()*60000);
+    dateArr.push(local.toISOString().slice(0,10));
   }
   document.getElementById('chart-detail-range').textContent=`(최근 ${days}일)`;
   const types=Object.keys(ITEM_NUMBERS);
@@ -3083,7 +3222,7 @@ function renderDailyDetailChart(){
       labels:dateArr.map(d=>{const[,m,dd]=d.split('-');return `${m}/${dd}`;}),
       datasets:types.map(t=>({
         label:`${ITEM_ICONS[t]} ${ITEM_LABELS[t]}`,
-        data:dateArr.map(d=>list.filter(r=>r.item===t&&r.date?.slice(0,10)===d).length),
+        data:dateArr.map(d=>list.filter(r=>{const rLocal=new Date(new Date(r.date).getTime()-new Date(r.date).getTimezoneOffset()*60000);return r.item===t&&rLocal.toISOString().slice(0,10)===d;}).length),
         borderColor:getItemClr()[t],
         backgroundColor:getItemClr()[t]+'28',
         borderWidth:2.5,pointRadius:3,pointHoverRadius:6,
@@ -3415,9 +3554,9 @@ function renderMedStats(){
 async function deleteMedLog(idx){
   if(!confirm('이 이력을 삭제하시겠습니까?'))return;
   if(!isOnline()) return;
-  saveSnapshot('의약품 이력 삭제');
   const entry=medLog[idx];
   if(!entry)return;
+  saveSnapshot('의약품 이력 삭제');
   const prevLog=[...medLog];
   medLog.splice(idx,1);
   renderMedLog();
@@ -3432,6 +3571,7 @@ async function deleteMedLog(idx){
   }catch(e){
     medLog=prevLog;
     renderMedLog();
+    undoStack.pop();updateHistoryBtns();
     toast('삭제 실패 — 네트워크를 확인해주세요','err');
   }
 }
@@ -3544,7 +3684,6 @@ function updateMedPreview(m,delta){
 async function saveMedAdj(){
   const m=medItems.find(x=>x.id===_medId);if(!m)return;
   if(!isOnline()) return;
-  saveSnapshot(`의약품 재고 조정: ${m.name}`);
   const reason=document.getElementById('med-reason').value;
   const rawVal=parseInt(document.getElementById('med-direct-qty').value||'0')||0;
   let delta;
@@ -3556,6 +3695,7 @@ async function saveMedAdj(){
     delta=rawVal;
   }
   if(delta===0){toast('변경량이 0입니다. 수량을 입력해주세요','err');return;}
+  saveSnapshot(`의약품 재고 조정: ${m.name}`);
   const prevQty=m.qty;
   const newQty=Math.max(0,m.qty+delta);
   const memo=document.getElementById('med-memo').value.trim();
@@ -3576,6 +3716,7 @@ async function saveMedAdj(){
     m.qty=prevQty;
     medLog.shift();
     renderMedicine();
+    undoStack.pop();updateHistoryBtns();
     toast('저장 실패 — 네트워크를 확인해주세요','err');
   }finally{
     if(btn){btn.disabled=false;btn.textContent='💾 저장';}
@@ -3654,6 +3795,7 @@ async function saveMedName(id){
   }catch(e){
     m.name=prevName;
     if(btn){btn.disabled=false;btn.textContent='저장';}
+    undoStack.pop();updateHistoryBtns();
     toast('저장 실패 — 네트워크를 확인해주세요','err');
   }
 }
@@ -3667,14 +3809,15 @@ async function submitMedAdd(){
   if(!cat||!name){toast('종류와 품명은 필수입니다','err');return;}
   if(medItems.some(m=>m.name===name&&m.cat===cat)){toast('이미 동일한 품목이 있습니다','err');return;}
   saveSnapshot(`의약품 품목 추가: ${name}`);
-  const id='med_'+Date.now();
+  const uid=()=>Date.now()+'_'+Math.random().toString(36).slice(2,7);
+  const id='med_'+uid();
   const newItem={id,cat,name,qty,unit};
   const lastIdx=medItems.map((m,i)=>m.cat===cat?i:-1).reduce((a,b)=>Math.max(a,b),-1);
   if(lastIdx>=0) medItems.splice(lastIdx+1,0,newItem);
   else medItems.push(newItem);
   let logEntry=null;
   if(qty>0){
-    const logId='log_'+Date.now();
+    const logId='log_'+uid();
     logEntry={logId,at:new Date().toISOString(),medId:id,cat,name,delta:qty,reason:'구비 추가',after:qty,unit};
     medLog.unshift(logEntry);
   }
@@ -3694,37 +3837,43 @@ async function submitMedAdd(){
     toast(`💊 ${name} 품목 추가 완료!`,'ok');
   }catch(e){
     medItems=medItems.filter(x=>x.id!==id);
-    if(logEntry)medLog.shift();
+    if(logEntry) medLog=medLog.filter(l=>l.logId!==logEntry.logId);
+    renderMedManageList();
+    buildMedFilters();
+    renderMedicine();
+    renderMedLog();
+    updateMedBadge();
+    undoStack.pop();updateHistoryBtns();
     toast('저장 실패 — 네트워크를 확인해주세요','err');
   }finally{
-    if(btn){btn.disabled=false;btn.textContent='＋ 품목 추가';}
+    if(btn){btn.disabled=false;btn.textContent='➕ 추가';}
   }
 }
 
 async function deleteMedItem(id){
+  if(!confirm('이 품목을 삭제하시겠습니까?\n※ 삭제된 품목은 복구할 수 없습니다.'))return;
   if(!isOnline()) return;
   const m=medItems.find(x=>x.id===id);if(!m)return;
-  if(medLog.some(l=>l.medId===id)){toast('사용 이력이 있는 품목은 삭제할 수 없습니다','err');return;}
-  if(!confirm(`${m.name}을(를) 삭제하시겠습니까?`))return;
   saveSnapshot(`의약품 품목 삭제: ${m.name}`);
   const prevItems=[...medItems];
   medItems=medItems.filter(x=>x.id!==id);
   renderMedManageList();
+  buildMedFilters();
   renderMedicine();
   updateMedBadge();
   try{
     await fbDel(`/medicine/${id}`);
-    buildMedFilters();
     toast(`${m.name} 삭제 완료`,'inf');
   }catch(e){
     medItems=prevItems;
     renderMedManageList();
+    buildMedFilters();
     renderMedicine();
     updateMedBadge();
+    undoStack.pop();updateHistoryBtns();
     toast('삭제 실패 — 네트워크를 확인해주세요','err');
   }
 }
-
 async function clearMedLog(){
   if(!confirm('이력을 모두 삭제하시겠습니까?'))return;
   if(!isOnline()) return;
@@ -3775,9 +3924,9 @@ function updateThemeBtn(isDark){
 }
 initTheme();
 init();
+
 </script>
 
-<!-- PWA 설치 배너 -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:1000;background:var(--surface);border-top:1px solid var(--border);padding:14px 18px;box-shadow:0 -4px 20px rgba(0,0,0,.1);align-items:center;gap:12px;">
   <img src="icon-192.png" style="width:44px;height:44px;border-radius:10px;flex-shrink:0;" alt="">
   <div style="flex:1;">

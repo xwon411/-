@@ -210,6 +210,7 @@ footer{text-align:center;padding:14px;font-size:11px;color:var(--text-muted);bor
 <footer>농업생명과학대학 학생회 · 대여 현황은 실시간으로 갱신됩니다</footer>
 
 <script>
+function esc(s){return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 // ── Firebase (읽기 전용) ──────────────────────────────────────
 const FB = 'https://cals-rental-default-rtdb.firebaseio.com';
 
@@ -241,8 +242,9 @@ async function fbGet(path){
 function getItemState(type, num){
   const key = fbKey(type, num);
   const iSt = itemStatus[key];
-  if(iSt === 'broken') return 'broken';
-  if(iSt === 'lost')   return 'lost';
+  const iStVal=typeof iSt==='object'?iSt.v:iSt;
+  if(iStVal==='broken') return 'broken';
+  if(iStVal==='lost')   return 'lost';
   const recs = rentals
     .filter(r => r.item === type && String(r.itemNum) === String(num))
     .sort((a,b) => new Date(b.date) - new Date(a.date));
@@ -318,6 +320,7 @@ function getDueInfo(r) {
     // 생필품: 대여 당일 18:00
     dueDate = new Date(rentedAt);
     dueDate.setHours(18, 0, 0, 0);
+    if(dueDate <= rentedAt) dueDate.setDate(dueDate.getDate() + 1);
   }
 
   const diffMs  = dueDate - now;
@@ -329,9 +332,11 @@ function getDueInfo(r) {
 
   if (diffMs < 0) {
     // 기한 초과
-    const overDay = Math.abs(diffDay);
-    const overHr  = Math.abs(diffHr);
-    return { cls:'over', ico:'🚨', big: overDay > 0 ? `${overDay}일 ${overHr}시간 초과` : `${overHr}시간 ${Math.abs(diffMin)}분 초과`, sub:`반납 기한: ${dueStr}`, dueStr };
+    const absDiffMs=Math.abs(diffMs);
+    const overDay=Math.floor(absDiffMs/86400000);
+    const overHr=Math.floor((absDiffMs%86400000)/3600000);
+    const overMin=Math.floor((absDiffMs%3600000)/60000);
+    return { cls:'over', ico:'🚨', big: overDay > 0 ? `${overDay}일 ${overHr}시간 초과` : `${overHr}시간 ${overMin}분 초과`, sub:`반납 기한: ${dueStr}`, dueStr };
   } else if (diffDay === 0 && diffHr < 3) {
     return { cls:'warn', ico:'⚠️', big: `${diffHr}시간 ${diffMin}분 남음`, sub:`반납 기한: ${dueStr}`, dueStr };
   } else if (diffDay < 2) {
@@ -372,7 +377,7 @@ function searchMyRental() {
   if (!found.length) {
     resultWrap.innerHTML = `<div class="result-empty">
       <div class="r-ico">📭</div>
-      <div><b>${name}</b>님의 대여 기록이 없습니다</div>
+      <div><b>${esc(name)}</b>님의 대여 기록이 없습니다</div>
     </div>`;
     return;
   }
