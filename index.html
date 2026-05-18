@@ -31,8 +31,11 @@
   --ib-multitap-bg:#ede9fe;--ib-heatpack-bg:#fce7f3;
   --sb-renting-bg:#dbeafe;--sb-returned-bg:#dcfce7;
   --sb-unpaid-bg:#fee2e2;--sb-broken-bg:#ffe4e6;--sb-lost-bg:#ede9fe;
+  --sb-unpaid-paid-bg:#fff7ed;--s-unpaid-paid:#ea580c;
+  --sb-lost-paid-bg:#f5f3ff;--s-lost-paid:#7c3aed;
   --sel-renting-bg:#dbeafe;--sel-returned-bg:#dcfce7;--sel-unpaid-bg:#fee2e2;
   --sel-broken-bg:#ffe4e6;--sel-lost-bg:#ede9fe;
+  --sel-unpaid-paid-bg:#fff7ed;--sel-lost-paid-bg:#f5f3ff;
   --item-sel-umbrella-bg:#e8f0e0;--item-sel-charger-bg:#dbeafe;
   --item-sel-calculator-bg:#fef3c7;--item-sel-multitap-bg:#ede9fe;--item-sel-heatpack-bg:#fce7f3;
   --btn-danger-bg:#fee2e2;--btn-danger-cl:#dc2626;--btn-danger-bd:#fecaca;
@@ -47,6 +50,8 @@
   --inv-unpaid-bg:#fef9c3;--inv-unpaid-bd:#fde68a;
   --inv-broken-bg:#fff1f2;--inv-broken-bd:#fecdd3;
   --inv-lost-bg:#fdf4ff;--inv-lost-bd:#e9d5ff;
+  --inv-unpaid-paid-bg:#fff7ed;--inv-unpaid-paid-bd:#fed7aa;
+  --inv-lost-paid-bg:#f5f3ff;--inv-lost-paid-bd:#c4b5fd;
   /* 물품상태 조건 선택 배경 */
   --cond-avail-bg:#dcfce7;--cond-unpaid-bg:#fee2e2;
   --cond-broken-bg:#ffe4e6;--cond-lost-bg:#ede9fe;
@@ -100,9 +105,12 @@
   /* ── 상태 배지 배경 ── */
   --sb-renting-bg:#0d1e38;--sb-returned-bg:#0d2914;
   --sb-unpaid-bg:#2a0f0f;--sb-broken-bg:#2a0f16;--sb-lost-bg:#180e34;
+  --sb-unpaid-paid-bg:#2a1500;--s-unpaid-paid:#f0874a;
+  --sb-lost-paid-bg:#1e1634;--s-lost-paid:#a07af5;
   /* ── 상태 선택 버튼 (모달) ── */
   --sel-renting-bg:#0d1e38;--sel-returned-bg:#0d2914;--sel-unpaid-bg:#2a0f0f;
   --sel-broken-bg:#2a0f16;--sel-lost-bg:#180e34;
+  --sel-unpaid-paid-bg:#2a1500;--sel-lost-paid-bg:#1e1634;
   /* ── 물품 선택 버튼 ── */
   --item-sel-umbrella-bg:#0d2914;--item-sel-charger-bg:#0d1e38;
   --item-sel-calculator-bg:#271c00;--item-sel-multitap-bg:#180e34;--item-sel-heatpack-bg:#290d1e;
@@ -118,6 +126,8 @@
   --inv-unpaid-bg:#281500;--inv-unpaid-bd:#562c00;
   --inv-broken-bg:#2a0f18;--inv-broken-bd:#58182c;
   --inv-lost-bg:#180e34;--inv-lost-bd:#381668;
+  --inv-unpaid-paid-bg:#2a1500;--inv-unpaid-paid-bd:#7c3300;
+  --inv-lost-paid-bg:#1e1634;--inv-lost-paid-bd:#4c2d8a;
   /* ── 물품상태 조건 선택 배경 ── */
   --cond-avail-bg:#0d2914;--cond-unpaid-bg:#2a0f0f;
   --cond-broken-bg:#2a0f16;--cond-lost-bg:#180e34;
@@ -251,6 +261,8 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 .sb-unpaid{background:var(--sb-unpaid-bg);color:var(--s-unpaid);}.sb-unpaid::before{background:var(--s-unpaid);animation:bl 1.2s ease infinite;}
 .sb-broken{background:var(--sb-broken-bg);color:var(--s-broken);}.sb-broken::before{background:var(--s-broken);}
 .sb-lost{background:var(--sb-lost-bg);color:var(--s-lost);}.sb-lost::before{background:var(--s-lost);}
+.sb-unpaid-paid{background:var(--sb-unpaid-paid-bg);color:var(--s-unpaid-paid);}.sb-unpaid-paid::before{background:var(--s-unpaid-paid);}
+.sb-lost-paid{background:var(--sb-lost-paid-bg);color:var(--s-lost-paid);}.sb-lost-paid::before{background:var(--s-lost-paid);}
 @keyframes bl{0%,100%{opacity:1}50%{opacity:.25}}
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(3px);z-index:500;align-items:center;justify-content:center;}
 .modal-overlay.open{display:flex;}
@@ -284,6 +296,8 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 .s5-opt.sel-unpaid{border-color:var(--s-unpaid);background:var(--sel-unpaid-bg);color:var(--s-unpaid);}
 .s5-opt.sel-broken{border-color:var(--s-broken);background:var(--sel-broken-bg);color:var(--s-broken);}
 .s5-opt.sel-lost{border-color:var(--s-lost);background:var(--sel-lost-bg);color:var(--s-lost);}
+.s5-opt.sel-unpaid_paid{border-color:var(--s-unpaid-paid);background:var(--sel-unpaid-paid-bg);color:var(--s-unpaid-paid);}
+.s5-opt.sel-lost_paid{border-color:var(--s-lost-paid);background:var(--sel-lost-paid-bg);color:var(--s-lost-paid);}
 .inv-tabs{display:flex;gap:6px;padding:13px 13px 0;flex-wrap:wrap;}
 .inv-tab{padding:5px 13px;border-radius:20px;cursor:pointer;font-size:12px;font-weight:600;border:1px solid var(--border);background:var(--surface2);transition:all .15s;}
 .inv-tab.active{background:var(--accent);color:white;border-color:var(--accent);}
@@ -296,6 +310,8 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 .inv-item.st-unpaid{background:var(--inv-unpaid-bg);border-color:var(--inv-unpaid-bd);}
 .inv-item.st-broken{background:var(--inv-broken-bg);border-color:var(--inv-broken-bd);}
 .inv-item.st-lost{background:var(--inv-lost-bg);border-color:var(--inv-lost-bd);}
+.inv-item.st-unpaid-paid{background:var(--inv-unpaid-paid-bg);border-color:var(--inv-unpaid-paid-bd);}
+.inv-item.st-lost-paid{background:var(--inv-lost-paid-bg);border-color:var(--inv-lost-paid-bd);}
 .cond-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
 .cond-opt{padding:12px 4px;border-radius:9px;cursor:pointer;border:2px solid var(--border);background:var(--surface2);text-align:center;font-size:11px;font-weight:600;transition:all .15s;}
 .cond-opt:hover{transform:translateY(-1px);}
@@ -304,6 +320,8 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 .cond-opt.sel-unpaid{border-color:var(--s-unpaid);background:var(--cond-unpaid-bg);color:var(--s-unpaid);}
 .cond-opt.sel-broken{border-color:var(--s-broken);background:var(--cond-broken-bg);color:var(--s-broken);}
 .cond-opt.sel-lost{border-color:var(--s-lost);background:var(--cond-lost-bg);color:var(--s-lost);}
+.cond-opt.sel-unpaid_paid{border-color:var(--s-unpaid-paid);background:var(--sel-unpaid-paid-bg);color:var(--s-unpaid-paid);}
+.cond-opt.sel-lost_paid{border-color:var(--s-lost-paid);background:var(--sel-lost-paid-bg);color:var(--s-lost-paid);}
 .bl-grid{display:flex;flex-direction:column;gap:10px;padding:14px;}
 .bl-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:0;}
 .bl-card-top{display:flex;align-items:flex-start;gap:13px;}
@@ -1347,13 +1365,15 @@ let ITEM_NUMBERS=JSON.parse(JSON.stringify(DEFAULT_ITEM_NUMBERS));
 // broken   → 고장 (물품 대여불가, 사람 무관)
 // lost     → 분실 (물품 대여불가 영구, 사람 블랙리스트)
 const S5=[
-  {v:'renting', l:'대여중',  cl:'sb-renting',  ico:'📦'},
-  {v:'returned',l:'반납완료',cl:'sb-returned', ico:'✅'},
-  {v:'unpaid',  l:'미납',    cl:'sb-unpaid',   ico:'⚠️'},
-  {v:'broken',  l:'고장',    cl:'sb-broken',   ico:'🔧'},
-  {v:'lost',    l:'분실',    cl:'sb-lost',     ico:'❌'}
+  {v:'renting',     l:'대여중',              cl:'sb-renting',     ico:'📦'},
+  {v:'returned',    l:'반납완료',            cl:'sb-returned',    ico:'✅'},
+  {v:'unpaid',      l:'미납',                cl:'sb-unpaid',      ico:'⚠️'},
+  {v:'broken',      l:'고장',                cl:'sb-broken',      ico:'🔧'},
+  {v:'lost',        l:'분실',                cl:'sb-lost',        ico:'❌'},
+  {v:'unpaid_paid', l:'대여중 (연체료 납부)',cl:'sb-unpaid-paid', ico:'🟠'},
+  {v:'lost_paid',   l:'분실 (분실비 납부)',  cl:'sb-lost-paid',   ico:'💜'}
 ];
-const BL_STATUS=['unpaid','lost']; // 블랙리스트 등록 상태
+const BL_STATUS=['unpaid','lost']; // 블랙리스트 등록 상태 (납부완료 상태는 제외)
 
 // ══ 되돌리기 / 앞으로 (Undo / Redo) ══
 const UNDO_LIMIT=10;
@@ -1645,6 +1665,12 @@ async function autoUnpaidUmbrella(){
   }
 }
 function renderAll(){updateStats();renderRecent();renderRentals();renderInventory();renderUnpaid();renderBlacklist();}
+function _activePage(){const p=document.querySelector('.page.active');return p?p.id.replace('page-',''):''}
+function renderAfterRental(){updateStats();renderRecent();const pg=_activePage();if(pg==='rentals')renderRentals();if(pg==='inventory')renderInventory();}
+function renderAfterStatus(){updateStats();renderRecent();const pg=_activePage();if(pg==='rentals')renderRentals();if(pg==='inventory')renderInventory();if(pg==='unpaid')renderUnpaid();if(pg==='blacklist')renderBlacklist();}
+function renderAfterInvCond(){updateStats();renderInventory();const pg=_activePage();if(pg==='unpaid')renderUnpaid();if(pg==='rentals')renderRentals();}
+function renderAfterEdit(){updateStats();renderRecent();const pg=_activePage();if(pg==='rentals')renderRentals();if(pg==='inventory')renderInventory();}
+function renderAfterPay(){updateStats();renderRecent();renderBlacklist();const pg=_activePage();if(pg==='rentals')renderRentals();if(pg==='unpaid')renderUnpaid();}
 async function refreshData(){
   const btn=document.getElementById('refresh-btn');
   const mobBtn=document.getElementById('mob-refresh-btn');
@@ -1681,14 +1707,16 @@ function getItemState(type,num){
   const iSt=itemStatus[key];
   const iStVal=typeof iSt==='object'?iSt.v:iSt; // 객체(메모 포함) or 문자열 모두 처리
   if(iStVal==='broken') return 'broken';
-  if(iStVal==='lost') return 'lost';
   // 가장 최근 대여 기록
   const recs=rentals.filter(r=>r.item===type&&String(r.itemNum)===String(num))
     .sort((a,b)=>new Date(b.date)-new Date(a.date));
-  if(!recs.length) return 'available';
+  if(!recs.length){if(iStVal==='lost')return 'lost';return 'available';}
   const last=recs[0];
   if(last.status==='returned') return 'available';
-  return last.status; // renting, unpaid, broken, lost
+  if(last.status==='unpaid_paid') return 'unpaid_paid'; // 미납금 납부 완료 → 별도 상태로 표시
+  if(last.status==='lost_paid') return 'lost_paid'; // 분실비 납부 완료 → 별도 상태로 표시
+  if(iStVal==='lost') return 'lost';
+  return last.status;
 }
 function isAvailable(type,num){const s=getItemState(type,num);return s==='available';}
 
@@ -1725,7 +1753,7 @@ function daysSince(iso){return Math.floor((Date.now()-new Date(iso))/86400000);}
 
 function actionBtns(r){
   let b=`<button class="btn btn-ghost btn-sm" onclick="openStatusModal(${r.id})">상태변경</button>`;
-  if(r.status==='renting'||r.status==='unpaid')
+  if(r.status==='renting'||r.status==='unpaid'||r.status==='unpaid_paid')
     b+=`<button class="btn btn-green btn-sm" onclick="quickReturn(${r.id})">반납</button>`;
   b+=`<button class="btn btn-danger btn-sm" onclick="deleteRental(${r.id})">삭제</button>`;
   return `<div class="td-actions">${b}</div>`;
@@ -1908,13 +1936,13 @@ function renderUnpaid(){
 async function restoreItemFromUnpaid(key,type,num){
   const prev=itemStatus[key];
   delete itemStatus[key];
-  renderAll();
+  renderAfterInvCond();
   try{
     await fbDel(`/itemStatus/${key}`);
     toast(`${ITEM_LABELS[type]} ${num} 복구 완료`,'ok');
   }catch(e){
     itemStatus[key]=prev;
-    renderAll();
+    renderAfterInvCond();
     toast('저장 실패 — 네트워크를 확인해주세요','err');
   }
 }
@@ -1927,13 +1955,15 @@ function renderInventory(){
   const sel=document.getElementById('inv-select');
   if(sel){sel.innerHTML=Object.keys(ITEM_NUMBERS).map(t=>`<option value="${t}"${t===currentInvTab?' selected':''}>${ITEM_ICONS[t]} ${ITEM_LABELS[t]}</option>`).join('');}
   const nums=ITEM_NUMBERS[currentInvTab];
-  const stMap={available:'st-available',renting:'st-renting',unpaid:'st-unpaid',broken:'st-broken',lost:'st-lost'};
+  const stMap={available:'st-available',renting:'st-renting',unpaid:'st-unpaid',broken:'st-broken',lost:'st-lost','unpaid_paid':'st-unpaid-paid','lost_paid':'st-lost-paid'};
   const lbMap={
     available:`<span class="sbadge sb-available" style="font-size:9px;padding:2px 4px;gap:3px">가능</span>`,
     renting:`<span class="sbadge sb-renting" style="font-size:9px;padding:2px 4px;gap:3px">대여중</span>`,
     unpaid:`<span class="sbadge sb-unpaid" style="font-size:9px;padding:2px 4px;gap:3px">미납</span>`,
     broken:`<span class="sbadge sb-broken" style="font-size:9px;padding:2px 4px;gap:3px">고장</span>`,
-    lost:`<span class="sbadge sb-lost" style="font-size:9px;padding:2px 4px;gap:3px">분실</span>`
+    lost:`<span class="sbadge sb-lost" style="font-size:9px;padding:2px 4px;gap:3px">분실</span>`,
+    unpaid_paid:`<span class="sbadge sb-unpaid-paid" style="font-size:9px;padding:2px 4px;gap:3px">미납 (미납금 납부)</span>`,
+    lost_paid:`<span class="sbadge sb-lost-paid" style="font-size:9px;padding:2px 4px;gap:3px">분실 (분실비 납부)</span>`
   };
   const grid=document.getElementById('inv-grid');
   grid.style.gridTemplateColumns='';
@@ -1941,7 +1971,7 @@ function renderInventory(){
     const st=getItemState(currentInvTab,num);
     const rec=rentals.filter(r=>r.item===currentInvTab&&String(r.itemNum)===String(num))
       .sort((a,b)=>new Date(b.date)-new Date(a.date))[0];
-    const renterStr=(rec&&(rec.status==='renting'||rec.status==='unpaid'))?`<div style="font-size:10px;font-weight:400;color:var(--text);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${rec.name}</div>`:'';
+    const renterStr=(rec&&['renting','unpaid','unpaid_paid','lost_paid'].includes(rec.status))?`<div style="font-size:10px;font-weight:400;color:var(--text);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${rec.name}</div>`:'';
     return `<div class="inv-item ${stMap[st]||'st-available'}" onclick="openInvModal('${currentInvTab}','${num}')">
       <div class="inv-num">${num}</div>${lbMap[st]||lbMap.available}${renterStr}
     </div>`;
@@ -1961,6 +1991,10 @@ function openInvModal(type,num){
     {v:'available',l:'대여가능',ico:'✅'},{v:'unpaid',l:'미납',ico:'⚠️'},
     {v:'broken',l:'고장',ico:'🔧'},{v:'lost',l:'분실',ico:'❌'}
   ];
+  const hasUnpaidRec=rentals.some(r=>r.item===type&&String(r.itemNum)===String(num)&&['unpaid','unpaid_paid'].includes(r.status));
+  const hasLostRec=rentals.some(r=>r.item===type&&String(r.itemNum)===String(num)&&['lost','lost_paid'].includes(r.status));
+  if(hasUnpaidRec) opts.push({v:'unpaid_paid',l:'미납금 납부',ico:'🟠'});
+  if(hasLostRec) opts.push({v:'lost_paid',l:'분실비 납부',ico:'💜'});
   document.getElementById('inv-cond-opts').innerHTML=opts.map(o=>
     `<div class="cond-opt${cur===o.v?' sel-'+o.v:''}" data-v="${o.v}" onclick="pickCond('${o.v}')">
       <div class="cico">${o.ico}</div>${o.l}
@@ -2012,8 +2046,25 @@ async function applyInvCond(){
         r.status='returned';r.returnDate=r.returnDate||new Date().toISOString();
         if(note)r.note=note;
       }
-      // itemStatus 삭제와 rental PUT을 한꺼번에 처리
       await Promise.all([fbDel(`/itemStatus/${key}`),...targets.map(r=>fbPut(`/rentals/${r.id}`,r))]);
+    }else if(val==='unpaid_paid'||val==='lost_paid'){
+      const srcStatus=val==='unpaid_paid'?'unpaid':'lost';
+      const targets=rentals.filter(r=>r.item===invType&&String(r.itemNum)===String(invNum)&&r.status===srcStatus);
+      const resolvedAt=new Date().toISOString();
+      for(const r of targets){
+        prevRentalStates.push({r,status:r.status,returnDate:r.returnDate,note:r.note,wasBlacklisted:r.wasBlacklisted,resolvedAt:r.resolvedAt});
+        r.wasBlacklisted=true;r.resolvedAt=resolvedAt;
+        r.status=val;if(note)r.note=note;
+      }
+      if(val==='lost_paid'){
+        // 분실비 납부: itemStatus는 lost 유지
+        itemStatus[key]='lost';
+        await Promise.all([fbPut(`/itemStatus/${key}`,'lost'),...targets.map(r=>fbPut(`/rentals/${r.id}`,r))]);
+      }else{
+        // 미납금 납부: itemStatus 삭제
+        delete itemStatus[key];
+        await Promise.all([fbDel(`/itemStatus/${key}`),...targets.map(r=>fbPut(`/rentals/${r.id}`,r))]);
+      }
     }else{
       const statusData=note?{v:val,note}:val;
       itemStatus[key]=statusData;
@@ -2027,16 +2078,16 @@ async function applyInvCond(){
         await fbPut(`/itemStatus/${key}`,statusData);
       }
     }
-    closeModal('modal-inv');renderAll();
+    closeModal('modal-inv');renderAfterInvCond();
     toast(`${ITEM_LABELS[invType]} ${invNum} → ${val==='available'?'대여가능':sInfo(val).l}`,'ok');
   }catch(e){
     // in-memory 롤백
     if(prevStatusVal!==undefined)itemStatus[key]=prevStatusVal;else delete itemStatus[key];
-    prevRentalStates.forEach(({r,status:s,returnDate:rd,note:n})=>{r.status=s;r.returnDate=rd;r.note=n;});
+    prevRentalStates.forEach(({r,status:s,returnDate:rd,note:n,wasBlacklisted:wb,resolvedAt:ra})=>{r.status=s;r.returnDate=rd;r.note=n;if(wb===undefined)delete r.wasBlacklisted;else r.wasBlacklisted=wb;if(ra===undefined)delete r.resolvedAt;else r.resolvedAt=ra;});
     // Firebase 롤백 (best-effort)
     if(prevStatusVal!==undefined)fbPut(`/itemStatus/${key}`,prevStatusVal);else fbDel(`/itemStatus/${key}`);
     prevRentalStates.forEach(({r})=>fbPut(`/rentals/${r.id}`,r));
-    renderAll();
+    renderAfterInvCond();
     undoStack.pop();updateHistoryBtns();
     toast('저장 실패 — 네트워크를 확인해주세요','err');
   }finally{
@@ -2102,7 +2153,7 @@ async function submitRental(){
   rentals.unshift(rec);
   try{
     await fbPut(`/rentals/${id}`,rec);
-    closeModal('modal-rental');renderAll();
+    closeModal('modal-rental');renderAfterRental();
     toast(`${name}님 ${ITEM_LABELS[selItemType]} ${itemNum} 대여 등록!`,'ok');
   }catch(e){
     rentals.shift();
@@ -2156,18 +2207,23 @@ async function applyStatus(){
     }else if(selStatus==='broken'||selStatus==='lost'){
       itemStatus[key]=selStatus;
       await Promise.all([fbPut(`/itemStatus/${key}`,selStatus),fbPut(`/rentals/${r.id}`,r)]);
+    }else if(selStatus==='lost_paid'){
+      // 분실비 납부: itemStatus는 lost 유지 (물품현황 분실 표시 유지)
+      itemStatus[key]='lost';
+      await Promise.all([fbPut(`/itemStatus/${key}`,'lost'),fbPut(`/rentals/${r.id}`,r)]);
     }else{
-      // renting/unpaid: 이전에 broken/lost로 등록된 itemStatus가 있으면 삭제
+      // renting/unpaid/unpaid_paid: itemStatus 삭제 (물품현황 대여중으로)
       delete itemStatus[key];
       await Promise.all([fbDel(`/itemStatus/${key}`),fbPut(`/rentals/${r.id}`,r)]);
     }
-    closeModal('modal-status');renderAll();
+    closeModal('modal-status');renderAfterStatus();
     toast(`상태: ${sInfo(selStatus).l}`,'ok');
   }catch(e){
     // 실패 시 롤백
     r.status=prevStatus;r.note=prevNote;r.returnDate=prevReturnDate;
     if(prevItemStatusVal!==undefined)itemStatus[key]=prevItemStatusVal;else delete itemStatus[key];
     undoStack.pop();updateHistoryBtns();
+    renderAfterStatus();
     toast('저장에 실패했습니다. 다시 시도해주세요.','err');
   }finally{
     if(btn){btn.disabled=false;btn.textContent='✅ 적용';}
@@ -2185,7 +2241,7 @@ async function quickReturn(id){
   delete itemStatus[key];
   try{
     await Promise.all([fbDel(`/itemStatus/${key}`),fbPut(`/rentals/${r.id}`,r)]);
-    renderAll();toast(`${r.name}님 ${ITEM_LABELS[r.item]} 반납 완료!`,'ok');
+    renderAfterStatus();toast(`${r.name}님 ${ITEM_LABELS[r.item]} 반납 완료!`,'ok');
   }catch(e){
     r.status=prevStatus;r.returnDate=prevReturnDate;
     if(prevItemStatusVal!==undefined)itemStatus[key]=prevItemStatusVal;else delete itemStatus[key];
@@ -2275,7 +2331,7 @@ async function saveEditRental(){
       if(prevItemStatusVal!==undefined) writes.push(fbPut(`/itemStatus/${newKey}`,prevItemStatusVal));
     }
     await Promise.all(writes);
-    closeModal('modal-edit');renderAll();
+    closeModal('modal-edit');renderAfterEdit();
     toast(`${name}님 대여 기록이 수정되었습니다`,'ok');
   }catch(e){
     Object.assign(r,prev);
@@ -2308,7 +2364,7 @@ async function deleteRental(id){
   const prevRentals=[...rentals];
   if(statusKey)delete itemStatus[statusKey];
   rentals=rentals.filter(x=>x.id!==id);
-  renderAll();
+  renderAfterStatus();
   try{
     const tasks=[fbDel(`/rentals/${id}`)];
     if(statusKey)tasks.push(fbDel(`/itemStatus/${statusKey}`));
@@ -2317,7 +2373,7 @@ async function deleteRental(id){
   }catch(e){
     rentals=prevRentals;
     if(statusKey&&prevStatusVal!==undefined)itemStatus[statusKey]=prevStatusVal;
-    renderAll();
+    renderAfterStatus();
     undoStack.pop();updateHistoryBtns();
     toast('삭제 실패 — 네트워크를 확인해주세요','err');
   }
@@ -2351,7 +2407,9 @@ function renderBlacklist(){
     const hasL=p.records.some(r=>r.status==='lost');
     const payBtns=[
       hasU?`<button class="btn btn-orange btn-sm" onclick="blPay('${escJs(p.name)}','${escJs(p.phone)}','unpaid')">연체료 납부</button>`:'',
-      hasL?`<button class="btn btn-purple btn-sm" onclick="blPay('${escJs(p.name)}','${escJs(p.phone)}','lost')">분실비 납부</button>`:''
+      hasU?`<button class="btn btn-green btn-sm" onclick="blReturn('${escJs(p.name)}','${escJs(p.phone)}','unpaid')">반납</button>`:'',
+      hasL?`<button class="btn btn-purple btn-sm" onclick="blPay('${escJs(p.name)}','${escJs(p.phone)}','lost')">분실비 납부</button>`:'',
+      hasL?`<button class="btn btn-ghost btn-sm" onclick="blReturn('${escJs(p.name)}','${escJs(p.phone)}','lost')">분실해제</button>`:''
     ].filter(Boolean).join('');
 
     // 문자 발송 상태
@@ -2556,6 +2614,7 @@ async function confirmSmsSent(){
 async function blPay(name,phone,status){
   if(!isOnline()) return;
   const label=status==='unpaid'?'연체료':'분실비';
+  const newStatus=status==='unpaid'?'unpaid_paid':'lost_paid';
   const targets=rentals.filter(r=>r.name===name&&r.phone===phone&&r.status===status);
   const items=targets.map(r=>`${ITEM_LABELS[r.item]} ${r.itemNum}`).join(', ');
   if(!confirm(`${name}님의 ${label} 납부를 처리하시겠습니까?\n\n대상 물품: ${items}\n\n납부 확인 후 블랙리스트에서 자동 해제됩니다.`)) return;
@@ -2567,20 +2626,51 @@ async function blPay(name,phone,status){
   const resolvedAt=new Date().toISOString();
   for(const r of targets){
     r.wasBlacklisted=true;r.resolvedAt=resolvedAt;
-    r.status='returned';r.returnDate=r.returnDate||resolvedAt;
-    delete itemStatus[fbKey(r.item,r.itemNum)];
+    r.status=newStatus;
   }
   try{
-    // rental PUT + itemStatus DELETE를 한꺼번에 처리
+    const writes=targets.map(r=>fbPut(`/rentals/${r.id}`,r));
+    await Promise.all(writes);
+    renderAfterPay();
+    toast(`${name}님 ${label} 납부 → 블랙리스트 해제!`,'ok');
+  }catch(e){
+    prevStates.forEach(({r,status:s,returnDate:rd,wasBlacklisted:wb,resolvedAt:ra,isKey:k,isVal:v})=>{
+      r.status=s;r.returnDate=rd;
+      if(wb===undefined)delete r.wasBlacklisted;else r.wasBlacklisted=wb;
+      if(ra===undefined)delete r.resolvedAt;else r.resolvedAt=ra;
+      if(v!==undefined)itemStatus[k]=v;else delete itemStatus[k];
+    });
+    undoStack.pop();updateHistoryBtns();
+    toast('저장에 실패했습니다. 다시 시도해주세요.','err');
+  }
+}
+async function blReturn(name,phone,status){
+  if(!isOnline()) return;
+  const label=status==='unpaid'?'미납':'분실';
+  const targets=rentals.filter(r=>r.name===name&&r.phone===phone&&r.status===status);
+  const items=targets.map(r=>`${ITEM_LABELS[r.item]} ${r.itemNum}`).join(', ');
+  if(!confirm(`${name}님의 ${label} 물품을 반납 처리하시겠습니까?\n\n대상 물품: ${items}\n\n반납 완료 후 블랙리스트에서 자동 해제됩니다.`)) return;
+  const prevStates=targets.map(r=>{
+    const k=fbKey(r.item,r.itemNum);
+    return {r,status:r.status,returnDate:r.returnDate,wasBlacklisted:r.wasBlacklisted,resolvedAt:r.resolvedAt,isKey:k,isVal:itemStatus[k]};
+  });
+  saveSnapshot(`${name} ${label} 반납처리`);
+  const resolvedAt=new Date().toISOString();
+  for(const r of targets){
+    r.wasBlacklisted=true;r.resolvedAt=resolvedAt;
+    r.status='returned';r.returnDate=resolvedAt;
+    const k=fbKey(r.item,r.itemNum);
+    delete itemStatus[k];
+  }
+  try{
     const writes=[
       ...targets.map(r=>fbPut(`/rentals/${r.id}`,r)),
       ...targets.map(r=>fbDel(`/itemStatus/${fbKey(r.item,r.itemNum)}`))
     ];
     await Promise.all(writes);
-    renderAll();
-    toast(`${name}님 ${label} 납부 → 블랙리스트 해제!`,'ok');
+    renderAfterPay();
+    toast(`${name}님 ${label} 물품 반납 → 블랙리스트 해제!`,'ok');
   }catch(e){
-    // 실패 시 전체 롤백 (wasBlacklisted/resolvedAt/itemStatus 포함)
     prevStates.forEach(({r,status:s,returnDate:rd,wasBlacklisted:wb,resolvedAt:ra,isKey:k,isVal:v})=>{
       r.status=s;r.returnDate=rd;
       if(wb===undefined)delete r.wasBlacklisted;else r.wasBlacklisted=wb;
@@ -2740,8 +2830,8 @@ function toggleDragMode(){
 function renderManageList(){
   const nums=ITEM_NUMBERS[manageTab];
   document.getElementById('manage-count').textContent=`(${nums.length}개)`;
-  // 대여중·미납 상태인 물품 번호 집합 (삭제 불가)
-  const lockedNums=new Set(rentals.filter(r=>r.item===manageTab&&['renting','unpaid'].includes(r.status)).map(r=>String(r.itemNum)));
+  // 대여중·미납·납부완료 상태인 물품 번호 집합 (삭제 불가)
+  const lockedNums=new Set(rentals.filter(r=>r.item===manageTab&&['renting','unpaid','unpaid_paid','lost_paid'].includes(r.status)).map(r=>String(r.itemNum)));
   // 고장·분실 기록만 있는 물품 번호 집합 (삭제 가능, 경고 표시)
   const hasHistoryNums=new Set(rentals.filter(r=>r.item===manageTab).map(r=>String(r.itemNum)));
 
@@ -2858,9 +2948,9 @@ async function addItemNum(){
 }
 
 async function deleteItemNum(numStr){
-  // 대여중·미납이면 삭제 불가
-  const isActive=rentals.some(r=>r.item===manageTab&&String(r.itemNum)===numStr&&['renting','unpaid'].includes(r.status));
-  if(isActive){toast('대여중이거나 미납 상태인 물품은 삭제할 수 없습니다','err');return;}
+  // 대여중·미납·납부완료 상태이면 삭제 불가
+  const isActive=rentals.some(r=>r.item===manageTab&&String(r.itemNum)===numStr&&['renting','unpaid','unpaid_paid','lost_paid'].includes(r.status));
+  if(isActive){toast('대여중이거나 미납/납부완료 상태인 물품은 삭제할 수 없습니다','err');return;}
   // 고장·분실 등 이력이 있으면 경고 후 삭제
   const hasHistory=rentals.some(r=>r.item===manageTab&&String(r.itemNum)===numStr);
   const msg=hasHistory
@@ -2901,7 +2991,7 @@ function exportCSV(){
   if(!rentals.length){toast('내보낼 대여 기록이 없습니다','inf');return;}
 
   const ITEM={'umbrella':'약속우산','charger':'충전기','calculator':'공학용 계산기','multitap':'멀티탭','heatpack':'찜질팩'};
-  const STATUS={'renting':'대여중','returned':'반납완료','unpaid':'미납','broken':'고장','lost':'분실'};
+  const STATUS={'renting':'대여중','returned':'반납완료','unpaid':'미납','broken':'고장','lost':'분실','unpaid_paid':'미납 (미납금 납부)','lost_paid':'분실 (분실비 납부)'};
   const pad=n=>String(n).padStart(2,'0');
   const fmtDate=iso=>{
     if(!iso)return '';
@@ -3000,10 +3090,10 @@ function tick(){const e=document.getElementById('clock-time');if(e){const n=new 
 // ══ STATS ══
 function cssVar(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim();}
 function getItemClr(){return{umbrella:cssVar('--c-umbrella'),charger:cssVar('--c-charger'),calculator:cssVar('--c-calculator'),multitap:cssVar('--c-multitap'),heatpack:cssVar('--c-heatpack')};}
-function getStClr(){return{renting:cssVar('--s-renting'),returned:cssVar('--s-returned'),unpaid:cssVar('--s-unpaid'),broken:cssVar('--s-broken'),lost:cssVar('--s-lost')};}
+function getStClr(){return{renting:cssVar('--s-renting'),returned:cssVar('--s-returned'),unpaid:cssVar('--s-unpaid'),broken:cssVar('--s-broken'),lost:cssVar('--s-lost'),unpaid_paid:cssVar('--s-unpaid-paid'),lost_paid:cssVar('--s-lost-paid')};}
 const ITEM_CLR={umbrella:'#2d5016',charger:'#1d4ed8',calculator:'#92400e',multitap:'#4c1d95',heatpack:'#9f1239'};
-const ST_CLR={renting:'#2563eb',returned:'#16a34a',unpaid:'#dc2626',broken:'#be123c',lost:'#7c3aed'};
-const ST_LBL={renting:'대여중',returned:'반납완료',unpaid:'미납',broken:'고장',lost:'분실'};
+const ST_CLR={renting:'#2563eb',returned:'#16a34a',unpaid:'#dc2626',broken:'#be123c',lost:'#7c3aed',unpaid_paid:'#ea580c',lost_paid:'#7c3aed'};
+const ST_LBL={renting:'대여중',returned:'반납완료',unpaid:'미납',broken:'고장',lost:'분실',unpaid_paid:'미납 (미납금 납부)',lost_paid:'분실 (분실비 납부)'};
 
 let _period='all';
 let _charts={};   // Chart.js 인스턴스 저장
