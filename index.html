@@ -1335,6 +1335,12 @@ function setHistoryLoading(v){
 
 function sInfo(v){return S5.find(s=>s.v===v)||{v,l:v,cl:'sb-renting',ico:'?'};}
 function sBadge(v){const s=sInfo(v);return `<span class="sbadge ${s.cl}">${s.l}</span>`;}
+// 대여 기록 기반 배지 — 미납 2주 이상이면 장기미납으로 시각적 구분
+function sBadgeR(r){
+  if(r.status==='unpaid'&&daysSince(r.date)>=14)
+    return `<span class="sbadge sb-unpaid">⏰ 장기미납</span>`;
+  return sBadge(r.status);
+}
 function itemBadge(t){return `<span class="item-badge ib-${t}">${ITEM_ICONS[t]} ${ITEM_LABELS[t]}</span>`;}
 // XSS 방지: 사용자 입력값을 HTML에 삽입할 때 반드시 사용
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
@@ -1570,7 +1576,7 @@ function makeRowIdx(r,idx,cols){
     item:`<td>${itemBadge(r.item)}</td>`,num:`<td class="td-mono">${esc(r.itemNum)}</td>`,
     date:`<td class="td-mono" style="font-size:11px">${fmtDate(r.date)}</td>`,
     returnDate:`<td class="td-mono" style="font-size:11px">${fmtDate(r.returnDate)}</td>`,
-    status:`<td>${sBadge(r.status)}</td>`,actions:`<td>${actionBtns(r)}</td>`,
+    status:`<td>${sBadgeR(r)}</td>`,actions:`<td>${actionBtns(r)}</td>`,
     days:`<td style="font-weight:700;color:var(--s-unpaid);font-family:'JetBrains Mono',monospace">${daysSince(r.date)}일</td>`
   };
   return `<tr>${cols.map(c=>c==='idx'?cells.idx():cells[c]).join('')}</tr>`;
@@ -1582,7 +1588,7 @@ function makeMobileCard(r,cols){
   return `<div class="m-card">
     <div class="m-card-top">
       <span class="m-card-name">${esc(r.name)}</span>
-      ${sBadge(r.status)}
+      ${sBadgeR(r)}
     </div>
     <div class="m-card-row">📞 <b>${esc(r.phone)}</b></div>
     <div class="m-card-row">🏫 <b>${esc(r.dept||'')}</b></div>
@@ -1736,7 +1742,9 @@ function renderUnpaid(){
 }
 
 async function restoreItemFromUnpaid(key,type,num){
+  if(!isOnline()) return;
   const prev=itemStatus[key];
+  saveSnapshot(`${ITEM_LABELS[type]} ${num} 복구`);
   delete itemStatus[key];
   renderAfterInvCond();
   try{
@@ -1745,6 +1753,7 @@ async function restoreItemFromUnpaid(key,type,num){
   }catch(e){
     itemStatus[key]=prev;
     renderAfterInvCond();
+    undoStack.pop();updateHistoryBtns();
     toast('저장 실패 — 네트워크를 확인해주세요','err');
   }
 }
@@ -1774,8 +1783,11 @@ function renderInventory(){
     const rec=rentals.filter(r=>r.item===currentInvTab&&String(r.itemNum)===String(num))
       .sort((a,b)=>new Date(b.date)-new Date(a.date))[0];
     const renterStr=(rec&&['renting','unpaid','unpaid_paid','lost_paid'].includes(rec.status))?`<div style="font-size:10px;font-weight:400;color:var(--text);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${rec.name}</div>`:'';
+    const invBadge=(st==='unpaid'&&rec&&daysSince(rec.date)>=14)
+      ?`<span class="sbadge sb-unpaid" style="font-size:9px;padding:2px 4px;gap:3px">⏰ 장기미납</span>`
+      :(lbMap[st]||lbMap.available);
     return `<div class="inv-item ${stMap[st]||'st-available'}" onclick="openInvModal('${currentInvTab}','${num}')">
-      <div class="inv-num">${num}</div>${lbMap[st]||lbMap.available}${renterStr}
+      <div class="inv-num">${num}</div>${invBadge}${renterStr}
     </div>`;
   }).join('');
 }
@@ -1795,7 +1807,8 @@ function openInvModal(type,num){
   ];
   const hasUnpaidRec=rentals.some(r=>r.item===type&&String(r.itemNum)===String(num)&&['unpaid','unpaid_paid'].includes(r.status));
   const hasLostRec=rentals.some(r=>r.item===type&&String(r.itemNum)===String(num)&&['lost','lost_paid'].includes(r.status));
-  if(hasUnpaidRec) opts.push({v:'unpaid_paid',l:'미납금 납부',ico:'🟠'});
+  if(hasUnpaidRec) opts.push({v:'unpaid_paid',l:'연체료 납부',ico:'🟠'});
+  if(hasUnpaidRec&&!hasLostRec) opts.push({v:'lost_paid',l:'분실비 납부',ico:'💜'});
   if(hasLostRec) opts.push({v:'lost_paid',l:'분실비 납부',ico:'💜'});
   document.getElementById('inv-cond-opts').innerHTML=opts.map(o=>
     `<div class="cond-opt${cur===o.v?' sel-'+o.v:''}" data-v="${o.v}" onclick="pickCond('${o.v}')">
@@ -1843,15 +1856,18 @@ async function applyInvCond(){
     if(val==='available'){
       delete itemStatus[key];
       const targets=rentals.filter(r=>r.item===invType&&String(r.itemNum)===String(invNum)&&['unpaid','broken','lost'].includes(r.status));
+      const resolvedAt=new Date().toISOString();
       for(const r of targets){
-        prevRentalStates.push({r,status:r.status,returnDate:r.returnDate,note:r.note});
-        r.status='returned';r.returnDate=r.returnDate||new Date().toISOString();
+        prevRentalStates.push({r,status:r.status,returnDate:r.returnDate,note:r.note,wasBlacklisted:r.wasBlacklisted,resolvedAt:r.resolvedAt});
+        // 블랙리스트 상태에서 복구 시 이력 기록
+        if(BL_STATUS.includes(r.status)){r.wasBlacklisted=true;r.resolvedAt=resolvedAt;}
+        r.status='returned';r.returnDate=r.returnDate||resolvedAt;
         if(note)r.note=note;
       }
       await Promise.all([fbDel(`/itemStatus/${key}`),...targets.map(r=>fbPut(`/rentals/${r.id}`,r))]);
     }else if(val==='unpaid_paid'||val==='lost_paid'){
-      const srcStatus=val==='unpaid_paid'?'unpaid':'lost';
-      const targets=rentals.filter(r=>r.item===invType&&String(r.itemNum)===String(invNum)&&r.status===srcStatus);
+      const srcStatuses=val==='unpaid_paid'?['unpaid']:['lost','unpaid'];
+      const targets=rentals.filter(r=>r.item===invType&&String(r.itemNum)===String(invNum)&&srcStatuses.includes(r.status));
       const resolvedAt=new Date().toISOString();
       for(const r of targets){
         prevRentalStates.push({r,status:r.status,returnDate:r.returnDate,note:r.note,wasBlacklisted:r.wasBlacklisted,resolvedAt:r.resolvedAt});
@@ -1911,8 +1927,9 @@ function checkRestriction(){
   const name=document.getElementById('f-name').value.trim();
   const phone=document.getElementById('f-phone').value.trim();
   const w=document.getElementById('r-warn');if(!w)return;
-  if(!name&&!phone){w.style.display='none';return;}
-  const bl=rentals.find(r=>r.name===name&&(phone?r.phone===phone:true)&&BL_STATUS.includes(r.status));
+  // 이름+전화번호 모두 입력된 경우에만 확인 (이름만으로 검색 시 동명이인 오탐 방지)
+  if(!name||!phone){w.style.display='none';return;}
+  const bl=rentals.find(r=>r.name===name&&r.phone===phone&&BL_STATUS.includes(r.status));
   if(bl){w.textContent=`⛔ ${bl.name}님은 "${sInfo(bl.status).l}" 상태로 대여가 제한됩니다.`;w.style.display='block';}
   else{w.style.display='none';}
 }
@@ -1996,8 +2013,15 @@ async function applyStatus(){
   const btn=document.querySelector('#modal-status .btn-primary');
   if(btn){btn.disabled=true;btn.textContent='저장 중...';}
   saveSnapshot(`${r.name} 상태변경 → ${sInfo(selStatus).l}`);
+  const prevWasBlacklisted=r.wasBlacklisted;
+  const prevResolvedAt=r.resolvedAt;
   r.status=selStatus;
   r.note=document.getElementById('f-status-note').value.trim();
+  // 블랙리스트 상태에서 해제 상태로 변경 시 이력 기록
+  if(BL_STATUS.includes(prevStatus)&&!BL_STATUS.includes(selStatus)){
+    r.wasBlacklisted=true;
+    r.resolvedAt=new Date().toISOString();
+  }
   const key=fbKey(r.item,r.itemNum);
   const prevItemStatusVal=itemStatus[key];
   try{
@@ -2023,6 +2047,8 @@ async function applyStatus(){
   }catch(e){
     // 실패 시 롤백
     r.status=prevStatus;r.note=prevNote;r.returnDate=prevReturnDate;
+    if(prevWasBlacklisted===undefined)delete r.wasBlacklisted;else r.wasBlacklisted=prevWasBlacklisted;
+    if(prevResolvedAt===undefined)delete r.resolvedAt;else r.resolvedAt=prevResolvedAt;
     if(prevItemStatusVal!==undefined)itemStatus[key]=prevItemStatusVal;else delete itemStatus[key];
     undoStack.pop();updateHistoryBtns();
     renderAfterStatus();
@@ -2036,16 +2062,25 @@ async function quickReturn(id){
   if(!isOnline()) return;
   const prevStatus=r.status;
   const prevReturnDate=r.returnDate;
+  const prevWasBlacklisted=r.wasBlacklisted;
+  const prevResolvedAt=r.resolvedAt;
   const key=fbKey(r.item,r.itemNum);
   const prevItemStatusVal=itemStatus[key];
   saveSnapshot(`${r.name} ${ITEM_LABELS[r.item]} 반납`);
   r.status='returned';r.returnDate=new Date().toISOString();
+  // 블랙리스트 상태에서 반납 시 이력 기록
+  if(BL_STATUS.includes(prevStatus)){
+    r.wasBlacklisted=true;
+    r.resolvedAt=new Date().toISOString();
+  }
   delete itemStatus[key];
   try{
     await Promise.all([fbDel(`/itemStatus/${key}`),fbPut(`/rentals/${r.id}`,r)]);
     renderAfterStatus();toast(`${r.name}님 ${ITEM_LABELS[r.item]} 반납 완료!`,'ok');
   }catch(e){
     r.status=prevStatus;r.returnDate=prevReturnDate;
+    if(prevWasBlacklisted===undefined)delete r.wasBlacklisted;else r.wasBlacklisted=prevWasBlacklisted;
+    if(prevResolvedAt===undefined)delete r.resolvedAt;else r.resolvedAt=prevResolvedAt;
     if(prevItemStatusVal!==undefined)itemStatus[key]=prevItemStatusVal;else delete itemStatus[key];
     undoStack.pop();updateHistoryBtns();
     toast('저장에 실패했습니다. 다시 시도해주세요.','err');
@@ -2164,17 +2199,20 @@ async function deleteRental(id){
   const statusKey=r?fbKey(r.item,r.itemNum):null;
   const prevStatusVal=statusKey?itemStatus[statusKey]:undefined;
   const prevRentals=[...rentals];
-  if(statusKey)delete itemStatus[statusKey];
+  // itemStatus는 해당 대여 기록이 고장/분실/분실납부 상태일 때만 삭제
+  // returned·renting·unpaid 등으로 삭제 시엔 itemStatus 유지 (다른 경로로 설정된 상태 보호)
+  const shouldClearStatus=statusKey&&r&&['broken','lost','lost_paid'].includes(r.status);
+  if(shouldClearStatus)delete itemStatus[statusKey];
   rentals=rentals.filter(x=>x.id!==id);
   renderAfterStatus();
   try{
     const tasks=[fbDel(`/rentals/${id}`)];
-    if(statusKey)tasks.push(fbDel(`/itemStatus/${statusKey}`));
+    if(shouldClearStatus)tasks.push(fbDel(`/itemStatus/${statusKey}`));
     await Promise.all(tasks);
     toast('삭제되었습니다','inf');
   }catch(e){
     rentals=prevRentals;
-    if(statusKey&&prevStatusVal!==undefined)itemStatus[statusKey]=prevStatusVal;
+    if(shouldClearStatus&&prevStatusVal!==undefined)itemStatus[statusKey]=prevStatusVal;
     renderAfterStatus();
     undoStack.pop();updateHistoryBtns();
     toast('삭제 실패 — 네트워크를 확인해주세요','err');
@@ -2203,13 +2241,19 @@ function renderBlacklist(){
     const logs=getSmsLogs(key).sort((a,b)=>new Date(b.sentAt)-new Date(a.sentAt));
     const lastSent=logs[0]||null;
 
-    const tags=p.records.map(r=>`<span class="sbadge ${sInfo(r.status).cl}" style="font-size:10px">${sInfo(r.status).l} · ${ITEM_LABELS[r.item]||r.item} ${esc(r.itemNum)}</span>`).join('');
+    const tags=p.records.map(r=>{
+      const isLong=r.status==='unpaid'&&daysSince(r.date)>=14;
+      const label=isLong?'⏰ 장기미납':sInfo(r.status).l;
+      const extra='';
+      return `<span class="sbadge ${sInfo(r.status).cl}" style="font-size:10px;${extra}">${label} · ${ITEM_LABELS[r.item]||r.item} ${esc(r.itemNum)}</span>`;
+    }).join('');
 
     const hasU=p.records.some(r=>r.status==='unpaid');
     const hasL=p.records.some(r=>r.status==='lost');
     const payBtns=[
       hasU?`<button class="btn btn-orange btn-sm" onclick="blPay('${escJs(p.name)}','${escJs(p.phone)}','unpaid')">연체료 납부</button>`:'',
       hasU?`<button class="btn btn-green btn-sm" onclick="blReturn('${escJs(p.name)}','${escJs(p.phone)}','unpaid')">반납</button>`:'',
+      (hasU&&!hasL)?`<button class="btn btn-purple btn-sm" onclick="blPayAsLost('${escJs(p.name)}','${escJs(p.phone)}')">분실비 납부</button>`:'',
       hasL?`<button class="btn btn-purple btn-sm" onclick="blPay('${escJs(p.name)}','${escJs(p.phone)}','lost')">분실비 납부</button>`:'',
       hasL?`<button class="btn btn-ghost btn-sm" onclick="blReturn('${escJs(p.name)}','${escJs(p.phone)}','lost')">분실해제</button>`:''
     ].filter(Boolean).join('');
@@ -2472,6 +2516,44 @@ async function blReturn(name,phone,status){
     await Promise.all(writes);
     renderAfterPay();
     toast(`${name}님 ${label} 물품 반납 → 블랙리스트 해제!`,'ok');
+  }catch(e){
+    prevStates.forEach(({r,status:s,returnDate:rd,wasBlacklisted:wb,resolvedAt:ra,isKey:k,isVal:v})=>{
+      r.status=s;r.returnDate=rd;
+      if(wb===undefined)delete r.wasBlacklisted;else r.wasBlacklisted=wb;
+      if(ra===undefined)delete r.resolvedAt;else r.resolvedAt=ra;
+      if(v!==undefined)itemStatus[k]=v;else delete itemStatus[k];
+    });
+    undoStack.pop();updateHistoryBtns();
+    toast('저장에 실패했습니다. 다시 시도해주세요.','err');
+  }
+}
+// 미납 → 분실비 납부 한 번에 처리 (미납으로 등록됐으나 실제 분실+납부한 경우)
+async function blPayAsLost(name,phone){
+  if(!isOnline()) return;
+  const targets=rentals.filter(r=>r.name===name&&r.phone===phone&&r.status==='unpaid');
+  if(!targets.length) return;
+  const items=targets.map(r=>`${ITEM_LABELS[r.item]} ${r.itemNum}`).join(', ');
+  if(!confirm(`${name}님의 미납을 분실로 변경하고 분실비 납부 처리하시겠습니까?\n\n대상 물품: ${items}\n\n물품은 분실 처리(영구 대여불가)되며, 블랙리스트에서 자동 해제됩니다.`)) return;
+  const prevStates=targets.map(r=>{
+    const k=fbKey(r.item,r.itemNum);
+    return {r,status:r.status,returnDate:r.returnDate,wasBlacklisted:r.wasBlacklisted,resolvedAt:r.resolvedAt,isKey:k,isVal:itemStatus[k]};
+  });
+  saveSnapshot(`${name} 미납→분실비 납부`);
+  const resolvedAt=new Date().toISOString();
+  for(const r of targets){
+    r.wasBlacklisted=true;r.resolvedAt=resolvedAt;
+    r.status='lost_paid';
+    const k=fbKey(r.item,r.itemNum);
+    itemStatus[k]='lost';
+  }
+  try{
+    const writes=[
+      ...targets.map(r=>fbPut(`/rentals/${r.id}`,r)),
+      ...targets.map(r=>fbPut(`/itemStatus/${fbKey(r.item,r.itemNum)}`,'lost'))
+    ];
+    await Promise.all(writes);
+    renderAfterPay();
+    toast(`${name}님 분실비 납부 → 블랙리스트 해제!`,'ok');
   }catch(e){
     prevStates.forEach(({r,status:s,returnDate:rd,wasBlacklisted:wb,resolvedAt:ra,isKey:k,isVal:v})=>{
       r.status=s;r.returnDate=rd;
@@ -3230,7 +3312,6 @@ const MED_DEFAULT=[
 let medItems=[];   // [{id,cat,name,qty}, ...]
 let medLog=[];     // [{at,cat,name,delta,reason,after}, ...]
 let _medId='';     // 조정 중인 의약품 id
-let _medDeltaTemp=0; // 모달 내 임시 delta
 
 async function initMedicine(){
   const [mData,lData]=await Promise.all([fbGet('/medicine'),fbGet('/medLog')]);
@@ -3470,7 +3551,7 @@ async function deleteMedLog(idx){
 
 function openMedModal(id){
   const m=medItems.find(x=>x.id===id);if(!m)return;
-  _medId=id;_medDeltaTemp=0;
+  _medId=id;
   const unit=MED_CAT_UNIT[m.cat]||'개';
   document.getElementById('med-modal-title').textContent=m.name;
   document.getElementById('med-modal-sub').textContent=m.cat;
@@ -3488,7 +3569,6 @@ function medReasonChange(){
   const reason=document.getElementById('med-reason').value;
   const label=document.getElementById('med-direct-label');
   const quick=document.getElementById('med-adj-quick');
-  _medDeltaTemp=0;
   document.getElementById('med-direct-qty').value='';
   if(reason==='수량 정정'){
     // 정정: 최종 수량을 직접 입력
@@ -3527,7 +3607,6 @@ function _setQuickBtns(isAdd){
 }
 
 function medAdjDelta(d){
-  _medDeltaTemp+=d;
   const reason=document.getElementById('med-reason').value;
   const m=medItems.find(x=>x.id===_medId);if(!m)return;
   // 사용/폐기는 delta가 음수가 돼야 하므로 절댓값 기준 처리
