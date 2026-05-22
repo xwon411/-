@@ -928,8 +928,9 @@ tbody td{padding:10px 13px;vertical-align:middle;}
     <div class="fg" style="margin-top:12px"><label>메모 (선택)</label><input class="fi" id="f-inv-note" placeholder="사유"></div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="goInvRentals()" style="margin-right:auto">📋 대여기록</button>
+    <button class="btn btn-ghost" onclick="goInvRentals()" style="margin-right:auto">대여기록</button>
     <button class="btn btn-ghost" onclick="closeModal('modal-inv')">취소</button>
+    <button class="btn btn-green" id="inv-unpaid-return-btn" style="display:none;width:82px" onclick="quickUnpaidReturnFromInv()">납부+반납</button>
     <button class="btn btn-green" id="inv-return-btn" style="display:none;width:82px" onclick="quickReturnFromInv()">✅ 반납</button>
     <button class="btn btn-primary" id="inv-rent-btn" style="display:none;width:82px" onclick="openRentalFromInv()">대여하기</button>
     <button class="btn btn-primary" id="inv-apply-btn" style="width:82px" onclick="applyInvCond()">저장</button>
@@ -1773,7 +1774,7 @@ function renderInventory(){
     unpaid:`<span class="sbadge sb-unpaid" style="font-size:9px;padding:2px 4px;gap:3px">미납</span>`,
     broken:`<span class="sbadge sb-broken" style="font-size:9px;padding:2px 4px;gap:3px">고장</span>`,
     lost:`<span class="sbadge sb-lost" style="font-size:9px;padding:2px 4px;gap:3px">분실</span>`,
-    unpaid_paid:`<span class="sbadge sb-unpaid-paid" style="font-size:9px;padding:2px 4px;gap:3px">미납 (미납금 납부)</span>`,
+    unpaid_paid:`<span class="sbadge sb-unpaid-paid" style="font-size:9px;padding:2px 4px;gap:3px">미납 (연체료 납부)</span>`,
     lost_paid:`<span class="sbadge sb-lost-paid" style="font-size:9px;padding:2px 4px;gap:3px">분실 (분실비 납부)</span>`
   };
   const grid=document.getElementById('inv-grid');
@@ -1801,10 +1802,13 @@ function openInvModal(type,num){
   const iSt=itemStatus[fbKey(type,num)];
   document.getElementById('f-inv-note').value=(typeof iSt==='object'?iSt.note:'') || '';
   const cur=st==='available'?'available':st;
-  const opts=[
-    {v:'available',l:'대여가능',ico:'✅'},{v:'unpaid',l:'미납',ico:'⚠️'},
-    {v:'broken',l:'고장',ico:'🔧'},{v:'lost',l:'분실',ico:'❌'}
-  ];
+  // 대여가능 옵션: 물품현황에서 직접 고장/분실 설정한 경우에만 표시
+  const iStVal2=typeof iSt==='object'?iSt.v:iSt;
+  const hasLostRentalRec=rentals.some(r=>r.item===type&&String(r.itemNum)===String(num)&&r.status==='lost');
+  const isDirectlySet=iStVal2==='broken'||(iStVal2==='lost'&&!hasLostRentalRec);
+  const opts=[];
+  if(isDirectlySet) opts.push({v:'available',l:'대여가능',ico:'✅'});
+  opts.push({v:'unpaid',l:'미납',ico:'⚠️'},{v:'broken',l:'고장',ico:'🔧'},{v:'lost',l:'분실',ico:'❌'});
   const hasUnpaidRec=rentals.some(r=>r.item===type&&String(r.itemNum)===String(num)&&['unpaid','unpaid_paid'].includes(r.status));
   const hasLostRec=rentals.some(r=>r.item===type&&String(r.itemNum)===String(num)&&['lost','lost_paid'].includes(r.status));
   if(hasUnpaidRec) opts.push({v:'unpaid_paid',l:'연체료 납부',ico:'🟠'});
@@ -1816,20 +1820,40 @@ function openInvModal(type,num){
     </div>`).join('');
   // 상태별 버튼 표시
   const returnBtn=document.getElementById('inv-return-btn');
+  const unpaidReturnBtn=document.getElementById('inv-unpaid-return-btn');
   const rentBtn=document.getElementById('inv-rent-btn');
   const applyBtn=document.getElementById('inv-apply-btn');
   if(st==='renting'){
     const rec=rentals.find(r=>r.item===type&&String(r.itemNum)===String(num)&&r.status==='renting');
     returnBtn.style.display=rec?'':'none';
     if(rec) returnBtn.dataset.rid=rec.id;
+    unpaidReturnBtn.style.display='none';
     rentBtn.style.display='none';
     applyBtn.style.display='';
   } else if(st==='available'){
     returnBtn.style.display='none';
+    unpaidReturnBtn.style.display='none';
     rentBtn.style.display='';
+    applyBtn.style.display='';
+  } else if(st==='unpaid'){
+    // 미납/장기미납: 연체료 납부+반납 버튼 표시
+    const rec=rentals.find(r=>r.item===type&&String(r.itemNum)===String(num)&&r.status==='unpaid');
+    unpaidReturnBtn.style.display=rec?'':'none';
+    if(rec) unpaidReturnBtn.dataset.rid=rec.id;
+    returnBtn.style.display='none';
+    rentBtn.style.display='none';
+    applyBtn.style.display='';
+  } else if(st==='unpaid_paid'){
+    // 연체료 납부 완료 상태: 일반 반납 버튼 표시
+    const rec=rentals.find(r=>r.item===type&&String(r.itemNum)===String(num)&&r.status==='unpaid_paid');
+    returnBtn.style.display=rec?'':'none';
+    if(rec) returnBtn.dataset.rid=rec.id;
+    unpaidReturnBtn.style.display='none';
+    rentBtn.style.display='none';
     applyBtn.style.display='';
   } else {
     returnBtn.style.display='none';
+    unpaidReturnBtn.style.display='none';
     rentBtn.style.display='none';
     applyBtn.style.display='';
   }
@@ -2092,6 +2116,17 @@ async function quickReturnFromInv(){
   closeModal('modal-inv');
   await quickReturn(id);
 }
+async function quickUnpaidReturnFromInv(){
+  const btn=document.getElementById('inv-unpaid-return-btn');
+  const id=Number(btn.dataset.rid);
+  const r=rentals.find(x=>x.id===id);if(!r)return;
+  if(!isOnline()) return;
+  const days=daysSince(r.date);
+  const label=days>=14?'장기미납':'미납';
+  if(!confirm(`${r.name}님의 ${label} 물품을 연체료 납부 처리 후 반납하시겠습니까?\n\n물품: ${ITEM_LABELS[r.item]} ${r.itemNum}\n경과일: ${days}일\n\n✅ 연체료 납부 완료 처리\n✅ 블랙리스트 자동 해제\n✅ 반납 완료 처리`)) return;
+  closeModal('modal-inv');
+  await quickReturn(id);
+}
 let editRentalId=null;
 let editSelItemType='';
 function openEditModal(id){
@@ -2252,7 +2287,7 @@ function renderBlacklist(){
     const hasL=p.records.some(r=>r.status==='lost');
     const payBtns=[
       hasU?`<button class="btn btn-orange btn-sm" onclick="blPay('${escJs(p.name)}','${escJs(p.phone)}','unpaid')">연체료 납부</button>`:'',
-      hasU?`<button class="btn btn-green btn-sm" onclick="blReturn('${escJs(p.name)}','${escJs(p.phone)}','unpaid')">반납</button>`:'',
+      hasU?`<button class="btn btn-green btn-sm" onclick="blReturn('${escJs(p.name)}','${escJs(p.phone)}','unpaid')">납부+반납</button>`:'',
       (hasU&&!hasL)?`<button class="btn btn-purple btn-sm" onclick="blPayAsLost('${escJs(p.name)}','${escJs(p.phone)}')">분실비 납부</button>`:'',
       hasL?`<button class="btn btn-purple btn-sm" onclick="blPay('${escJs(p.name)}','${escJs(p.phone)}','lost')">분실비 납부</button>`:'',
       hasL?`<button class="btn btn-ghost btn-sm" onclick="blReturn('${escJs(p.name)}','${escJs(p.phone)}','lost')">분실해제</button>`:''
@@ -2875,7 +2910,7 @@ function exportCSV(){
   if(!rentals.length){toast('내보낼 대여 기록이 없습니다','inf');return;}
 
   const ITEM={'umbrella':'약속우산','charger':'충전기','calculator':'공학용 계산기','multitap':'멀티탭','heatpack':'찜질팩'};
-  const STATUS={'renting':'대여중','returned':'반납완료','unpaid':'미납','broken':'고장','lost':'분실','unpaid_paid':'미납 (미납금 납부)','lost_paid':'분실 (분실비 납부)'};
+  const STATUS={'renting':'대여중','returned':'반납완료','unpaid':'미납','broken':'고장','lost':'분실','unpaid_paid':'미납 (연체료 납부)','lost_paid':'분실 (분실비 납부)'};
   const pad=n=>String(n).padStart(2,'0');
   const fmtDate=iso=>{
     if(!iso)return '';
@@ -2977,7 +3012,7 @@ function getItemClr(){return{umbrella:cssVar('--c-umbrella'),charger:cssVar('--c
 function getStClr(){return{renting:cssVar('--s-renting'),returned:cssVar('--s-returned'),unpaid:cssVar('--s-unpaid'),broken:cssVar('--s-broken'),lost:cssVar('--s-lost'),unpaid_paid:cssVar('--s-unpaid-paid'),lost_paid:cssVar('--s-lost-paid')};}
 const ITEM_CLR={umbrella:'#2d5016',charger:'#1d4ed8',calculator:'#92400e',multitap:'#4c1d95',heatpack:'#9f1239'};
 const ST_CLR={renting:'#2563eb',returned:'#16a34a',unpaid:'#dc2626',broken:'#be123c',lost:'#7c3aed',unpaid_paid:'#ea580c',lost_paid:'#7c3aed'};
-const ST_LBL={renting:'대여중',returned:'반납완료',unpaid:'미납',broken:'고장',lost:'분실',unpaid_paid:'미납 (미납금 납부)',lost_paid:'분실 (분실비 납부)'};
+const ST_LBL={renting:'대여중',returned:'반납완료',unpaid:'미납',broken:'고장',lost:'분실',unpaid_paid:'미납 (연체료 납부)',lost_paid:'분실 (분실비 납부)'};
 
 let _period='all';
 let _charts={};   // Chart.js 인스턴스 저장
