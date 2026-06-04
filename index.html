@@ -1516,6 +1516,7 @@ function getItemState(type,num){
   const iSt=itemStatus[key];
   const iStVal=typeof iSt==='object'?iSt.v:iSt; // 객체(메모 포함) or 문자열 모두 처리
   if(iStVal==='broken') return 'broken';
+  if(iStVal==='lost') return 'lost';
   // 가장 최근 대여 기록
   const recs=rentals.filter(r=>r.item===type&&String(r.itemNum)===String(num))
     .sort((a,b)=>new Date(b.date)-new Date(a.date));
@@ -1722,7 +1723,7 @@ function renderUnpaid(){
   tb2.innerHTML=directItems.map(({key,type,num,val})=>`<tr>
     <td>${itemBadge(type)}</td>
     <td class="td-mono">${num}</td>
-    <td>${sBadge(val)}</td>
+    <td>${sBadge(typeof val==='object'?val.v:val)}</td>
     <td><div class="td-actions">
       <button class="btn btn-green btn-sm" onclick="restoreItemFromUnpaid('${key}','${type}','${num}')">복구</button>
     </div></td>
@@ -1734,7 +1735,7 @@ function renderUnpaid(){
     if(!ml){ml=document.createElement('div');ml.className='mobile-card-list';sec2.querySelector('.tbl-wrap').appendChild(ml);}
     ml.innerHTML=directItems.map(({key,type,num,val})=>`
       <div class="m-card">
-        <div class="m-card-top">${itemBadge(type)}<span class="td-mono" style="font-weight:700">${num}</span>${sBadge(val)}</div>
+        <div class="m-card-top">${itemBadge(type)}<span class="td-mono" style="font-weight:700">${num}</span>${sBadge(typeof val==='object'?val.v:val)}</div>
         <div class="m-card-actions"><button class="btn btn-green btn-sm" onclick="restoreItemFromUnpaid('${key}','${type}','${num}')">복구</button></div>
       </div>`).join('');
   }
@@ -1910,7 +1911,8 @@ async function applyInvCond(){
     }else{
       const statusData=note?{v:val,note}:val;
       itemStatus[key]=statusData;
-      const rec=rentals.find(r=>r.item===invType&&String(r.itemNum)===String(invNum)&&r.status==='renting');
+      // renting 뿐 아니라 unpaid(미납) 상태인 대여기록도 함께 업데이트
+      const rec=rentals.find(r=>r.item===invType&&String(r.itemNum)===String(invNum)&&['renting','unpaid'].includes(r.status));
       if(rec){
         prevRentalStates.push({r:rec,status:rec.status,note:rec.note});
         rec.status=val;if(note)rec.note=note;
