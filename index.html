@@ -1516,16 +1516,15 @@ function getItemState(type,num){
   const iSt=itemStatus[key];
   const iStVal=typeof iSt==='object'?iSt.v:iSt; // 객체(메모 포함) or 문자열 모두 처리
   if(iStVal==='broken') return 'broken';
-  if(iStVal==='lost') return 'lost';
   // 가장 최근 대여 기록
   const recs=rentals.filter(r=>r.item===type&&String(r.itemNum)===String(num))
     .sort((a,b)=>new Date(b.date)-new Date(a.date));
   if(!recs.length){if(iStVal==='lost')return 'lost';return 'available';}
   const last=recs[0];
-  if(last.status==='returned') return 'available';
   if(last.status==='unpaid_paid') return 'unpaid_paid'; // 미납금 납부 완료 → 별도 상태로 표시
   if(last.status==='lost_paid') return 'lost_paid'; // 분실비 납부 완료 → 별도 상태로 표시
-  if(iStVal==='lost') return 'lost';
+  if(iStVal==='lost') return 'lost'; // itemStatus 분실은 returned보다 우선
+  if(last.status==='returned') return 'available';
   return last.status;
 }
 function isAvailable(type,num){const s=getItemState(type,num);return s==='available';}
