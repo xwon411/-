@@ -2275,7 +2275,10 @@ function renderBlacklist(){
   grid.innerHTML=persons.map(p=>{
     const key=smsKey(p.name,p.phone);
     const logs=getSmsLogs(key).sort((a,b)=>new Date(b.sentAt)-new Date(a.sentAt));
-    const lastSent=logs[0]||null;
+    // 현재 BL 에피소드 시작일 (가장 이른 현재 대여일) — 이전 에피소드 발송 이력 제외
+    const currentBlStart=p.records.reduce((min,r)=>{const d=new Date(r.date);return d<min?d:min;},new Date(8640000000000000));
+    const currentLogs=logs.filter(l=>new Date(l.sentAt)>=currentBlStart);
+    const lastSent=currentLogs[0]||null;
 
     const tags=p.records.map(r=>{
       const isLong=r.status==='unpaid'&&daysSince(r.date)>=14;
@@ -2294,9 +2297,9 @@ function renderBlacklist(){
       hasL?`<button class="btn btn-ghost btn-sm" onclick="blReturn('${escJs(p.name)}','${escJs(p.phone)}','lost')">분실해제</button>`:''
     ].filter(Boolean).join('');
 
-    // 문자 발송 상태
+    // 문자 발송 상태 (현재 BL 에피소드 기준)
     const smsBadge=lastSent
-      ?`<span class="sms-badge sms-sent">✉️ 발송완료</span><span class="sms-last-time">${fmtDate(lastSent.sentAt)}</span>${logs.length>1?`<span style="font-size:10px;color:var(--text-muted)">총 ${logs.length}회</span>`:''}`
+      ?`<span class="sms-badge sms-sent">✉️ 발송완료</span><span class="sms-last-time">${fmtDate(lastSent.sentAt)}</span>${currentLogs.length>1?`<span style="font-size:10px;color:var(--text-muted)">총 ${currentLogs.length}회</span>`:''}`
       :`<span class="sms-badge sms-none">✉️ 미발송</span>`;
 
     // 발송 이력 (최근 3건, 펼치기)
