@@ -1,52 +1,41 @@
+/* 농생대 대여 관리 — 서비스 워커
+   전략: 같은 출처(앱 셸)는 네트워크 우선 + 오프라인 캐시 폴백.
+   Firebase/CDN/폰트 등 외부 출처는 캐시하지 않고 브라우저 기본 동작에 위임.
+   → 온라인일 때는 항상 최신 파일을 받고, 오프라인일 때만 캐시로 대체하므로
+     "오래된 앱이 캐시되어 멈추는" 문제를 방지한다. */
 const CACHE = 'cals-rental-v1';
-const ASSETS = [
-  './index.html',
-  './public.html',
-  './manifest.json',
-  './manifest-public.json',
-  './icon-192.png',
-  './icon-512.png'
-];
+const ASSETS = ['./', './index.html', './icon-192.png', './icon-512.png', './manifest.json'];
 
-// 설치: 핵심 파일 캐시
 self.addEventListener('install', e => {
   e.waitUntil(
-    caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting())
+    caches.open(CACHE)
+      .then(c => c.addAll(ASSETS).catch(() => {}))
+      .then(() => self.skipWaiting())
   );
 });
 
-// 활성화: 이전 캐시 삭제
 self.addEventListener('activate', e => {
   e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-    ).then(() => self.clients.claim())
+    caches.keys()
+      .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+      .then(() => self.clients.claim())
   );
 });
 
-// 요청 처리: Network First (Firebase 실시간 데이터 우선) + 캐시 폴백
 self.addEventListener('fetch', e => {
-  const url = new URL(e.request.url);
+  const req = e.request;
+  if (req.method !== 'GET') return;                 // 쓰기 요청은 건드리지 않음
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return;  // 외부(Firebase·CDN·폰트)는 그대로 통과
 
-  // Firebase / Google Fonts / CDN 요청은 항상 네트워크 우선
-  if (
-    url.hostname.includes('firebaseio.com') ||
-    url.hostname.includes('googleapis.com') ||
-    url.hostname.includes('cloudflare.com')
-  ) {
-    e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
-    return;
-  }
-
-  // HTML/JS/CSS 등 앱 파일: 네트워크 먼저, 실패 시 캐시
+  // 같은 출처: 네트워크 우선, 실패 시 캐시
   e.respondWith(
-    fetch(e.request)
+    fetch(req)
       .then(res => {
-        // 성공하면 캐시 업데이트
-        const clone = res.clone();
-        caches.open(CACHE).then(c => c.put(e.request, clone));
+        const copy = res.clone();
+        caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {});
         return res;
       })
-      .catch(() => caches.match(e.request))
+      .catch(() => caches.match(req).then(m => m || caches.match('./index.html')))
   );
 });

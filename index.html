@@ -15,6 +15,10 @@
 <meta property="og:url" content="https://xwon411.github.io/-/index.html">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://cals-rental-default-rtdb.firebaseio.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <title>농업생명과학대학 학생회 대여 관리</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -493,6 +497,19 @@ tbody td{padding:10px 13px;vertical-align:middle;}
   .mob-undo-btn:disabled{opacity:0.3;pointer-events:none;}
   .mob-undo-btn:active{background:var(--surface2);}
 }
+/* ══ 저장 중 인디케이터 ══ */
+#saving-indicator{
+  display:none;position:fixed;top:14px;left:50%;transform:translateX(-50%);
+  z-index:9998;background:var(--accent);color:#fff;
+  padding:8px 16px;border-radius:20px;font-size:12px;font-weight:600;
+  box-shadow:0 6px 20px rgba(0,0,0,.22);align-items:center;gap:8px;
+  font-family:'Noto Sans KR',sans-serif;pointer-events:none;
+}
+#saving-indicator .spin{
+  width:12px;height:12px;border:2px solid rgba(255,255,255,.4);
+  border-top-color:#fff;border-radius:50%;animation:savspin .7s linear infinite;flex-shrink:0;
+}
+@keyframes savspin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -1413,6 +1430,7 @@ let editId=null,invType='',invNum='';
 let selItemType='',selStatus='';
 let _invNumFilter='';
 let _rentalsFiltered=false;
+let _opLock=false; // 저장 처리 중 중복 클릭 방지 잠금
 
 // ══ INIT ══
 async function init(){
@@ -1516,11 +1534,16 @@ function getItemState(type,num){
   const iSt=itemStatus[key];
   const iStVal=typeof iSt==='object'?iSt.v:iSt; // 객체(메모 포함) or 문자열 모두 처리
   if(iStVal==='broken') return 'broken';
-  // 가장 최근 대여 기록
-  const recs=rentals.filter(r=>r.item===type&&String(r.itemNum)===String(num))
-    .sort((a,b)=>new Date(b.date)-new Date(a.date));
-  if(!recs.length){if(iStVal==='lost')return 'lost';return 'available';}
-  const last=recs[0];
+  // 가장 최근 대여 기록 (배열 생성·정렬 없이 1회 순회로 최신 1건만 탐색 — 성능)
+  const ns=String(num);
+  let last=null,lastT=-Infinity;
+  for(const r of rentals){
+    if(r.item===type&&String(r.itemNum)===ns){
+      const t=new Date(r.date).getTime();
+      if(t>lastT){lastT=t;last=r;}
+    }
+  }
+  if(!last){if(iStVal==='lost')return 'lost';return 'available';}
   if(last.status==='unpaid_paid') return 'unpaid_paid'; // 미납금 납부 완료 → 별도 상태로 표시
   if(last.status==='lost_paid') return 'lost_paid'; // 분실비 납부 완료 → 별도 상태로 표시
   if(iStVal==='lost') return 'lost'; // itemStatus 분실은 returned보다 우선
@@ -1625,7 +1648,7 @@ function renderRentals(resetPage=false){
   const fi=document.getElementById('s-item').value,fs=document.getElementById('s-status').value;
   const fd=document.getElementById('s-day').value;
   let list=[...rentals].sort((a,b)=>new Date(b.date)-new Date(a.date));
-  if(q)list=list.filter(r=>r.name.includes(q)||r.phone.includes(q));
+  if(q)list=list.filter(r=>(r.name||'').toLowerCase().includes(q)||(r.phone||'').includes(q));
   if(_invNumFilter)list=list.filter(r=>String(r.itemNum)===_invNumFilter);
   if(fi)list=list.filter(r=>r.item===fi);
   if(fs==='active')list=list.filter(r=>r.status!=='returned');
@@ -2083,8 +2106,10 @@ async function applyStatus(){
   }
 }
 async function quickReturn(id){
+  if(_opLock)return;
   const r=rentals.find(x=>x.id===id);if(!r)return;
   if(!isOnline()) return;
+  _opLock=true;_beginSaving();
   const prevStatus=r.status;
   const prevReturnDate=r.returnDate;
   const prevWasBlacklisted=r.wasBlacklisted;
@@ -2109,7 +2134,7 @@ async function quickReturn(id){
     if(prevItemStatusVal!==undefined)itemStatus[key]=prevItemStatusVal;else delete itemStatus[key];
     undoStack.pop();updateHistoryBtns();
     toast('저장에 실패했습니다. 다시 시도해주세요.','err');
-  }
+  }finally{_opLock=false;_endSaving();}
 }
 async function quickReturnFromInv(){
   const btn=document.getElementById('inv-return-btn');
@@ -2173,6 +2198,7 @@ function editSelectItemType(t){
   _fillEditItemNums(t, '');
 }
 async function saveEditRental(){
+  if(_opLock)return;
   const r=rentals.find(x=>x.id===editRentalId);if(!r)return;
   const name=document.getElementById('e-name').value.trim();
   const phone=document.getElementById('e-phone').value.trim();
@@ -2187,6 +2213,7 @@ async function saveEditRental(){
   const newKey=fbKey(editSelItemType,itemNum);
   const keyChanged=prevKey!==newKey;
   const prevItemStatusVal=itemStatus[prevKey];
+  _opLock=true;_beginSaving();
   saveSnapshot(`${r.name} 대여 기록 편집`);
   r.name=name; r.phone=phone; r.dept=dept;
   r.item=editSelItemType; r.itemNum=itemNum;
@@ -2214,7 +2241,7 @@ async function saveEditRental(){
     }
     undoStack.pop();updateHistoryBtns();
     toast('저장에 실패했습니다. 다시 시도해주세요.','err');
-  }
+  }finally{_opLock=false;_endSaving();}
 }
 function openRentalFromInv(){
   closeModal('modal-inv');
@@ -2497,6 +2524,7 @@ async function confirmSmsSent(){
   }
 }
 async function blPay(name,phone,status){
+  if(_opLock)return;
   if(!isOnline()) return;
   const label=status==='unpaid'?'연체료':'분실비';
   const newStatus=status==='unpaid'?'unpaid_paid':'lost_paid';
@@ -2507,6 +2535,7 @@ async function blPay(name,phone,status){
     const k=fbKey(r.item,r.itemNum);
     return {r,status:r.status,returnDate:r.returnDate,wasBlacklisted:r.wasBlacklisted,resolvedAt:r.resolvedAt,isKey:k,isVal:itemStatus[k]};
   });
+  _opLock=true;_beginSaving();
   saveSnapshot(`${name} ${label} 납부`);
   const resolvedAt=new Date().toISOString();
   for(const r of targets){
@@ -2527,9 +2556,10 @@ async function blPay(name,phone,status){
     });
     undoStack.pop();updateHistoryBtns();
     toast('저장에 실패했습니다. 다시 시도해주세요.','err');
-  }
+  }finally{_opLock=false;_endSaving();}
 }
 async function blReturn(name,phone,status){
+  if(_opLock)return;
   if(!isOnline()) return;
   const label=status==='unpaid'?'미납':'분실';
   const targets=rentals.filter(r=>r.name===name&&r.phone===phone&&r.status===status);
@@ -2539,6 +2569,7 @@ async function blReturn(name,phone,status){
     const k=fbKey(r.item,r.itemNum);
     return {r,status:r.status,returnDate:r.returnDate,wasBlacklisted:r.wasBlacklisted,resolvedAt:r.resolvedAt,isKey:k,isVal:itemStatus[k]};
   });
+  _opLock=true;_beginSaving();
   saveSnapshot(`${name} ${label} 반납처리`);
   const resolvedAt=new Date().toISOString();
   for(const r of targets){
@@ -2564,10 +2595,11 @@ async function blReturn(name,phone,status){
     });
     undoStack.pop();updateHistoryBtns();
     toast('저장에 실패했습니다. 다시 시도해주세요.','err');
-  }
+  }finally{_opLock=false;_endSaving();}
 }
 // 미납 → 분실비 납부 한 번에 처리 (미납으로 등록됐으나 실제 분실+납부한 경우)
 async function blPayAsLost(name,phone){
+  if(_opLock)return;
   if(!isOnline()) return;
   const targets=rentals.filter(r=>r.name===name&&r.phone===phone&&r.status==='unpaid');
   if(!targets.length) return;
@@ -2577,6 +2609,7 @@ async function blPayAsLost(name,phone){
     const k=fbKey(r.item,r.itemNum);
     return {r,status:r.status,returnDate:r.returnDate,wasBlacklisted:r.wasBlacklisted,resolvedAt:r.resolvedAt,isKey:k,isVal:itemStatus[k]};
   });
+  _opLock=true;_beginSaving();
   saveSnapshot(`${name} 미납→분실비 납부`);
   const resolvedAt=new Date().toISOString();
   for(const r of targets){
@@ -2602,7 +2635,7 @@ async function blPayAsLost(name,phone){
     });
     undoStack.pop();updateHistoryBtns();
     toast('저장에 실패했습니다. 다시 시도해주세요.','err');
-  }
+  }finally{_opLock=false;_endSaving();}
 }
 function goRentals(name){
   _rentalsFiltered=true;
@@ -3006,6 +3039,20 @@ function toast(msg,type='inf'){
   el.innerHTML=`<span>${type==='ok'?'✅':type==='err'?'❌':'ℹ️'}</span> ${msg}`;
   c.appendChild(el);setTimeout(()=>el.remove(),3500);
 }
+// 저장 중 표시 — 0.25초 이상 걸리는 저장에만 표시(빠른 저장은 깜빡임 방지)
+let _savingTimer=null;
+function _beginSaving(){
+  clearTimeout(_savingTimer);
+  _savingTimer=setTimeout(()=>{
+    const el=document.getElementById('saving-indicator');
+    if(el)el.style.display='flex';
+  },250);
+}
+function _endSaving(){
+  clearTimeout(_savingTimer);
+  const el=document.getElementById('saving-indicator');
+  if(el)el.style.display='none';
+}
 function tick(){const e=document.getElementById('clock-time');if(e){const n=new Date();e.textContent=`${p2(n.getHours())}:${p2(n.getMinutes())}:${p2(n.getSeconds())}`; }}
 ['modal-rental','modal-status','modal-edit','modal-inv','modal-manage','modal-sms','modal-med-manage'].forEach(id=>{
   document.getElementById(id).addEventListener('click',e=>{if(e.target.id===id)closeModal(id);});
@@ -3379,9 +3426,9 @@ async function initMedicine(){
 function buildMedFilters(){
   const cats=[...new Set(medItems.map(m=>m.cat))];
   const sel=document.getElementById('med-cat-filter');
-  sel.innerHTML='<option value="">전체 종류</option>'+cats.map(c=>`<option value="${c}">${c}</option>`).join('');
+  sel.innerHTML='<option value="">전체 종류</option>'+cats.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');
   const lsel=document.getElementById('med-log-filter');
-  lsel.innerHTML='<option value="">전체</option>'+medItems.map(m=>`<option value="${m.id}">${m.cat} · ${m.name}</option>`).join('');
+  lsel.innerHTML='<option value="">전체</option>'+medItems.map(m=>`<option value="${esc(m.id)}">${esc(m.cat)} · ${esc(m.name)}</option>`).join('');
 }
 
 function renderMedicine(){
@@ -3395,8 +3442,8 @@ function renderMedicine(){
     return `<div class="med-card ${st}" onclick="openMedModal('${m.id}')">
       <div class="med-card-top">
         <div>
-          <div class="med-card-name">${m.name}</div>
-          <div class="med-cat-badge" style="margin-top:3px;display:inline-flex;align-items:center;gap:3px">${m.cat}<span class="med-status-dot ${st}" style="display:inline-block"></span></div>
+          <div class="med-card-name">${esc(m.name)}</div>
+          <div class="med-cat-badge" style="margin-top:3px;display:inline-flex;align-items:center;gap:3px">${esc(m.cat)}<span class="med-status-dot ${st}" style="display:inline-block"></span></div>
         </div>
       </div>
       <div class="med-qty ${st}">${m.qty}</div>
@@ -3416,7 +3463,7 @@ function updateMedBadge(){
   if(b){b.textContent=cnt;b.style.display=cnt>0?'inline-flex':'none';}
   if(mb){mb.textContent=cnt;mb.style.display=cnt>0?'block':'none';}
   const unit=m=>MED_CAT_UNIT[m.cat]||'개';
-  const tagsHtml=lowItems.map(m=>`<span class="med-banner-tag">${m.name} ${m.qty}${unit(m)} 남음</span>`).join('');
+  const tagsHtml=lowItems.map(m=>`<span class="med-banner-tag">${esc(m.name)} ${m.qty}${unit(m)} 남음</span>`).join('');
   // 의약품 페이지 배너 (id: med-page-banner)
   const pb=document.getElementById('med-page-banner');
   const pbi=document.getElementById('med-page-banner-items');
@@ -3442,15 +3489,15 @@ function renderMedLog(){
     const memoRow=hasMemo
       ?`<tr id="memo-row-${realIdx}" style="display:none;background:var(--surface2)">
           <td colspan="6" style="padding:6px 14px 8px 32px;font-size:11px;color:var(--text-muted)">
-            💬 ${l.memo}
+            💬 ${esc(l.memo)}
           </td>
         </tr>`
       :'';
     return `<tr style="cursor:${hasMemo?'pointer':'default'}" onclick="${hasMemo?`toggleMedMemo(${realIdx})`:''}">
       <td class="td-mono" style="font-size:10px;white-space:nowrap">${fmtDate(l.at)}</td>
-      <td class="td-name" style="font-size:11px">${l.name}</td>
+      <td class="td-name" style="font-size:11px">${esc(l.name)}</td>
       <td class="med-log-change ${cls}">${sign}${l.delta}</td>
-      <td class="td-sub" style="font-size:11px">${l.reason}${hasMemo?` <span style="font-size:9px;color:var(--accent);font-weight:700">💬</span>`:''}</td>
+      <td class="td-sub" style="font-size:11px">${esc(l.reason)}${hasMemo?` <span style="font-size:9px;color:var(--accent);font-weight:700">💬</span>`:''}</td>
       <td class="td-mono" style="font-weight:700">${l.after}</td>
       <td><button class="btn btn-danger btn-sm" style="padding:2px 6px;font-size:10px" onclick="event.stopPropagation();deleteMedLog(${realIdx})">✕</button></td>
     </tr>${memoRow}`;
@@ -3756,9 +3803,9 @@ function renderMedManageList(){
           ?`<span style="display:inline-flex;align-items:center;gap:3px;font-size:10px;opacity:.4">🔒 이력 있음</span>`
           :`<button class="btn btn-danger btn-sm" onclick="deleteMedItem('${m.id}')">삭제</button>`;
         return `<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border);border-radius:7px;background:var(--surface);font-size:12px;">
-          <span style="background:var(--surface2);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:600;color:var(--text-muted);white-space:nowrap;flex-shrink:0">${m.cat}</span>
-          <span id="med-name-view-${m.id}" style="font-weight:600;flex:1">${m.name}</span>
-          <input id="med-name-edit-${m.id}" class="fi" style="display:none;flex:1;padding:4px 8px;font-size:12px" value="${m.name}"
+          <span style="background:var(--surface2);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:600;color:var(--text-muted);white-space:nowrap;flex-shrink:0">${esc(m.cat)}</span>
+          <span id="med-name-view-${m.id}" style="font-weight:600;flex:1">${esc(m.name)}</span>
+          <input id="med-name-edit-${m.id}" class="fi" style="display:none;flex:1;padding:4px 8px;font-size:12px" value="${esc(m.name)}"
             onkeydown="if(event.key==='Enter')saveMedName('${m.id}');if(event.key==='Escape')cancelMedName('${m.id}')">
           <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);flex-shrink:0">${m.qty}${m.unit||'정'}</span>
           <button class="btn btn-ghost btn-sm" onclick="startMedNameEdit('${m.id}')" id="med-edit-btn-${m.id}" title="이름 변경">✏️</button>
@@ -3915,7 +3962,7 @@ init();
 </div>
 <script>
 if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'));
+  window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 }
 let _dp=null;
 window.addEventListener('beforeinstallprompt',e=>{
@@ -3931,6 +3978,7 @@ document.getElementById('pwa-install-btn').addEventListener('click',async()=>{
 });
 window.addEventListener('appinstalled',()=>{document.getElementById('pwa-banner').style.display='none';});
 </script>
+<div id="saving-indicator"><span class="spin"></span>저장 중...</div>
 <div class="toast-wrap" id="toasts"></div>
 </body>
 </html>
