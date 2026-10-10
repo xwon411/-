@@ -203,6 +203,7 @@ footer{text-align:center;padding:14px;font-size:11px;color:var(--text-muted);bor
     <b>대여 기간</b><br>
     &nbsp;&nbsp;· 약속우산 : 대여 후 일주일 이내 반납<br>
     &nbsp;&nbsp;· 충전기 · 계산기 · 멀티탭 · 찜질팩 : 당일 18:00까지 반납<br>
+    <b>문의</b> : 복지부국장 김서준 (010-9643-4064)
   </div>
 </main>
 
@@ -230,26 +231,32 @@ let itemStatus = {};
 
 function fbKey(type, num){ return `${type}_${String(num).replace(/[\.\#\$\/\[\]]/g,'_')}`; }
 
+// 데이터가 비어 있으면 null, 네트워크/서버 오류면 throw (실패를 '기록 없음'으로 보여주지 않도록)
 async function fbGet(path){
-  try{
-    const r = await fetch(`${FB}${path}.json`);
-    const d = await r.json();
-    return d || null;
-  } catch(e){ return null; }
+  const r = await fetch(`${FB}${path}.json`);
+  if(!r.ok) throw new Error(`HTTP ${r.status}`);
+  const d = await r.json();
+  return d || null;
 }
+let loaded = false; // 한 번이라도 정상적으로 불러왔는지
 
+// 관리자 페이지(index.html)의 getItemState와 같은 규칙
 function getItemState(type, num){
   const key = fbKey(type, num);
   const iSt = itemStatus[key];
   const iStVal=typeof iSt==='object'?iSt.v:iSt;
   if(iStVal==='broken') return 'broken';
-  if(iStVal==='lost')   return 'lost';
   const recs = rentals
     .filter(r => r.item === type && String(r.itemNum) === String(num))
     .sort((a,b) => new Date(b.date) - new Date(a.date));
-  if(!recs.length) return 'available';
-  if(recs[0].status === 'returned') return 'available';
-  return recs[0].status;
+  const last = recs[0];
+  if(!last) return iStVal==='lost' ? 'lost' : 'available';
+  if(last.status === 'unpaid_paid') return 'renting';               // 연체료 납부 후 아직 반납 전 → 대여중
+  if(last.status === 'lost_paid' && !last.replacedAt) return 'lost'; // 분실비 납부, 아직 교체 전
+  if(last.status === 'lost_paid') return iStVal==='lost' ? 'lost' : 'available'; // 새 물품으로 교체됨
+  if(iStVal==='lost') return 'lost';
+  if(last.status === 'returned') return 'available';
+  return last.status;
 }
 
 // ── 렌더 ────────────────────────────────────────────────────
@@ -303,8 +310,8 @@ const ITEM_ICONS  = {umbrella:'☂️', charger:'🔌', calculator:'🧮', multi
 const ITEM_COLORS = {umbrella:'#2d5016', charger:'#1d4ed8', calculator:'#92400e', multitap:'#4c1d95', heatpack:'#9f1239'};
 
 function getDueInfo(r) {
-  // 반납완료 상태면 별도 처리
-  if (r.status === 'returned') return null;
+  // 물품을 아직 갖고 있는 상태만 기한 표시 (반납·고장·분실·분실비 납부는 제외)
+  if (!['renting','unpaid','unpaid_paid'].includes(r.status)) return null;
 
   const rentedAt = new Date(r.date);
   const now = new Date();
@@ -312,9 +319,10 @@ function getDueInfo(r) {
 
   let dueDate;
   if (r.item === 'umbrella') {
-    // 약속우산: 대여일 + 7일
+    // 약속우산: 대여 7일째 오후 6시 (관리자 페이지 자동 미납 기준과 동일)
     dueDate = new Date(rentedAt);
     dueDate.setDate(dueDate.getDate() + 7);
+    dueDate.setHours(18, 0, 0, 0);
   } else {
     // 생필품: 대여 당일 18:00
     dueDate = new Date(rentedAt);
@@ -327,7 +335,7 @@ function getDueInfo(r) {
   const diffHr  = Math.floor((diffMs % 86400000) / 3600000);
   const diffMin = Math.floor((diffMs % 3600000) / 60000);
 
-  const dueStr = `${dueDate.getFullYear()}.${pad(dueDate.getMonth()+1)}.${pad(dueDate.getDate())} ${pad(dueDate.getHours())}:00`;
+  const dueStr = `${dueDate.getFullYear()}.${pad(dueDate.getMonth()+1)}.${pad(dueDate.getDate())} ${pad(dueDate.getHours())}:${pad(dueDate.getMinutes())}`;
 
   if (diffMs < 0) {
     // 기한 초과
@@ -366,9 +374,18 @@ function searchMyRental() {
     return;
   }
 
+  if (!loaded) {
+    resultWrap.style.display = 'block';
+    resultWrap.innerHTML = `<div class="result-empty">
+      <div class="r-ico">⚠️</div>
+      <div>데이터를 불러오지 못했습니다. 잠시 후 다시 시도해주세요</div>
+    </div>`;
+    return;
+  }
+
   // 이름 + 전화번호 모두 일치하는 기록만 (최신순)
   const found = [...rentals]
-    .filter(r => r.name === name && r.phone === phone)
+    .filter(r => r.name === name && String(r.phone||'').replace(/\D/g,'') === phone.replace(/\D/g,''))
     .sort((a,b) => new Date(b.date) - new Date(a.date));
 
   resultWrap.style.display = 'block';
@@ -389,14 +406,16 @@ function searchMyRental() {
   }
 
   resultWrap.innerHTML = found.map(r => {
-    const stMap = { renting:'renting', unpaid:'unpaid', returned:'returned', broken:'unpaid', lost:'unpaid' };
-    const stLbl = { renting:'대여중', unpaid:'미납', returned:'반납완료', broken:'고장', lost:'분실' };
+    const stMap = { renting:'renting', unpaid:'unpaid', returned:'returned', broken:'unpaid', lost:'unpaid', unpaid_paid:'renting', lost_paid:'returned' };
+    const stLbl = { renting:'대여중', unpaid:'미납', returned:'반납완료', broken:'고장', lost:'분실', unpaid_paid:'미납 (연체료 납부)', lost_paid:'분실 (분실비 납부)' };
     const stCls = stMap[r.status] || 'renting';
     const due   = getDueInfo(r);
 
     let ddHtml = '';
     if (r.status === 'returned') {
       ddHtml = `<div class="rrc-dday done"><span class="dd-ico">✅</span><span class="dd-txt">반납 완료</span></div>`;
+    } else if (r.status === 'lost_paid') {
+      ddHtml = `<div class="rrc-dday done"><span class="dd-ico">✅</span><span class="dd-txt">분실비 납부 완료</span></div>`;
     } else if (due) {
       ddHtml = `<div class="rrc-dday ${due.cls}">
         <span class="dd-ico">${due.ico}</span>
@@ -412,7 +431,7 @@ function searchMyRental() {
         <div class="rrc-icon">${ITEM_ICONS[r.item] || '📦'}</div>
         <div>
           <div class="rrc-name">${ITEM_LABELS[r.item] || r.item}</div>
-          <div class="rrc-num">번호 ${r.itemNum}</div>
+          <div class="rrc-num">번호 ${esc(r.itemNum)}</div>
         </div>
         <div class="rrc-status rrc-st-${stCls}">${stLbl[r.status] || r.status}</div>
       </div>
@@ -446,6 +465,11 @@ async function loadData(){
     }
 
     render();
+    loaded = true;
+    // 조회 결과를 띄워둔 상태면 최신 데이터로 다시 표시 (남은 시간·반납 여부 갱신)
+    if (document.getElementById('search-result').style.display === 'block'
+        && document.getElementById('name-input').value.trim()
+        && document.getElementById('phone-input').value.trim()) searchMyRental();
 
     const now = new Date();
     const pad = n => String(n).padStart(2,'0');
@@ -478,7 +502,7 @@ setInterval(loadData, 30000);
 </div>
 <script>
 if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'));
+  window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 }
 let _dp=null;
 window.addEventListener('beforeinstallprompt',e=>{
