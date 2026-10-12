@@ -79,9 +79,6 @@ main{flex:1;padding:16px 16px 40px;max-width:600px;margin:0 auto;width:100%;}
 .chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;
   border-radius:20px;font-size:11px;font-weight:600;}
 .chip-renting{background:#dbeafe;color:#2563eb;}
-.chip-broken {background:#ffe4e6;color:#be123c;}
-.chip-lost   {background:#ede9fe;color:#7c3aed;}
-.chip-unpaid {background:#fee2e2;color:#dc2626;}
 
 /* 안내 문구 */
 .notice{background:var(--surface);border:1px solid var(--border);border-radius:12px;
@@ -196,14 +193,9 @@ footer{text-align:center;padding:14px;font-size:11px;color:var(--text-muted);bor
     </div>
   </div>
 
-  <div class="notice">
+  <div class="notice" id="notice">
     <div class="notice-title">📋 대여 안내</div>
-    <b>대여 위치</b> : 200동 1037A호 (학생회실)<br>
-    <b>대여 시간</b> : 평일 14:00 ~ 18:00<br>
-    <b>대여 기간</b><br>
-    &nbsp;&nbsp;· 약속우산 : 대여 후 일주일 이내 반납<br>
-    &nbsp;&nbsp;· 충전기 · 계산기 · 멀티탭 · 찜질팩 : 당일 18:00까지 반납<br>
-    <b>문의</b> : 복지부국장 김서준 (010-9643-4064)
+    <div id="notice-body"></div>
   </div>
 </main>
 
@@ -239,6 +231,30 @@ async function fbGet(path){
   return d || null;
 }
 let loaded = false; // 한 번이라도 정상적으로 불러왔는지
+
+// ── 대여 안내 (관리자 페이지 '📢 학생 페이지 안내'에서 수정 → Firebase /publicInfo) ──
+const PUBLIC_INFO_DEFAULT = {
+  location:'200동 1037A호 (학생회실)',
+  hours:'평일 14:00 ~ 18:00',
+  periods:'약속우산 : 대여 후 일주일 이내 반납\n충전기 · 계산기 · 멀티탭 · 찜질팩 : 당일 18:00까지 반납',
+  contact:'복지부국장 김서준 (010-9643-4064)'
+};
+function renderNotice(info){
+  const d = {...PUBLIC_INFO_DEFAULT, ...(info||{})};
+  const rows = [];
+  if(d.location) rows.push(`<b>대여 위치</b> : ${esc(d.location)}`);
+  if(d.hours)    rows.push(`<b>대여 시간</b> : ${esc(d.hours)}`);
+  const periods = String(d.periods||'').split('\n').map(x=>x.trim()).filter(Boolean);
+  if(periods.length) rows.push(`<b>대여 기간</b>` + periods.map(x=>`<br>&nbsp;&nbsp;· ${esc(x)}`).join(''));
+  if(d.contact)  rows.push(`<b>문의</b> : ${esc(d.contact)}`);
+  document.getElementById('notice-body').innerHTML = rows.join('<br>');
+}
+// 불러오기 전에는 회색 로딩 표시만 (기본 문구가 잠깐 보였다 바뀌는 깜빡임 방지)
+document.getElementById('notice-body').innerHTML =
+  '<div class="skeleton" style="height:12px;width:70%;margin:6px 0"></div>'+
+  '<div class="skeleton" style="height:12px;width:55%;margin:6px 0"></div>'+
+  '<div class="skeleton" style="height:12px;width:80%;margin:6px 0"></div>';
+let noticeShown = false;
 
 // 관리자 페이지(index.html)의 getItemState와 같은 규칙
 function getItemState(type, num){
@@ -455,6 +471,10 @@ async function loadData(){
     const [rData, iData, nData] = await Promise.all([
       fbGet('/rentals'), fbGet('/itemStatus'), fbGet('/itemNumbers')
     ]);
+    // 안내 문구는 실패해도 현황 표시에 영향 없게 따로 불러옴
+    // 저장한 적 없거나(null) 실패하면 기본 문구 — 단, 이미 저장된 문구를 보여준 뒤 실패하면 그대로 둠
+    fbGet('/publicInfo').then(d=>{renderNotice(d);noticeShown=true;})
+      .catch(()=>{if(!noticeShown){renderNotice(null);noticeShown=true;}});
 
     rentals    = rData ? Object.values(rData) : [];
     itemStatus = iData || {};
@@ -478,6 +498,7 @@ async function loadData(){
       `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
     dot.className = 'upd-dot';
   } catch(e){
+    if(!noticeShown){renderNotice(null);noticeShown=true;}
     timeEl.textContent = '불러오기 실패';
     dot.className = 'upd-dot loading';
   } finally{

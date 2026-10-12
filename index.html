@@ -60,11 +60,11 @@
   --cond-avail-bg:#dcfce7;--cond-unpaid-bg:#fee2e2;
   --cond-broken-bg:#ffe4e6;--cond-lost-bg:#ede9fe;
   /* 위험(삭제) 색 */
-  --c-danger:#dc2626;--c-danger-bg:#fee2e2;--c-danger-bd:#fecaca;
+  --c-danger:#dc2626;--c-danger-bg:#fee2e2;
   --c-danger-bg2:#fecaca;
   /* 경고(노랑) 색 */
   --c-warn-bg:#fefce8;--c-warn-bd:#fde68a;--c-warn-light:#fef3c7;
-  --c-warn-text:#92400e;--c-warn:#f59e0b;--c-warn-dark:#d97706;
+  --c-warn-text:#92400e;--c-warn:#f59e0b;
   /* 의약품 카드 */
   --med-low-bg:#fffbeb;--med-low-bd:#f59e0b;
   --med-empty-bg:#fef2f2;--med-empty-bd:#ef4444;
@@ -80,8 +80,6 @@
   /* SMS 배지 */
   --sms-sent-bg:#dcfce7;--sms-sent-cl:#16a34a;
   --sms-none-bg:#f3f4f6;--sms-none-cl:#9ca3af;
-  /* 알림 배너 */
-  --alert-bg:#fef2f2;--alert-bd:#fecaca;--alert-cnt-bg:#ef4444;
   /* 아바타 (블랙리스트) */
   --bl-avatar-bg:#fee2e2;--bl-avatar-cl:#dc2626;
   --bl-avatar-bg2:#e0e7ff;--bl-avatar-cl2:#4338ca;
@@ -212,6 +210,9 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 .blh-dates{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;}
 .blh-note{font-size:11px;color:var(--text-muted);}
 @media(max-width:768px){.blh-cards{display:flex;}.blh-table{display:none;}}
+/* 의약품 순서 변경 — 들어갈 자리 표시 선 */
+.med-order-row.med-drop-before{box-shadow:0 -3px 0 0 var(--accent);}
+.med-order-row.med-drop-after{box-shadow:0 3px 0 0 var(--accent);}
 /* 대여 등록 자동완성 */
 .ac-list{display:none;position:absolute;top:100%;left:0;right:0;z-index:30;margin-top:3px;background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.12);max-height:230px;overflow-y:auto;}
 .ac-item{padding:8px 11px;cursor:pointer;display:flex;flex-direction:column;gap:2px;border-bottom:1px solid var(--border);}
@@ -285,8 +286,6 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 .sms-log-item .sli-note{color:var(--text);}
 /* 문자 발송 모달 */
 .sms-modal-info{background:var(--surface2);border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:13px;}
-.alert-banner{background:var(--alert-bg);border:1px solid var(--alert-bd);border-radius:9px;padding:11px 16px;display:flex;align-items:center;gap:10px;margin-bottom:18px;font-size:13px;}
-.alert-banner .cnt{background:var(--alert-cnt-bg);color:white;font-weight:700;padding:2px 7px;border-radius:20px;font-family:'JetBrains Mono',monospace;font-size:11px;}
 .empty-state{padding:46px 20px;text-align:center;color:var(--text-muted);}
 .empty-state .ico{font-size:38px;margin-bottom:11px;opacity:.4;}.empty-state p{font-size:13px;}
 
@@ -326,7 +325,7 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 .mob-util-btn:disabled{opacity:.5;pointer-events:none;}
 @media(max-width:768px){
   .sidebar{display:none;}.mobile-nav{display:block;}.fab{display:flex;}
-  .main{margin-left:0;padding:12px 10px 80px;}
+  .main{margin-left:0;padding:52px 10px 80px;} /* 위쪽 고정 버튼 줄(📢 🔄 되돌리기) 아래로 제목 내림 */
   .page-title{font-size:17px;}.page-sub{font-size:11px;}
   .page-header{flex-direction:column;gap:8px;margin-bottom:16px;}
   .stats-row{grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px;}
@@ -386,10 +385,6 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 .tv-card::before{content:attr(data-ico);position:absolute;right:6px;top:4px;font-size:22px;opacity:.07;}
 .tv-icon{font-size:16px;margin-bottom:3px;}
 .tv-name{font-size:9px;font-weight:700;color:var(--text-muted);letter-spacing:.04em;margin-bottom:7px;}
-.tv-ring-wrap{display:flex;justify-content:center;}
-.tv-ring{width:46px;height:46px;}
-.tv-rate-label{font-size:8px;font-weight:700;margin-top:3px;letter-spacing:.04em;}
-.tv-footer{margin-top:6px;display:flex;justify-content:space-around;font-size:9px;color:var(--text-muted);}
 
 /* 도넛 패널 — col-span 1 */
 .donut-panel{display:flex;flex-direction:column;gap:7px;}
@@ -411,7 +406,6 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 
 /* 차트 캔버스 높이 */
 .ch140{height:140px;position:relative;}
-.ch160{height:160px;position:relative;}
 
 /* 라인 차트 — col-span 3 */
 .sc-full{grid-column:1/-1;}
@@ -448,20 +442,12 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 .med-status-dot.low{background:var(--med-dot-low);animation:bl 1.5s ease infinite;}
 .med-status-dot.empty{background:var(--med-dot-empty);animation:bl .8s ease infinite;}
 
-/* 카테고리 탭 */
-.med-cat-tabs{display:flex;gap:6px;padding:13px 13px 0;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
-.med-cat-tabs::-webkit-scrollbar{display:none;}
-.med-cat-tab{padding:5px 13px;border-radius:20px;cursor:pointer;font-size:12px;font-weight:600;border:1px solid var(--border);background:var(--surface2);transition:all .15s;white-space:nowrap;flex-shrink:0;}
-.med-cat-tab.active{background:var(--accent);color:white;border-color:var(--accent);}
-
 /* 의약품 조정 모달 */
 .med-adj-row{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:10px 0;}
 .med-adj-btn{min-width:48px;padding:8px 10px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:var(--surface2);color:var(--text);transition:all .15s;font-family:'JetBrains Mono',monospace;}
 .med-adj-btn:hover{border-color:var(--accent);background:var(--accent-pale);color:var(--accent);}
 .med-adj-btn.minus{border-color:var(--med-adj-minus-bd);color:var(--med-adj-minus-cl);background:var(--med-adj-minus-bg);}
 .med-adj-btn.minus:hover{background:var(--med-adj-minus-hover);}
-.med-qty-display{font-size:38px;font-weight:900;letter-spacing:-.05em;text-align:center;margin:12px 0 4px;font-family:'JetBrains Mono',monospace;}
-.med-qty-label{text-align:center;font-size:12px;color:var(--text-muted);margin-bottom:12px;}
 
 /* 이력 테이블 */
 .med-log-change{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;}
@@ -494,8 +480,6 @@ tbody td{padding:10px 13px;vertical-align:middle;}
   .mobile-card-list{display:none!important;}
 }
 
-/* ══ 모바일 페이지 히스토리 버튼 ══ */
-#hist-back:disabled, #hist-fwd:disabled{opacity:0.3;pointer-events:none;}
 
 /* ══ 모바일 되돌리기/앞으로 버튼 ══ */
 .mobile-undo-btns{display:none;}
@@ -572,6 +556,9 @@ tbody td{padding:10px 13px;vertical-align:middle;}
     <span id="sync-dot" style="width:6px;height:6px;border-radius:50%;background:#9ca3af;flex-shrink:0;transition:background .5s"></span>
     <span id="clock-time">--:--:--</span>
     <span id="offline-label" style="display:none;margin-left:auto;font-size:10px;background:#dc2626;color:white;padding:1px 6px;border-radius:10px;font-weight:700">오프라인</span>
+    <button onclick="openNoticeModal()" title="학생 페이지 안내 수정"
+      style="margin-left:auto;background:none;border:none;cursor:pointer;font-size:13px;padding:2px 4px;line-height:1;border-radius:5px;color:inherit;transition:background .15s"
+      onmouseover="this.style.background='rgba(255,255,255,.15)'" onmouseout="this.style.background='none'">📢</button>
   </div>
   <div style="padding:0 10px 4px;display:flex;gap:6px">
     <button id="undo-btn" class="sidebar-util-btn" onclick="undoAction()" disabled>
@@ -629,13 +616,14 @@ tbody td{padding:10px 13px;vertical-align:middle;}
           <option value="calculator">공학용 계산기</option><option value="multitap">멀티탭</option><option value="heatpack">찜질팩</option>
         </select>
         <select class="flt" id="s-status" onchange="_invNumFilter='';renderRentals(true)">
-          <option value="active" selected>반납완료 제외</option>
+          <option value="active" selected>처리완료 제외</option>
           <option value="">전체 상태</option>
           <option value="renting">대여중</option>
           <option value="returned">반납완료</option>
           <option value="unpaid">미납</option>
           <option value="broken">고장</option>
           <option value="lost">분실</option>
+          <option value="paid">납부완료 (연체료·분실비)</option>
         </select>
         <select class="flt" id="s-day" onchange="_invNumFilter='';renderRentals(true)">
           <option value="">전체 요일</option>
@@ -720,7 +708,7 @@ tbody td{padding:10px 13px;vertical-align:middle;}
       <div class="section-actions">
         <div class="search-wrap">🔍<input type="text" id="bl-search" placeholder="이름, 연락처, 학부" oninput="renderBlacklist()" style="width:180px"></div>
         <select class="flt" id="bl-filter" onchange="renderBlacklist()">
-          <option value="">전체 사유</option><option value="unpaid">미납</option><option value="long">장기미납 (2주 이상)</option><option value="lost">분실</option>
+          <option value="">전체 사유</option><option value="unpaid">미납</option><option value="long">장기미납 (기한 후 7일 이상)</option><option value="lost">분실</option>
         </select>
         <select class="flt" id="bl-sms" onchange="renderBlacklist()">
           <option value="">문자 전체</option><option value="none">문자 미발송만</option>
@@ -1027,7 +1015,7 @@ tbody td{padding:10px 13px;vertical-align:middle;}
   <div class="modal-header">
     <div>
       <div class="modal-title">⚙️ 의약품 품목 관리</div>
-      <div class="modal-sub">품목 추가 · 삭제 (사용 이력이 있는 품목은 삭제 불가)</div>
+      <div class="modal-sub">품목 추가 · 삭제 (삭제해도 사용 이력은 그대로 남아요)</div>
     </div>
     <button class="modal-close" onclick="closeModal('modal-med-manage')">✕</button>
   </div>
@@ -1124,16 +1112,12 @@ tbody td{padding:10px 13px;vertical-align:middle;}
         <option value="구비 추가">구비 추가 (증가)</option>
         <option value="폐기">폐기 (차감)</option>
         <option value="수량 정정">수량 정정 (직접 입력)</option>
-        <option value="기타">기타</option>
+        <option value="기타+">기타 (증가)</option>
+        <option value="기타-">기타 (차감)</option>
       </select>
     </div>
     <!-- 빠른 버튼 -->
-    <div id="med-adj-quick" class="med-adj-row">
-      <button class="med-adj-btn minus" onclick="medAdjDelta(-5)">－5</button>
-      <button class="med-adj-btn minus" onclick="medAdjDelta(-1)">－1</button>
-      <button class="med-adj-btn" onclick="medAdjDelta(+1)">＋1</button>
-      <button class="med-adj-btn" onclick="medAdjDelta(+5)">＋5</button>
-    </div>
+    <div id="med-adj-quick" class="med-adj-row"></div>
     <!-- 직접 입력 -->
     <div class="fg" style="margin-top:10px">
       <label id="med-direct-label">사용 수량 직접 입력</label>
@@ -1169,8 +1153,32 @@ tbody td{padding:10px 13px;vertical-align:middle;}
   </div>
 </div>
 
+<!-- 학생 페이지 안내 수정 모달 -->
+<div class="modal-overlay" id="modal-notice">
+<div class="modal" style="width:460px">
+  <div class="modal-header">
+    <div><div class="modal-title">📢 학생 페이지 안내</div><div class="modal-sub">학생용 대여 현황 페이지 하단 '대여 안내'에 표시돼요</div></div>
+    <button class="modal-close" onclick="closeModal('modal-notice')">✕</button>
+  </div>
+  <div class="modal-body">
+    <div class="form-grid">
+      <div class="fg full"><label>대여 위치</label><input class="fi" id="n-location"></div>
+      <div class="fg full"><label>대여 시간</label><input class="fi" id="n-hours"></div>
+      <div class="fg full"><label>대여 기간 <span style="font-weight:400;opacity:.6">(한 줄에 하나씩)</span></label><textarea class="fi" id="n-periods" rows="3" style="resize:vertical;line-height:1.6"></textarea></div>
+      <div class="fg full"><label>문의</label><input class="fi" id="n-contact"></div>
+    </div>
+    <button class="btn btn-ghost btn-sm" style="margin-top:12px" onclick="fillNoticeForm(PUBLIC_INFO_EXAMPLE)">📝 예시 문구로 채우기</button>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" onclick="closeModal('modal-notice')">취소</button>
+    <button class="btn btn-primary" id="notice-save-btn" onclick="saveNotice()">💾 저장</button>
+  </div>
+</div>
+</div>
+
 <!-- MOBILE NAV -->
 <div class="mobile-undo-btns">
+  <button class="mob-util-btn" onclick="openNoticeModal()" title="학생 페이지 안내 수정">📢</button>
   <button class="mob-util-btn" id="mob-refresh-btn" onclick="refreshData()" title="새로고침">🔄</button>
   <button class="mob-undo-btn" id="mob-undo-btn" onclick="undoAction()" disabled>↩ 되돌리기</button>
   <button class="mob-undo-btn" id="mob-redo-btn" onclick="redoAction()" disabled>앞으로 ↪</button>
@@ -1257,18 +1265,23 @@ async function undoAction(){
   if(_historyBusy||!undoStack.length) return;
   _historyBusy=true;
   try{
-    redoStack.push(captureNow(undoStack[undoStack.length-1].label));
-    if(redoStack.length>UNDO_LIMIT) redoStack.shift();
-    await applySnapshot(undoStack.pop(),'↩ 되돌리기');
+    const snap=undoStack.pop();
+    const cur=captureNow(snap.label);
+    // 저장 실패 시 되돌리기 기록을 잃지 않도록, 성공했을 때만 '앞으로' 목록에 넣음
+    if(await applySnapshot(snap,'↩ 되돌리기')){redoStack.push(cur);if(redoStack.length>UNDO_LIMIT)redoStack.shift();}
+    else undoStack.push(snap);
+    updateHistoryBtns();
   }finally{_historyBusy=false;}
 }
 async function redoAction(){
   if(_historyBusy||!redoStack.length) return;
   _historyBusy=true;
   try{
-    undoStack.push(captureNow(redoStack[redoStack.length-1].label));
-    if(undoStack.length>UNDO_LIMIT) undoStack.shift();
-    await applySnapshot(redoStack.pop(),'↪ 앞으로');
+    const snap=redoStack.pop();
+    const cur=captureNow(snap.label);
+    if(await applySnapshot(snap,'↪ 앞으로')){undoStack.push(cur);if(undoStack.length>UNDO_LIMIT)undoStack.shift();}
+    else redoStack.push(snap);
+    updateHistoryBtns();
   }finally{_historyBusy=false;}
 }
 async function applySnapshot(snap,prefix){
@@ -1293,11 +1306,11 @@ async function applySnapshot(snap,prefix){
     // 스냅샷에 있고 현재와 다른 것 → PUT
     for(const r of snap.rentals){
       const p=prevRMap[r.id];
-      if(!p||JSON.stringify(p)!==JSON.stringify(r)) writes.push(fbPut(`/rentals/${r.id}`,r));
+      if(!p||JSON.stringify(p)!==JSON.stringify(r)) writes.push(opPut(`/rentals/${r.id}`,r));
     }
     // 현재에 있는데 스냅샷에 없는 것 → DELETE
     for(const r of prevRentals){
-      if(!snapRMap[r.id]) writes.push(fbDel(`/rentals/${r.id}`));
+      if(!snapRMap[r.id]) writes.push(opDel(`/rentals/${r.id}`));
     }
 
     // ── itemStatus diff ──
@@ -1305,15 +1318,15 @@ async function applySnapshot(snap,prefix){
     const prevISKeys=new Set(Object.keys(prevItemStatus));
     for(const k of snapISKeys){
       if(!prevISKeys.has(k)||JSON.stringify(prevItemStatus[k])!==JSON.stringify(snap.itemStatus[k]))
-        writes.push(fbPut(`/itemStatus/${k}`,snap.itemStatus[k]));
+        writes.push(opPut(`/itemStatus/${k}`,snap.itemStatus[k]));
     }
     for(const k of prevISKeys){
-      if(!snapISKeys.has(k)) writes.push(fbDel(`/itemStatus/${k}`));
+      if(!snapISKeys.has(k)) writes.push(opDel(`/itemStatus/${k}`));
     }
 
     // ── ITEM_NUMBERS — 변경 시에만 전체 PUT (소량 데이터) ──
     if(JSON.stringify(prevItemNumbers)!==JSON.stringify(snap.ITEM_NUMBERS))
-      writes.push(fbPut('/itemNumbers',snap.ITEM_NUMBERS));
+      writes.push(opPut('/itemNumbers',snap.ITEM_NUMBERS));
 
     // ── medicine diff ──
     if(snap.medItems){
@@ -1321,10 +1334,10 @@ async function applySnapshot(snap,prefix){
       const prevMMap={}; prevMedItems.forEach(m=>prevMMap[m.id]=m);
       for(const m of snap.medItems){
         const p=prevMMap[m.id];
-        if(!p||JSON.stringify(p)!==JSON.stringify(m)) writes.push(fbPut(`/medicine/${m.id}`,m));
+        if(!p||JSON.stringify(p)!==JSON.stringify(m)) writes.push(opPut(`/medicine/${m.id}`,m));
       }
       for(const m of prevMedItems){
-        if(!snapMMap[m.id]) writes.push(fbDel(`/medicine/${m.id}`));
+        if(!snapMMap[m.id]) writes.push(opDel(`/medicine/${m.id}`));
       }
     }
 
@@ -1335,15 +1348,15 @@ async function applySnapshot(snap,prefix){
       for(const l of snap.medLog){
         if(!l.logId) continue;
         const p=prevLMap[l.logId];
-        if(!p||JSON.stringify(p)!==JSON.stringify(l)) writes.push(fbPut(`/medLog/${l.logId}`,l));
+        if(!p||JSON.stringify(p)!==JSON.stringify(l)) writes.push(opPut(`/medLog/${l.logId}`,l));
       }
       for(const l of prevMedLog){
         if(!l.logId) continue;
-        if(!snapLMap[l.logId]) writes.push(fbDel(`/medLog/${l.logId}`));
+        if(!snapLMap[l.logId]) writes.push(opDel(`/medLog/${l.logId}`));
       }
     }
 
-    await Promise.all(writes);
+    await fbCommit(writes);
     dot(true);
     setHistoryLoading(false);
     updateHistoryBtns();
@@ -1351,6 +1364,7 @@ async function applySnapshot(snap,prefix){
     buildMedFilters();renderMedicine();renderMedLog();updateMedBadge();refreshMedStatsIfVisible();
     if(_blTab==='history')renderBlHistory();
     toast(`${prefix} "${snap.label}" 완료`,'ok');
+    return true;
   }catch(e){
     // Firebase 실패 시 in-memory도 원상복구
     rentals=prevRentals; itemStatus=prevItemStatus; ITEM_NUMBERS=prevItemNumbers;
@@ -1362,6 +1376,7 @@ async function applySnapshot(snap,prefix){
     buildMedFilters();renderMedicine();renderMedLog();updateMedBadge();
     if(_blTab==='history')renderBlHistory();
     toast('동기화 실패 — 되돌리기가 취소되었습니다','err');
+    return false;
   }
 }
 function updateHistoryBtns(){
@@ -1392,9 +1407,20 @@ function setHistoryLoading(v){
 
 function sInfo(v){return S5.find(s=>s.v===v)||{v,l:v,cl:'sb-renting',ico:'?'};}
 function sBadge(v){const s=sInfo(v);return `<span class="sbadge ${s.cl}">${s.l}</span>`;}
-// 대여 기록 기반 배지 — 미납 2주 이상이면 장기미납으로 시각적 구분
+// 반납 기한 — 약속우산: 대여 7일째 18:00 / 그 외: 대여 당일 18:00 (18시 이후 대여면 다음 날 18:00)
+// (학생 페이지 public.html의 반납 기한·자동 미납 기준과 동일)
+function dueDate(r){
+  const d=new Date(r.date);
+  if(r.item==='umbrella'){d.setDate(d.getDate()+7);d.setHours(18,0,0,0);return d;}
+  const due=new Date(d);due.setHours(18,0,0,0);
+  if(due<=d)due.setDate(due.getDate()+1);
+  return due;
+}
+const LONG_UNPAID_DAYS=7; // 반납 기한이 지나고 며칠 넘으면 장기미납인지
+function isLongUnpaid(r){return r.status==='unpaid'&&r.date&&(Date.now()-dueDate(r).getTime())>=LONG_UNPAID_DAYS*86400000;}
+// 대여 기록 기반 배지 — 반납 기한이 지나고 7일 이상이면 장기미납으로 시각적 구분
 function sBadgeR(r){
-  if(r.status==='unpaid'&&daysSince(r.date)>=14)
+  if(isLongUnpaid(r))
     return `<span class="sbadge sb-unpaid">⏰ 장기미납</span>`;
   return sBadge(r.status);
 }
@@ -1416,6 +1442,18 @@ async function fbGet(path){
 }
 function fbPut(path,data){
   return fetch(`${FB}${path}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})
+    .then(r=>{if(!r.ok)throw new Error(`HTTP ${r.status}`);dot(true);return r;}).catch(e=>{dot(false);throw e;});
+}
+// ── 묶음 저장: 여러 경로를 Firebase에 '한 번에' 저장 (전부 성공하거나 전부 실패) ──
+// 예) fbCommit([opPut('/rentals/1',r), opDel('/itemStatus/umbrella_5')])
+// 루트에 다중 경로 PATCH 한 번 → 일부만 저장돼 데이터가 어긋나는 일이 없음 (null = 삭제)
+function opPut(path,data){return [path,data];}
+function opDel(path){return [path,null];}
+function fbCommit(ops){
+  const body={};
+  for(const [path,val] of ops)body[path.replace(/^\//,'')]=val===undefined?null:val;
+  if(!Object.keys(body).length)return Promise.resolve();
+  return fetch(`${FB}/.json`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
     .then(r=>{if(!r.ok)throw new Error(`HTTP ${r.status}`);dot(true);return r;}).catch(e=>{dot(false);throw e;});
 }
 function fbDel(path){return fetch(`${FB}${path}.json`,{method:'DELETE'}).then(r=>{if(!r.ok)throw new Error(`HTTP ${r.status}`);dot(true);return r;}).catch(e=>{dot(false);throw e;});}
@@ -1508,10 +1546,7 @@ async function autoUnpaidUmbrella(){
   const now=Date.now();
   const targets=rentals.filter(r=>{
     if(r.item!=='umbrella'||r.status!=='renting') return false;
-    const cutoff=new Date(r.date);
-    cutoff.setDate(cutoff.getDate()+7);
-    cutoff.setHours(18,0,0,0); // 7일 후 오후 6시 (로컬 시간)
-    return now>=cutoff.getTime();
+    return now>=dueDate(r).getTime(); // 대여 7일째 오후 6시
   });
   if(!targets.length) return;
   saveSnapshot(`약속우산 자동 미납 처리 (${targets.length}건)`);
@@ -1521,7 +1556,7 @@ async function autoUnpaidUmbrella(){
     r.note=(r.note?r.note+' / ':'')+'7일 경과 자동 미납 처리';
   }
   try{
-    await Promise.all(targets.map(r=>fbPut(`/rentals/${r.id}`,r)));
+    await fbCommit(targets.map(r=>opPut(`/rentals/${r.id}`,r)));
     toast('약속우산 7일 경과 — 자동 미납 처리되었습니다','inf');
     renderAll();
   }catch(e){
@@ -1597,6 +1632,29 @@ function isLatestRecord(r){
   const t=new Date(r.date).getTime();
   return !rentals.some(x=>x!==r&&x.item===r.item&&String(x.itemNum)===String(r.itemNum)&&new Date(x.date).getTime()>t);
 }
+// ── 물품 '잡기' (동시 대여 방지) ──
+// /itemLock/<물품키> 값을 조건부 저장(if-match)으로 바꿔서, 같은 물품을 동시에 등록하려는 두 사람 중 한 명만 통과시킴.
+// 브라우저·Firebase가 조건부 저장을 지원하지 않으면 { ok:true, mode:'fallback' } → 기존 '서버 재확인' 방식만 사용
+let _lockMode=''; // 'lock' | 'fallback' (확인용)
+async function claimItem(type,num){
+  const url=`${FB}/itemLock/${fbKey(type,num)}.json`;
+  let etag=null;
+  try{
+    const r=await fetch(url,{headers:{'X-Firebase-ETag':'true'}});
+    if(r.ok)etag=r.headers.get('ETag');
+  }catch(e){etag=null;}
+  if(!etag){_lockMode='fallback';return {ok:true,mode:'fallback'};}
+  let w;
+  try{
+    w=await fetch(url,{method:'PUT',headers:{'Content-Type':'application/json','if-match':etag},
+      body:JSON.stringify(Date.now()+'_'+Math.random().toString(36).slice(2,8))});
+  }catch(e){_lockMode='fallback';return {ok:true,mode:'fallback'};}
+  if(w.status===412)return {ok:false}; // 그사이 다른 사람이 이 물품을 잡음
+  if(!w.ok){_lockMode='fallback';return {ok:true,mode:'fallback'};}
+  _lockMode='lock';
+  return {ok:true,mode:'lock'};
+}
+
 // 저장 직전 서버의 최신 데이터로 물품 상태 재확인 (다른 관리자가 동시에 처리한 경우 대비)
 async function serverItemState(type,num){
   const [rData,iData]=await Promise.all([fbGet('/rentals'),fbGet('/itemStatus')]);
@@ -1676,6 +1734,13 @@ function makeMobileCard(r,cols){
     ${hasActions?`<div class="m-card-actions">${actionBtns(r)}</div>`:''}
   </div>`;
 }
+// 휴대폰용 카드 목록 — 표(tbody)가 들어 있는 .tbl-wrap 안에 카드 목록을 만들어 채움 (비었으면 안내 문구)
+function setMobileCards(tbodyId,html,emptyMsg){
+  const wrap=document.getElementById(tbodyId)?.closest('.tbl-wrap');if(!wrap)return;
+  let ml=wrap.querySelector('.mobile-card-list');
+  if(!ml){ml=document.createElement('div');ml.className='mobile-card-list';wrap.appendChild(ml);}
+  ml.innerHTML=html||`<div style="padding:20px;text-align:center;color:var(--text-muted)">${emptyMsg}</div>`;
+}
 function emptyRow(n,msg='내역이 없습니다'){return `<tr><td colspan="${n}"><div class="empty-state"><div class="ico">📭</div><p>${msg}</p></div></td></tr>`;}
 
 // ══ RENDER TABLES ══
@@ -1684,12 +1749,7 @@ function renderRecent(){
   const cols=['name','phone','dept','item','num','date','status','actions'];
   document.getElementById('tbl-recent').innerHTML=
     list.length?list.map(r=>makeRow(r,cols)).join(''):emptyRow(8);
-  const mw=document.getElementById('tbl-recent').closest('.tbl-wrap');
-  if(mw){
-    let ml=mw.querySelector('.mobile-card-list');
-    if(!ml){ml=document.createElement('div');ml.className='mobile-card-list';mw.appendChild(ml);}
-    ml.innerHTML=list.length?list.map(r=>makeMobileCard(r,cols)).join(''):'<div style="padding:20px;text-align:center;color:var(--text-muted)">내역이 없습니다</div>';
-  }
+  setMobileCards('tbl-recent',list.map(r=>makeMobileCard(r,cols)).join(''),'내역이 없습니다');
 }
 const PAGE_SIZE=20;
 let currentPage=1;
@@ -1705,7 +1765,9 @@ function renderRentals(resetPage=false){
   if(q)list=list.filter(r=>(r.name||'').toLowerCase().includes(q)||(r.phone||'').includes(q)||(qd&&(r.phone||'').replace(/\D/g,'').includes(qd)));
   if(_invNumFilter)list=list.filter(r=>String(r.itemNum)===_invNumFilter);
   if(fi)list=list.filter(r=>r.item===fi);
-  if(fs==='active')list=list.filter(r=>r.status!=='returned');
+  // 처리완료 제외: 반납완료 + 분실비 납부(처리 끝남)는 숨김. 연체료 납부는 아직 반납 전이라 표시
+  if(fs==='active')list=list.filter(r=>r.status!=='returned'&&r.status!=='lost_paid');
+  else if(fs==='paid')list=list.filter(r=>r.status==='unpaid_paid'||r.status==='lost_paid');
   else if(fs)list=list.filter(r=>r.status===fs);
   if(fd!=='')list=list.filter(r=>r.date&&new Date(r.date).getDay()===parseInt(fd));
 
@@ -1717,12 +1779,7 @@ function renderRentals(resetPage=false){
   const rcols=['idx','name','phone','dept','item','num','date','returnDate','status','actions'];
   document.getElementById('tbl-rentals').innerHTML=
     paged.length?paged.map((r,i)=>makeRowIdx(r,start+i,rcols)).join(''):emptyRow(10,'해당 조건의 대여 내역이 없습니다');
-  const rmw=document.getElementById('tbl-rentals').closest('.tbl-wrap');
-  if(rmw){
-    let rml=rmw.querySelector('.mobile-card-list');
-    if(!rml){rml=document.createElement('div');rml.className='mobile-card-list';rmw.appendChild(rml);}
-    rml.innerHTML=paged.length?paged.map(r=>makeMobileCard(r,rcols)).join(''):'<div style="padding:20px;text-align:center;color:var(--text-muted)">해당 조건의 대여 내역이 없습니다</div>';
-  }
+  setMobileCards('tbl-rentals',paged.map(r=>makeMobileCard(r,rcols)).join(''),'해당 조건의 대여 내역이 없습니다');
 
   // 페이지네이션 UI
   const pg=document.getElementById('rentals-pagination');
@@ -1761,12 +1818,7 @@ function renderUnpaid(){
   const ucols=['name','phone','dept','item','num','date','days','status','actions'];
   document.getElementById('tbl-unpaid').innerHTML=
     list.length?list.map(r=>makeRow(r,ucols)).join(''):emptyRow(9,'대여 이상 내역 없음');
-  const umw=document.getElementById('tbl-unpaid').closest('.tbl-wrap');
-  if(umw){
-    let uml=umw.querySelector('.mobile-card-list');
-    if(!uml){uml=document.createElement('div');uml.className='mobile-card-list';umw.appendChild(uml);}
-    uml.innerHTML=list.length?list.map(r=>makeMobileCard(r,ucols)).join(''):'<div style="padding:20px;text-align:center;color:var(--text-muted)">대여 이상 내역 없음</div>';
-  }
+  setMobileCards('tbl-unpaid',list.map(r=>makeMobileCard(r,ucols)).join(''),'대여 이상 내역 없음');
 
   // 섹션 2: 물품현황에서 직접 처리한 고장/분실 (대여 기록과 무관한 것만)
   // itemStatus 중 현재 대여 기록으로 이미 표시된 물품은 제외
@@ -1791,9 +1843,7 @@ function renderUnpaid(){
   const tb2=document.getElementById('tbl-item-cond');
   if(!directItems.length){
     tb2.innerHTML=emptyRow(4,'물품 자체 이상 없음');
-    // 모바일 카드도 비움
-    const sec2=document.getElementById('unpaid-sec-2');
-    if(sec2){let ml=sec2.querySelector('.mobile-card-list');if(!ml){ml=document.createElement('div');ml.className='mobile-card-list';sec2.querySelector('.tbl-wrap').appendChild(ml);}ml.innerHTML='<div style="padding:20px;text-align:center;color:var(--text-muted)">물품 자체 이상 없음</div>';}
+    setMobileCards('tbl-item-cond','','물품 자체 이상 없음');
     return;
   }
   tb2.innerHTML=directItems.map(({key,type,num,val})=>`<tr>
@@ -1805,16 +1855,11 @@ function renderUnpaid(){
     </div></td>
   </tr>`).join('');
   // 모바일 카드 렌더링
-  const sec2=document.getElementById('unpaid-sec-2');
-  if(sec2){
-    let ml=sec2.querySelector('.mobile-card-list');
-    if(!ml){ml=document.createElement('div');ml.className='mobile-card-list';sec2.querySelector('.tbl-wrap').appendChild(ml);}
-    ml.innerHTML=directItems.map(({key,type,num,val})=>`
+  setMobileCards('tbl-item-cond',directItems.map(({key,type,num,val})=>`
       <div class="m-card">
         <div class="m-card-top">${itemBadge(type)}<span class="td-mono" style="font-weight:700">${esc(num)}</span>${sBadge(typeof val==='object'?val.v:val)}</div>
         <div class="m-card-actions"><button class="btn btn-green btn-sm" onclick="restoreItemFromUnpaid('${esc(escJs(key))}','${esc(escJs(type))}','${esc(escJs(num))}')">복구</button></div>
-      </div>`).join('');
-  }
+      </div>`).join(''),'물품 자체 이상 없음');
   // 기본 섹션1 활성화 (초기 렌더시, 탭2가 활성화된 경우 강제 전환 방지)
   if(!document.getElementById('utab-2')?.classList.contains('active')) switchUnpaidTab(1);
 }
@@ -1861,7 +1906,7 @@ function renderInventory(){
     const rec=rentals.filter(r=>r.item===currentInvTab&&String(r.itemNum)===String(num))
       .sort((a,b)=>new Date(b.date)-new Date(a.date))[0];
     const renterStr=(rec&&(['renting','unpaid','unpaid_paid'].includes(rec.status)||isOpenLostPaid(rec)))?`<div style="font-size:10px;font-weight:400;color:var(--text);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(rec.name)}</div>`:'';
-    const invBadge=(st==='unpaid'&&rec&&daysSince(rec.date)>=14)
+    const invBadge=(st==='unpaid'&&rec&&isLongUnpaid(rec))
       ?`<span class="sbadge sb-unpaid" style="font-size:9px;padding:2px 4px;gap:3px">⏰ 장기미납</span>`
       :(lbMap[st]||lbMap.available);
     return `<div class="inv-item ${stMap[st]||'st-available'}" onclick="openInvModal('${currentInvTab}','${esc(escJs(num))}')">
@@ -1978,7 +2023,7 @@ async function applyInvCond(){
         r.note=(r.note?r.note+' / ':'')+'새 물품으로 교체'+(note?` (${note})`:'');
       }
       targets.push(...replaced);
-      await Promise.all([fbDel(`/itemStatus/${key}`),...targets.map(r=>fbPut(`/rentals/${r.id}`,r))]);
+      await fbCommit([opDel(`/itemStatus/${key}`),...targets.map(r=>opPut(`/rentals/${r.id}`,r))]);
     }else if(val==='unpaid_paid'||val==='lost_paid'){
       const srcStatuses=val==='unpaid_paid'?['unpaid']:['lost','unpaid'];
       const targets=rentals.filter(r=>r.item===invType&&String(r.itemNum)===String(invNum)&&srcStatuses.includes(r.status));
@@ -1991,11 +2036,11 @@ async function applyInvCond(){
       if(val==='lost_paid'){
         // 분실비 납부: itemStatus는 lost 유지
         itemStatus[key]='lost';
-        await Promise.all([fbPut(`/itemStatus/${key}`,'lost'),...targets.map(r=>fbPut(`/rentals/${r.id}`,r))]);
+        await fbCommit([opPut(`/itemStatus/${key}`,'lost'),...targets.map(r=>opPut(`/rentals/${r.id}`,r))]);
       }else{
         // 미납금 납부: itemStatus 삭제
         delete itemStatus[key];
-        await Promise.all([fbDel(`/itemStatus/${key}`),...targets.map(r=>fbPut(`/rentals/${r.id}`,r))]);
+        await fbCommit([opDel(`/itemStatus/${key}`),...targets.map(r=>opPut(`/rentals/${r.id}`,r))]);
       }
     }else{
       const statusData=note?{v:val,note}:val;
@@ -2006,7 +2051,7 @@ async function applyInvCond(){
         prevRentalStates.push({r:rec,status:rec.status,note:rec.note});
         rec.status=val;if(note)rec.note=note;
         // itemStatus PUT과 rental PUT을 한꺼번에 처리
-        await Promise.all([fbPut(`/itemStatus/${key}`,statusData),fbPut(`/rentals/${rec.id}`,rec)]);
+        await fbCommit([opPut(`/itemStatus/${key}`,statusData),opPut(`/rentals/${rec.id}`,rec)]);
       }else{
         await fbPut(`/itemStatus/${key}`,statusData);
       }
@@ -2017,9 +2062,6 @@ async function applyInvCond(){
     // in-memory 롤백
     if(prevStatusVal!==undefined)itemStatus[key]=prevStatusVal;else delete itemStatus[key];
     prevRentalStates.forEach(({r,status:s,returnDate:rd,note:n,wasBlacklisted:wb,resolvedAt:ra,replacedAt:rp})=>{r.status=s;r.returnDate=rd;r.note=n;if(rp===undefined)delete r.replacedAt;else r.replacedAt=rp;if(wb===undefined)delete r.wasBlacklisted;else r.wasBlacklisted=wb;if(ra===undefined)delete r.resolvedAt;else r.resolvedAt=ra;});
-    // Firebase 롤백 (best-effort)
-    if(prevStatusVal!==undefined)fbPut(`/itemStatus/${key}`,prevStatusVal);else fbDel(`/itemStatus/${key}`);
-    prevRentalStates.forEach(({r})=>fbPut(`/rentals/${r.id}`,r));
     renderAfterInvCond();
     undoStack.pop();updateHistoryBtns();
     toast('저장 실패 — 네트워크를 확인해주세요','err');
@@ -2114,7 +2156,7 @@ function suggestKey(e){
   }else if(e.key==='Enter'&&_acIdx>=0){
     e.preventDefault();pickSuggest(_acIdx);
   }else if(e.key==='Escape'){
-    e.stopPropagation();hideSuggest();
+    e.preventDefault();e.stopPropagation();hideSuggest();
   }
 }
 // 이름+전화번호가 예전 기록과 정확히 같으면 비어 있는 학부를 자동으로 채움
@@ -2133,8 +2175,8 @@ function selectItemType(t){
   const nums=ITEM_NUMBERS[t].filter(n=>isAvailable(t,n));
   const sel=document.getElementById('f-item-num');
   sel.innerHTML=nums.length
-    ?nums.map(n=>{const u=busy.has(String(n));return `<option value="${n}"${u?' disabled':''}>${n}${u?' (대여중)':''}</option>`;}).join('')
-    :'<option disabled>대여 가능 물품 없음</option>';
+    ?'<option value="" selected>-- 번호 선택 --</option>'+nums.map(n=>{const u=busy.has(String(n));return `<option value="${esc(n)}"${u?' disabled':''}>${esc(n)}${u?' (대여중)':''}</option>`;}).join('')
+    :'<option value="" disabled selected>대여 가능 물품 없음</option>';
   document.getElementById('item-num-wrap').style.display='block';
 }
 function fmtPhone(el){
@@ -2149,6 +2191,7 @@ async function submitRental(){
   const dept=document.getElementById('f-dept').value;
   const itemNum=(document.getElementById('f-item-num')||{value:''}).value;
   const note=document.getElementById('f-note').value.trim();
+  if(name&&phone&&dept&&selItemType&&!itemNum){toast('물품 번호를 선택해주세요','err');document.getElementById('f-item-num')?.focus();return;}
   if(!name||!phone||!dept||!selItemType||!itemNum){toast('모든 필수 항목을 입력해주세요','err');return;}
   const bl=rentals.find(r=>r.name===name&&r.phone===phone&&BL_STATUS.includes(r.status));
   if(bl){toast(`⛔ ${name}님은 "${sInfo(bl.status).l}" 상태로 대여가 제한됩니다.`,'err');return;}
@@ -2159,8 +2202,14 @@ async function submitRental(){
   if(!isOnline()) return;
   const btn=document.getElementById('rental-submit-btn');
   if(btn){btn.disabled=true;btn.textContent='확인 중...';}
-  // 다른 관리자가 그사이 같은 물품을 대여했거나 이 사람이 블랙리스트에 올랐는지 서버에서 재확인
+  // ① 물품 잡기 (동시에 같은 물품 등록 방지) ② 다른 관리자가 그사이 대여했거나 이 사람이 대여제한인지 서버에서 재확인
   try{
+    const cl=await claimItem(selItemType,itemNum);
+    if(!cl.ok){
+      toast(`⛔ ${ITEM_LABELS[selItemType]} ${itemNum}은(는) 방금 다른 곳에서 처리 중입니다. 새로고침 후 다시 시도해주세요.`,'err');
+      if(btn){btn.disabled=false;btn.textContent='✅ 등록';}
+      return;
+    }
     const sv=await serverItemState(selItemType,itemNum);
     if(sv.state!=='available'){
       toast(`⛔ ${ITEM_LABELS[selItemType]} ${itemNum}은(는) 방금 다른 곳에서 "${sInfo(sv.state).l}" 처리되었습니다. 새로고침 후 다시 시도해주세요.`,'err');
@@ -2180,7 +2229,7 @@ async function submitRental(){
   }
   if(btn)btn.textContent='저장 중...';
   saveSnapshot(`${name} ${ITEM_LABELS[selItemType]} 대여 등록`);
-  const id=Date.now();
+  const id=Date.now()*1000+Math.floor(Math.random()*1000); // 같은 순간 두 곳에서 등록해도 번호가 겹치지 않게
   const rec={id,name,phone,dept,item:selItemType,itemNum,date:new Date().toISOString(),returnDate:null,status:'renting',note};
   rentals.unshift(rec);
   try{
@@ -2223,6 +2272,14 @@ async function applyStatus(){
   const r=rentals.find(x=>x.id===editId);if(!r)return;
   if(!isOnline()) return;
   const latest=isLatestRecord(r);
+  if(selStatus==='returned'){
+    const rdv=document.getElementById('f-return-date').value;
+    if(rdv){
+      const rt=new Date(rdv).getTime();
+      if(rt>Date.now()+5*60000){toast('반납 일시는 미래로 설정할 수 없습니다','err');return;}
+      if(r.date&&rt<new Date(r.date).getTime()){toast('반납 일시가 대여 일시보다 빠를 수 없습니다','err');return;}
+    }
+  }
   // 같은 번호로 더 최근 대여 기록이 있으면, 물품을 '갖고 있는' 상태로 되돌릴 수 없음 (이중 대여 방지)
   if(!latest&&['renting','unpaid','unpaid_paid'].includes(selStatus)&&selStatus!==r.status){
     toast('이 번호는 이후에 다른 대여 기록이 있어 대여중·미납 상태로 바꿀 수 없습니다','err');return;
@@ -2256,18 +2313,18 @@ async function applyStatus(){
       const rd=document.getElementById('f-return-date').value;
       r.returnDate=rd?new Date(rd).toISOString():new Date().toISOString();
       delete itemStatus[key];
-      await Promise.all([fbDel(`/itemStatus/${key}`),fbPut(`/rentals/${r.id}`,r)]);
+      await fbCommit([opDel(`/itemStatus/${key}`),opPut(`/rentals/${r.id}`,r)]);
     }else if(selStatus==='broken'||selStatus==='lost'){
       itemStatus[key]=selStatus;
-      await Promise.all([fbPut(`/itemStatus/${key}`,selStatus),fbPut(`/rentals/${r.id}`,r)]);
+      await fbCommit([opPut(`/itemStatus/${key}`,selStatus),opPut(`/rentals/${r.id}`,r)]);
     }else if(selStatus==='lost_paid'){
       // 분실비 납부: itemStatus는 lost 유지 (물품현황 분실 표시 유지)
       itemStatus[key]='lost';
-      await Promise.all([fbPut(`/itemStatus/${key}`,'lost'),fbPut(`/rentals/${r.id}`,r)]);
+      await fbCommit([opPut(`/itemStatus/${key}`,'lost'),opPut(`/rentals/${r.id}`,r)]);
     }else{
       // renting/unpaid/unpaid_paid: itemStatus 삭제 (물품현황 대여중으로)
       delete itemStatus[key];
-      await Promise.all([fbDel(`/itemStatus/${key}`),fbPut(`/rentals/${r.id}`,r)]);
+      await fbCommit([opDel(`/itemStatus/${key}`),opPut(`/rentals/${r.id}`,r)]);
     }
     closeModal('modal-status');renderAfterStatus();
     toast(`상태: ${sInfo(selStatus).l}`,'ok');
@@ -2304,7 +2361,7 @@ async function quickReturn(id){
   }
   delete itemStatus[key];
   try{
-    await Promise.all([fbDel(`/itemStatus/${key}`),fbPut(`/rentals/${r.id}`,r)]);
+    await fbCommit([opDel(`/itemStatus/${key}`),opPut(`/rentals/${r.id}`,r)]);
     renderAfterStatus();toast(`${r.name}님 ${ITEM_LABELS[r.item]} 반납 완료!`,'ok');
   }catch(e){
     r.status=prevStatus;r.returnDate=prevReturnDate;
@@ -2327,7 +2384,7 @@ async function quickUnpaidReturnFromInv(){
   const r=rentals.find(x=>x.id===id);if(!r)return;
   if(!isOnline()) return;
   const days=daysSince(r.date);
-  const label=days>=14?'장기미납':'미납';
+  const label=isLongUnpaid(r)?'장기미납':'미납';
   if(!confirm(`${r.name}님의 ${label} 물품을 연체료 납부 처리 후 반납하시겠습니까?\n\n물품: ${ITEM_LABELS[r.item]} ${r.itemNum}\n경과일: ${days}일\n\n✅ 연체료 납부 완료 처리\n✅ 대여제한 자동 해제\n✅ 반납 완료 처리`)) return;
   closeModal('modal-inv');
   await quickReturn(id);
@@ -2386,6 +2443,11 @@ async function saveEditRental(){
   const dateVal=document.getElementById('e-date').value;
   const note=document.getElementById('e-note').value.trim();
   if(!name||!phone||!dept||!editSelItemType||!itemNum){toast('필수 항목을 모두 입력해주세요','err');return;}
+  if(dateVal){
+    const nd=new Date(dateVal).getTime();
+    if(nd>Date.now()+5*60000){toast('대여 일시는 미래로 설정할 수 없습니다','err');return;}
+    if(r.returnDate&&nd>new Date(r.returnDate).getTime()){toast('대여 일시가 반납 일시보다 늦을 수 없습니다','err');return;}
+  }
   if(!isOnline()) return;
   const prev={...r};
   const prevKey=fbKey(r.item,r.itemNum);
@@ -2395,6 +2457,8 @@ async function saveEditRental(){
   // 물품을 갖고 있는 기록의 번호를 바꾸면, 새 번호가 서버 기준으로도 비어 있는지 재확인 (이중 대여 방지)
   if(keyChanged&&['renting','unpaid','unpaid_paid'].includes(r.status)){
     try{
+      const cl=await claimItem(editSelItemType,itemNum);
+      if(!cl.ok){toast(`⛔ ${ITEM_LABELS[editSelItemType]} ${itemNum}은(는) 방금 다른 곳에서 처리 중입니다. 새로고침 후 다시 시도해주세요.`,'err');return;}
       const sv=await serverItemState(editSelItemType,itemNum);
       if(sv.state!=='available'){toast(`⛔ ${ITEM_LABELS[editSelItemType]} ${itemNum}은(는) 현재 "${sInfo(sv.state).l}" 상태입니다. 새로고침 후 다시 시도해주세요.`,'err');return;}
     }catch(e){toast('서버 확인 실패 — 인터넷 연결을 확인 후 다시 시도해주세요','err');return;}
@@ -2411,12 +2475,12 @@ async function saveEditRental(){
     if(prevItemStatusVal!==undefined) itemStatus[newKey]=prevItemStatusVal;
   }
   try{
-    const writes=[fbPut(`/rentals/${r.id}`,r)];
+    const writes=[opPut(`/rentals/${r.id}`,r)];
     if(keyChanged){
-      writes.push(fbDel(`/itemStatus/${prevKey}`));
-      if(prevItemStatusVal!==undefined) writes.push(fbPut(`/itemStatus/${newKey}`,prevItemStatusVal));
+      writes.push(opDel(`/itemStatus/${prevKey}`));
+      if(prevItemStatusVal!==undefined) writes.push(opPut(`/itemStatus/${newKey}`,prevItemStatusVal));
     }
-    await Promise.all(writes);
+    await fbCommit(writes);
     closeModal('modal-edit');renderAfterEdit();
     toast(`${name}님 대여 기록이 수정되었습니다`,'ok');
   }catch(e){
@@ -2455,9 +2519,9 @@ async function deleteRental(id){
   rentals=rentals.filter(x=>x.id!==id);
   renderAfterStatus();
   try{
-    const tasks=[fbDel(`/rentals/${id}`)];
-    if(shouldClearStatus)tasks.push(fbDel(`/itemStatus/${statusKey}`));
-    await Promise.all(tasks);
+    const tasks=[opDel(`/rentals/${id}`)];
+    if(shouldClearStatus)tasks.push(opDel(`/itemStatus/${statusKey}`));
+    await fbCommit(tasks);
     toast('삭제되었습니다','inf');
   }catch(e){
     rentals=prevRentals;
@@ -2489,8 +2553,8 @@ function renderBlacklist(){
   });
   let persons=Object.values(map);
   if(q)persons=persons.filter(p=>p.name.toLowerCase().includes(q)||p.phone.includes(q)||p.dept.toLowerCase().includes(q));
-  // 사유 필터 (장기미납 = 미납 2주 이상)
-  const matchReason=r=>!sf||(sf==='long'?(r.status==='unpaid'&&daysSince(r.date)>=14):r.status===sf);
+  // 사유 필터 (장기미납 = 반납 기한 지나고 7일 이상 미납)
+  const matchReason=r=>!sf||(sf==='long'?isLongUnpaid(r):r.status===sf);
   if(sf)persons=persons.filter(p=>p.records.some(matchReason));
   // 대여 요일 필터 (빌린 날의 요일 기준)
   const sd=document.getElementById('bl-day')?.value||'';
@@ -2505,7 +2569,7 @@ function renderBlacklist(){
     const {logs,currentLogs,lastSent}=_blSmsInfo(p);
 
     const tags=p.records.map(r=>{
-      const isLong=r.status==='unpaid'&&daysSince(r.date)>=14;
+      const isLong=isLongUnpaid(r);
       const label=isLong?'⏰ 장기미납':sInfo(r.status).l;
       const extra='';
       return `<span class="sbadge ${sInfo(r.status).cl}" style="font-size:10px;${extra}">${label} · ${ITEM_LABELS[r.item]||r.item} ${esc(r.itemNum)}</span>`;
@@ -2614,7 +2678,7 @@ function renderSmsModalLog(){
               <span style="font-size:10px;color:var(--accent);font-weight:700;flex-shrink:0">📝 메모</span>
               <span id="sms-reply-view-${i}" style="font-size:11px;color:var(--text);flex:1">${esc(l.reply)}</span>
               <input id="sms-reply-input-${i}" class="fi" style="display:none;flex:1;padding:3px 7px;font-size:11px" value="${esc(l.reply)}"
-                onkeydown="if(event.key==='Enter')saveSmsReply(${i});if(event.key==='Escape')cancelSmsReply(${i})">
+                onkeydown="if(event.key==='Enter')saveSmsReply(${i});if(event.key==='Escape'){event.preventDefault();cancelSmsReply(${i})}">
               <button id="sms-reply-edit-${i}" onclick="startSmsReplyEdit(${i})"
                 style="background:none;border:none;cursor:pointer;font-size:11px;color:var(--text-muted);padding:1px 3px;flex-shrink:0">✏️</button>
               <button id="sms-reply-save-${i}" onclick="saveSmsReply(${i})"
@@ -2662,7 +2726,7 @@ async function saveSmsReply(i){
   if(btn){btn.disabled=true;btn.textContent='저장 중...';}
   try{
     await fbPut(`/smsLog/${key}`,logs);
-    closeModal('modal-sms');
+    renderSmsModalLog(); // 창은 그대로 두고 목록만 새로 그림
     renderBlacklist();
     toast('메모 저장 완료','ok');
   }catch(e){
@@ -2740,8 +2804,8 @@ async function blPay(name,phone,status){
     r.status=newStatus;
   }
   try{
-    const writes=targets.map(r=>fbPut(`/rentals/${r.id}`,r));
-    await Promise.all(writes);
+    const writes=targets.map(r=>opPut(`/rentals/${r.id}`,r));
+    await fbCommit(writes);
     renderAfterPay();
     toast(`${name}님 ${label} 납부 → 대여제한 해제!`,'ok');
   }catch(e){
@@ -2777,10 +2841,10 @@ async function blReturn(name,phone,status){
   }
   try{
     const writes=[
-      ...targets.map(r=>fbPut(`/rentals/${r.id}`,r)),
-      ...targets.map(r=>fbDel(`/itemStatus/${fbKey(r.item,r.itemNum)}`))
+      ...targets.map(r=>opPut(`/rentals/${r.id}`,r)),
+      ...targets.map(r=>opDel(`/itemStatus/${fbKey(r.item,r.itemNum)}`))
     ];
-    await Promise.all(writes);
+    await fbCommit(writes);
     renderAfterPay();
     toast(`${name}님 ${label} 물품 반납 → 대여제한 해제!`,'ok');
   }catch(e){
@@ -2817,10 +2881,10 @@ async function blPayAsLost(name,phone){
   }
   try{
     const writes=[
-      ...targets.map(r=>fbPut(`/rentals/${r.id}`,r)),
-      ...targets.map(r=>fbPut(`/itemStatus/${fbKey(r.item,r.itemNum)}`,'lost'))
+      ...targets.map(r=>opPut(`/rentals/${r.id}`,r)),
+      ...targets.map(r=>opPut(`/itemStatus/${fbKey(r.item,r.itemNum)}`,'lost'))
     ];
-    await Promise.all(writes);
+    await fbCommit(writes);
     renderAfterPay();
     toast(`${name}님 분실비 납부 → 대여제한 해제!`,'ok');
   }catch(e){
@@ -3027,16 +3091,41 @@ function renderManageList(){
         <span class="imn">${esc(n)}</span>
       </div>`;
     }
+    // 잠긴 번호: 마우스를 올리거나(PC) 누르면(휴대폰) 잠금 이유와 푸는 방법을 토스트로 안내
+    const lockEv=locked?`onmouseenter="showLockToast('${esc(escJs(key))}')" onclick="showLockToast('${esc(escJs(key))}',true)"`:'';
     const statusIcon=locked
-      ?'<span title="대여중·미납 — 삭제 불가" style="font-size:10px;opacity:.5">🔒</span>'
+      ?`<span ${lockEv} style="font-size:10px;opacity:.5;cursor:help">🔒</span>`
       :hasHistory?'<span title="대여 기록 있음" style="font-size:10px;opacity:.5">📋</span>':'';
     const delBtn=locked
-      ?`<span style="width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;opacity:.3;font-size:11px">✕</span>`
+      ?`<span ${lockEv} style="width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;opacity:.3;font-size:11px;cursor:not-allowed">✕</span>`
       :`<button class="del-btn" onclick="deleteItemNum('${esc(escJs(key))}')" title="삭제">✕</button>`;
     return `<div class="inv-manage-item">
       <span class="imn">${esc(n)}</span>${statusIcon}${delBtn}
     </div>`;
   }).join('');
+}
+
+// 잠긴 물품 번호 안내 토스트 — 왜 잠겼는지 + 어떻게 하면 풀리는지
+let _lockToastKey='',_lockToastAt=0,_lockToastEl=null;
+function showLockToast(numStr,force){
+  // 같은 번호에 마우스를 계속 올렸다 내렸다 해도 3초 안에는 한 번만 표시
+  if(!force&&_lockToastKey===numStr&&Date.now()-_lockToastAt<3000)return;
+  const holdSt=['renting','unpaid','unpaid_paid'];
+  const r=rentals.filter(x=>x.item===manageTab&&String(x.itemNum)===numStr&&(holdSt.includes(x.status)||isOpenLostPaid(x)))
+    .sort((a,b)=>new Date(b.date)-new Date(a.date))[0];
+  if(!r)return;
+  const label=`${ITEM_LABELS[manageTab]} ${numStr}`;
+  const who=r.name?`${r.name}님`:'대여자';
+  let why,how;
+  if(r.status==='renting'){why=`${who}이 대여중이에요`;how='반납 처리하면';}
+  else if(r.status==='unpaid'){why=`${who}이 반납하지 않은 미납 상태예요`;how='대여 제한 시스템에서 "납부+반납" 또는 반납 처리하면';}
+  else if(r.status==='unpaid_paid'){why=`${who}이 연체료는 납부했지만 아직 물품을 반납하지 않았어요`;how='반납 처리하면';}
+  else{why=`분실비는 납부됐지만 아직 새 물품으로 교체하지 않았어요`;how='새 물품을 들여온 뒤 물품 현황에서 이 번호를 "대여가능"으로 저장하면';}
+  // 이전 안내 토스트는 지우고 새로 표시 (토스트가 쌓이지 않게)
+  if(_lockToastEl&&_lockToastEl.isConnected)_lockToastEl.remove();
+  toast(`🔒 ${label} 삭제 불가 — ${why}. ${how} 잠금이 풀려요.`,'inf');
+  _lockToastEl=document.getElementById('toasts').lastElementChild;
+  _lockToastKey=numStr;_lockToastAt=Date.now();
 }
 
 // 드래그 이벤트 핸들러
@@ -3089,7 +3178,24 @@ function onDragEnd(e){
   e.currentTarget.classList.remove('dragging');
   _clearDropIndicators();
   _dragSrcIdx=null;
+  _invStopScroll();
 }
+// 물품 번호 순서 변경 — 드래그 중 목록 위·아래 끝에 가까우면 자동 스크롤
+let _invScrollTimer=null,_invScrollSpeed=0;
+function _invStopScroll(){_invScrollSpeed=0;clearInterval(_invScrollTimer);_invScrollTimer=null;}
+(function(){
+  const box=document.getElementById('manage-list');
+  box.addEventListener('dragover',e=>{
+    if(!_dragMode||_dragSrcIdx===null)return;
+    const b=box.getBoundingClientRect(),edge=48;
+    _invScrollSpeed=e.clientY>b.bottom-edge?Math.ceil((e.clientY-(b.bottom-edge))/4):e.clientY<b.top+edge?-Math.ceil(((b.top+edge)-e.clientY)/4):0;
+    if(_invScrollSpeed&&!_invScrollTimer){
+      _invScrollTimer=setInterval(()=>{if(!_invScrollSpeed){_invStopScroll();return;}box.scrollTop+=_invScrollSpeed;},16);
+    }
+  });
+  box.addEventListener('dragleave',e=>{if(!box.contains(e.relatedTarget))_invScrollSpeed=0;});
+  box.addEventListener('drop',()=>_invStopScroll());
+})();
 
 async function addItemNum(){
   const input=document.getElementById('manage-new-num');
@@ -3137,9 +3243,9 @@ async function deleteItemNum(numStr){
   renderInventory();
   updateStats();
   try{
-    const tasks=[fbPut('/itemNumbers',ITEM_NUMBERS)];
-    if(prevStatusVal!==undefined)tasks.push(fbDel(`/itemStatus/${key}`));
-    await Promise.all(tasks);
+    const tasks=[opPut('/itemNumbers',ITEM_NUMBERS)];
+    if(prevStatusVal!==undefined)tasks.push(opDel(`/itemStatus/${key}`));
+    await fbCommit(tasks);
     toast(`${ITEM_LABELS[manageTab]} ${numStr} 삭제 완료`,'inf');
   }catch(e){
     ITEM_NUMBERS[manageTab]=prevNums;
@@ -3160,23 +3266,16 @@ function saveItemNumbers(){
 function exportCSV(){
   if(!rentals.length){toast('내보낼 대여 기록이 없습니다','inf');return;}
 
-  const ITEM={'umbrella':'약속우산','charger':'충전기','calculator':'공학용 계산기','multitap':'멀티탭','heatpack':'찜질팩'};
-  const STATUS={'renting':'대여중','returned':'반납완료','unpaid':'미납','broken':'고장','lost':'분실','unpaid_paid':'미납 (연체료 납부)','lost_paid':'분실 (분실비 납부)'};
-  const pad=n=>String(n).padStart(2,'0');
-  const fmtDate=iso=>{
-    if(!iso)return '';
-    const d=new Date(iso);
-    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-  };
+  const csvDate=iso=>iso?`${_localDay(new Date(iso))} ${fmtDate(iso).slice(-5)}`:''; // 2026-10-12 14:30
 
   const header=['이름','연락처','학부','물품','번호','대여일시','반납일시','상태','메모'];
   const rows=[...rentals]
     .sort((a,b)=>new Date(b.date)-new Date(a.date))
     .map(r=>[
       r.name, r.phone, r.dept||'',
-      ITEM[r.item]||r.item, r.itemNum,
-      fmtDate(r.date), fmtDate(r.returnDate),
-      STATUS[r.status]||r.status, r.note||''
+      ITEM_LABELS[r.item]||r.item, `="${r.itemNum}"`, // ="2-1" 형태로 넣어 엑셀이 날짜로 바꾸지 않게
+      csvDate(r.date), csvDate(r.returnDate),
+      sInfo(r.status).l, r.note||''
     ].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(','));
 
   // BOM 추가 (엑셀 한글 깨짐 방지)
@@ -3186,7 +3285,7 @@ function exportCSV(){
   const a=document.createElement('a');
   const today=new Date();
   a.href=url;
-  a.download=`대여기록_${today.getFullYear()}-${pad(today.getMonth()+1)}-${pad(today.getDate())}.csv`;
+  a.download=`대여기록_${_localDay(today)}.csv`;
   a.click();
   setTimeout(()=>URL.revokeObjectURL(url),1000);
   toast(`${rentals.length}건 CSV 다운로드 완료!`,'ok');
@@ -3194,26 +3293,7 @@ function exportCSV(){
 
 // ══ UTILS ══
 
-// ══ 모바일 페이지 히스토리 ══
-let _pageHist=['dashboard'];
-let _pageHistIdx=0;
-function histBack(){
-  if(_pageHistIdx<=0) return;
-  _pageHistIdx--;
-  showPage(_pageHist[_pageHistIdx], true);
-}
-function histFwd(){
-  if(_pageHistIdx>=_pageHist.length-1) return;
-  _pageHistIdx++;
-  showPage(_pageHist[_pageHistIdx], true);
-}
-function updateHistBtns(){
-  const b=document.getElementById('hist-back');
-  const f=document.getElementById('hist-fwd');
-  if(b) b.disabled=_pageHistIdx<=0;
-  if(f) f.disabled=_pageHistIdx>=_pageHist.length-1;
-}
-function showPage(id, fromHist=false){
+function showPage(id){
   // 대여 현황에서 다른 페이지로 이동 시 필터 초기화
   if(id!=='rentals'&&_rentalsFiltered){
     _invNumFilter='';
@@ -3221,15 +3301,6 @@ function showPage(id, fromHist=false){
     document.getElementById('s-search').value='';
     document.getElementById('s-item').value='';
     document.getElementById('s-status').value='active';
-  }
-  if(!fromHist && window.innerWidth<=768){
-    // 현재 위치 이후 히스토리 제거 후 추가
-    _pageHist=_pageHist.slice(0,_pageHistIdx+1);
-    if(_pageHist[_pageHistIdx]!==id){
-      _pageHist.push(id);
-      _pageHistIdx=_pageHist.length-1;
-    }
-    updateHistBtns();
   }
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item,.mnav-item').forEach(n=>n.classList.remove('active'));
@@ -3246,6 +3317,17 @@ function showPage(id, fromHist=false){
   updateStats();
 }
 function openModal(id){document.getElementById(id).classList.add('open');}
+// Esc: 가장 위에 열린 창 닫기 (자동완성 목록·편집 중인 입력칸은 각자 Esc를 먼저 처리)
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Escape'||e.defaultPrevented)return;
+  const t=e.target;
+  if(t&&t.matches&&t.matches('[id^="sms-reply-input-"],[id^="med-name-edit-"],[id^="med-cat-edit-"],[id^="med-unit-edit-"]'))return;
+  if(document.getElementById('pw-overlay')?.style.display!=='none')return; // 로그인 화면
+  const open=[...document.querySelectorAll('.modal-overlay.open')];
+  const top=open[open.length-1];if(!top)return;
+  e.preventDefault();
+  if(top.id==='modal-chart-detail')closeChartDetail();else closeModal(top.id);
+});
 function closeModal(id){
   // 순서 변경 중에 물품 목록 관리 창을 닫으면 바뀐 순서를 저장
   if(id==='modal-manage'&&_dragMode) toggleDragMode();
@@ -3274,15 +3356,13 @@ function _endSaving(){
   if(el)el.style.display='none';
 }
 function tick(){const e=document.getElementById('clock-time');if(e){const n=new Date();e.textContent=`${p2(n.getHours())}:${p2(n.getMinutes())}:${p2(n.getSeconds())}`; }}
-['modal-rental','modal-status','modal-edit','modal-inv','modal-manage','modal-sms','modal-med-manage','modal-med'].forEach(id=>{
+['modal-rental','modal-status','modal-edit','modal-inv','modal-manage','modal-sms','modal-med-manage','modal-med','modal-notice'].forEach(id=>{
   document.getElementById(id).addEventListener('click',e=>{if(e.target.id===id)closeModal(id);});
 });
 // ══ STATS ══
 function cssVar(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim();}
 function getItemClr(){return{umbrella:cssVar('--c-umbrella'),charger:cssVar('--c-charger'),calculator:cssVar('--c-calculator'),multitap:cssVar('--c-multitap'),heatpack:cssVar('--c-heatpack')};}
 function getStClr(){return{renting:cssVar('--s-renting'),returned:cssVar('--s-returned'),unpaid:cssVar('--s-unpaid'),broken:cssVar('--s-broken'),lost:cssVar('--s-lost'),unpaid_paid:cssVar('--s-unpaid-paid'),lost_paid:cssVar('--s-lost-paid')};}
-const ITEM_CLR={umbrella:'#2d5016',charger:'#1d4ed8',calculator:'#92400e',multitap:'#4c1d95',heatpack:'#9f1239'};
-const ST_CLR={renting:'#2563eb',returned:'#16a34a',unpaid:'#dc2626',broken:'#be123c',lost:'#7c3aed',unpaid_paid:'#ea580c',lost_paid:'#7c3aed'};
 const ST_LBL={renting:'대여중',returned:'반납완료',unpaid:'미납',broken:'고장',lost:'분실',unpaid_paid:'미납 (연체료 납부)',lost_paid:'분실 (분실비 납부)'};
 
 let _period='all';
@@ -3296,8 +3376,8 @@ function setPeriod(p){
 
 function _filtered(){
   if(_period==='all') return rentals;
-  const cut=Date.now()-parseInt(_period)*86400000;
-  return rentals.filter(r=>new Date(r.date).getTime()>=cut);
+  const cut=new Date();cut.setHours(0,0,0,0);cut.setDate(cut.getDate()-(parseInt(_period)-1)); // 오늘 포함 N일 (일별 그래프와 같은 기준)
+  return rentals.filter(r=>new Date(r.date).getTime()>=cut.getTime());
 }
 
 function _destroyAll(){
@@ -3313,7 +3393,8 @@ function renderTurnover(list){
   wrap.innerHTML=types.map(t=>{
     const total   = list.filter(r=>r.item===t).length;
     const returned= list.filter(r=>r.item===t&&r.status==='returned').length;
-    const unpaid  = list.filter(r=>r.item===t&&['unpaid','lost'].includes(r.status)).length;
+    // 미납·분실이었던 건 전부 (연체료·분실비 납부 후, 대여제한 해제 후 반납한 건 포함)
+    const unpaid  = list.filter(r=>r.item===t&&(['unpaid','lost','unpaid_paid','lost_paid'].includes(r.status)||r.wasBlacklisted)).length;
     const returnRate = total>0 ? Math.round(returned/total*100) : 0;
     const unpaidRate = total>0 ? Math.round(unpaid/total*100)  : 0;
 
@@ -3415,8 +3496,9 @@ function renderHourChart(list){
       datasets:[{
         label:'대여 건수',
         data:hours,
-        backgroundColor:hours.map((_,i)=>(i>=9&&i<=18)?cssVar('--s-returned')+'cc':cssVar('--s-returned')+'40'),
-        borderColor:hours.map((_,i)=>(i>=9&&i<=18)?cssVar('--s-returned'):cssVar('--s-returned')+'66'),
+        // 운영 시간(14:00~18:00) 막대를 진하게
+        backgroundColor:hours.map((_,i)=>(i>=14&&i<18)?cssVar('--s-returned')+'cc':cssVar('--s-returned')+'40'),
+        borderColor:hours.map((_,i)=>(i>=14&&i<18)?cssVar('--s-returned'):cssVar('--s-returned')+'66'),
         borderWidth:1,borderRadius:3
       }]
     },
@@ -3431,43 +3513,45 @@ function renderHourChart(list){
   });
 }
 
-// ── ⑤ 일별 추이 라인 ──────────────────────────────────────────
-function renderDailyChart(list){
-  _charts['daily']?.destroy();
-  const ctx=document.getElementById('chart-daily')?.getContext('2d');
-  if(!ctx)return;
+// ── ⑤ 일별 추이 라인 (작은 그래프 / 자세히 보기 공용) ──────────────
+function _dailyChartConfig(list,big){
   const days=_period==='all'?30:parseInt(_period);
   const dateArr=[];
-  for(let i=days-1;i>=0;i--){
-    const d=new Date();d.setDate(d.getDate()-i);
-    const local=new Date(d.getTime()-d.getTimezoneOffset()*60000);
-    dateArr.push(local.toISOString().slice(0,10));
-  }
-  document.getElementById('st-line-range').textContent=
-    `(최근 ${days}일)`;
-  const types=Object.keys(ITEM_NUMBERS);
-  _charts['daily']=new Chart(ctx,{
+  for(let i=days-1;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);dateArr.push(_localDay(d));}
+  const clr=getItemClr(),muted=cssVar('--text-muted'),grid=cssVar('--border');
+  return {days,config:{
     type:'line',
     data:{
       labels:dateArr.map(d=>{const[,m,dd]=d.split('-');return `${m}/${dd}`;}),
-      datasets:types.map(t=>({
+      datasets:Object.keys(ITEM_NUMBERS).map(t=>({
         label:`${ITEM_ICONS[t]} ${ITEM_LABELS[t]}`,
-        data:dateArr.map(d=>list.filter(r=>{const rLocal=new Date(new Date(r.date).getTime()-new Date(r.date).getTimezoneOffset()*60000);return r.item===t&&rLocal.toISOString().slice(0,10)===d;}).length),
-        borderColor:getItemClr()[t],
-        backgroundColor:getItemClr()[t]+'30',
-        borderWidth:2,pointRadius:2.5,pointHoverRadius:5,
+        data:dateArr.map(d=>list.filter(r=>r.item===t&&r.date&&_localDay(new Date(r.date))===d).length),
+        borderColor:clr[t],backgroundColor:clr[t]+(big?'28':'30'),
+        borderWidth:big?2.5:2,pointRadius:big?3:2.5,pointHoverRadius:big?6:5,
         fill:false,tension:.4
       }))
     },
     options:{
       responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{position:'bottom',labels:{color:cssVar('--text-muted'),font:{size:11},padding:12,boxWidth:10,boxHeight:10}}},
+      plugins:{
+        legend:{position:'bottom',labels:{color:muted,font:{size:big?12:11},padding:big?16:12,boxWidth:big?12:10,boxHeight:big?12:10}},
+        ...(big?{tooltip:{mode:'index',intersect:false}}:{})
+      },
       scales:{
-        x:{grid:{color:cssVar('--border')},ticks:{color:cssVar('--text-muted'),font:{size:10},maxTicksLimit:15}},
-        y:{beginAtZero:true,ticks:{color:cssVar('--text-muted'),stepSize:1,font:{size:11}},grid:{color:cssVar('--border')}}
-      }
+        x:{grid:{color:grid},ticks:{color:muted,font:{size:big?11:10},maxTicksLimit:big?20:15}},
+        y:{beginAtZero:true,ticks:{color:muted,stepSize:1,font:{size:big?12:11}},grid:{color:grid}}
+      },
+      ...(big?{interaction:{mode:'nearest',axis:'x',intersect:false}}:{})
     }
-  });
+  }};
+}
+function renderDailyChart(list){
+  _charts['daily']?.destroy();
+  const ctx=document.getElementById('chart-daily')?.getContext('2d');
+  if(!ctx)return;
+  const {days,config}=_dailyChartConfig(list,false);
+  document.getElementById('st-line-range').textContent=`(최근 ${days}일)`;
+  _charts['daily']=new Chart(ctx,config);
 }
 
 // ── 일별 추이 자세히 보기 ──────────────────────────────────────
@@ -3486,42 +3570,9 @@ function renderDailyDetailChart(){
   _charts['daily-detail']?.destroy();
   const ctx=document.getElementById('chart-daily-detail')?.getContext('2d');
   if(!ctx)return;
-  const list=_filtered();
-  const days=_period==='all'?30:parseInt(_period);
-  const dateArr=[];
-  for(let i=days-1;i>=0;i--){
-    const d=new Date();d.setDate(d.getDate()-i);
-    const local=new Date(d.getTime()-d.getTimezoneOffset()*60000);
-    dateArr.push(local.toISOString().slice(0,10));
-  }
+  const {days,config}=_dailyChartConfig(_filtered(),true);
   document.getElementById('chart-detail-range').textContent=`(최근 ${days}일)`;
-  const types=Object.keys(ITEM_NUMBERS);
-  _charts['daily-detail']=new Chart(ctx,{
-    type:'line',
-    data:{
-      labels:dateArr.map(d=>{const[,m,dd]=d.split('-');return `${m}/${dd}`;}),
-      datasets:types.map(t=>({
-        label:`${ITEM_ICONS[t]} ${ITEM_LABELS[t]}`,
-        data:dateArr.map(d=>list.filter(r=>{const rLocal=new Date(new Date(r.date).getTime()-new Date(r.date).getTimezoneOffset()*60000);return r.item===t&&rLocal.toISOString().slice(0,10)===d;}).length),
-        borderColor:getItemClr()[t],
-        backgroundColor:getItemClr()[t]+'28',
-        borderWidth:2.5,pointRadius:3,pointHoverRadius:6,
-        fill:false,tension:.4
-      }))
-    },
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{
-        legend:{position:'bottom',labels:{color:cssVar('--text-muted'),font:{size:12},padding:16,boxWidth:12,boxHeight:12}},
-        tooltip:{mode:'index',intersect:false}
-      },
-      scales:{
-        x:{grid:{color:cssVar('--border')},ticks:{color:cssVar('--text-muted'),font:{size:11},maxTicksLimit:20}},
-        y:{beginAtZero:true,ticks:{color:cssVar('--text-muted'),stepSize:1,font:{size:12}},grid:{color:cssVar('--border')}}
-      },
-      interaction:{mode:'nearest',axis:'x',intersect:false}
-    }
-  });
+  _charts['daily-detail']=new Chart(ctx,config);
 }
 
 // ── 전체 렌더 진입점 ──────────────────────────────────────────
@@ -3533,6 +3584,71 @@ function renderStats(){
   renderDept(list);
   renderHourChart(list);
   renderDailyChart(list);
+}
+
+// ══ 학생 페이지 안내 (Firebase /publicInfo) ══
+// public.html의 PUBLIC_INFO_DEFAULT와 같은 값 — 저장한 적 없으면 이 문구가 학생 페이지에 표시됨
+const PUBLIC_INFO_DEFAULT={
+  location:'200동 1037A호 (학생회실)',
+  hours:'평일 14:00 ~ 18:00',
+  periods:'약속우산 : 대여 후 일주일 이내 반납\n충전기 · 계산기 · 멀티탭 · 찜질팩 : 당일 18:00까지 반납',
+  contact:'복지부국장 김서준 (010-9643-4064)'
+};
+// '예시 문구로 채우기' — 작성 가이드용 예시 (학생 페이지에 직접 쓰이지 않음)
+const PUBLIC_INFO_EXAMPLE={
+  location:'200동 1037A호 (학생회실)',
+  hours:'평일 14:00 ~ 18:00',
+  periods:'약속우산 : 대여 후 일주일 이내 반납\n충전기 · 계산기 · 멀티탭 · 찜질팩 : 당일 18:00까지 반납',
+  contact:'복지국장 홍길동 (010-1234-5678)'
+};
+function fillNoticeForm(d){
+  document.getElementById('n-location').value=d.location||'';
+  document.getElementById('n-hours').value=d.hours||'';
+  document.getElementById('n-periods').value=d.periods||'';
+  document.getElementById('n-contact').value=d.contact||'';
+}
+// 불러오는 동안 입력칸을 비우고 잠가 둠 (기본 문구가 잠깐 보였다 바뀌는 깜빡임 방지)
+function _noticeLoading(on){
+  ['n-location','n-hours','n-periods','n-contact'].forEach(id=>{
+    const el=document.getElementById(id);
+    el.disabled=on;el.placeholder=on?'불러오는 중…':'';
+    if(on)el.value='';
+  });
+  const sv=document.getElementById('notice-save-btn');if(sv)sv.disabled=on;
+}
+async function openNoticeModal(){
+  if(!isOnline())return;
+  _noticeLoading(true);
+  openModal('modal-notice');
+  try{
+    const d=await fbGet('/publicInfo');
+    fillNoticeForm(d?{...PUBLIC_INFO_DEFAULT,...d}:PUBLIC_INFO_DEFAULT); // 저장한 적 없으면 지금 학생 페이지에 보이는 문구
+    _noticeLoading(false);
+  }catch(e){
+    _noticeLoading(false);
+    closeModal('modal-notice');
+    toast('안내 문구를 불러오지 못했습니다 — 인터넷 연결을 확인해주세요','err');
+  }
+}
+async function saveNotice(){
+  if(!isOnline())return;
+  const data={
+    location:document.getElementById('n-location').value.trim(),
+    hours:document.getElementById('n-hours').value.trim(),
+    periods:document.getElementById('n-periods').value.split('\n').map(x=>x.trim()).filter(Boolean).join('\n'),
+    contact:document.getElementById('n-contact').value.trim()
+  };
+  const btn=document.getElementById('notice-save-btn');
+  if(btn){btn.disabled=true;btn.textContent='저장 중...';}
+  try{
+    await fbPut('/publicInfo',data);
+    closeModal('modal-notice');
+    toast('학생 페이지 안내가 저장되었습니다','ok');
+  }catch(e){
+    toast('저장 실패 — 네트워크를 확인해주세요','err');
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='💾 저장';}
+  }
 }
 
 // ══ 비밀번호 인증 ══
@@ -3578,7 +3694,6 @@ function togglePwVis(){
 })();
 
 // ══ 의약품 관리 ══
-const MED_CATEGORIES=['진통제','지사제','소화제','알레르기 완화제','기침 가래 약','제산제','종합감기약','연고','밴드','드레싱 밴드','모기약','소독제','파스'];
 const MED_CAT_UNIT={
   '진통제':'정','지사제':'정','소화제':'정','알레르기 완화제':'정','기침 가래 약':'정','제산제':'정',
   '종합감기약':'정','연고':'개','밴드':'개','드레싱 밴드':'개','모기약':'개','소독제':'개','파스':'개'
@@ -3639,8 +3754,9 @@ async function initMedicine(){
     // 최초 시딩
     medItems=MED_DEFAULT.map(d=>({...d}));
     const obj={};medItems.forEach(m=>obj[m.id]=m);
-    fbPut('/medicine',obj).catch(()=>{});
-    fbPut('/medicineSeeded',true).catch(()=>{});
+    // 기본 품목과 '등록 완료' 표시를 한 번에 저장 (하나만 저장돼 다음 접속 때 목록이 비는 일 방지)
+    try{await fbCommit([opPut('/medicine',obj),opPut('/medicineSeeded',true)]);}
+    catch(e){toast('기본 의약품 목록을 저장하지 못했습니다 — 새로고침 후 다시 확인해주세요','err');}
   }
   medLog=lData?Object.values(lData).sort((a,b)=>new Date(b.at)-new Date(a.at)):[];
   buildMedFilters();
@@ -3658,8 +3774,13 @@ function buildMedFilters(){
   if(cats.includes(prevCat)) sel.value=prevCat;
   const lsel=document.getElementById('med-log-filter');
   const prevLog=lsel.value;
-  lsel.innerHTML='<option value="">전체</option>'+medItems.map(m=>`<option value="${esc(m.id)}">${esc(m.cat)} · ${esc(m.name)}</option>`).join('');
-  if(medItems.some(m=>m.id===prevLog)) lsel.value=prevLog;
+  // 삭제된 품목도 이력이 남아 있으면 '(삭제됨)'으로 필터에 표시
+  const liveIds=new Set(medItems.map(m=>m.id));
+  const deleted={};medLog.forEach(l=>{if(l.medId&&!liveIds.has(l.medId)&&!deleted[l.medId])deleted[l.medId]=l;});
+  lsel.innerHTML='<option value="">전체</option>'
+    +medItems.map(m=>`<option value="${esc(m.id)}">${esc(m.cat)} · ${esc(m.name)}</option>`).join('')
+    +Object.values(deleted).map(l=>`<option value="${esc(l.medId)}">${esc(l.cat)} · ${esc(l.name)} (삭제됨)</option>`).join('');
+  if([...lsel.options].some(o=>o.value===prevLog)) lsel.value=prevLog;
 }
 // 의약품 페이지가 열려 있을 때만 사용 통계 다시 그리기
 function refreshMedStatsIfVisible(){if(_activePage()==='medicine')renderMedStats();}
@@ -3888,6 +4009,9 @@ function openMedModal(id){
   openModal('modal-med');
 }
 
+// 차감 사유 / 이력에 남길 사유 이름 ('기타+'·'기타-'는 이력에 '기타'로 기록, +/−로 구분)
+const MED_MINUS=['사용','폐기','기타-'];
+function medReasonLabel(r){return r==='기타+'||r==='기타-'?'기타':r;}
 function medReasonChange(){
   const reason=document.getElementById('med-reason').value;
   const label=document.getElementById('med-direct-label');
@@ -3897,14 +4021,14 @@ function medReasonChange(){
     // 정정: 최종 수량을 직접 입력
     if(label)label.textContent='정정 후 수량 (최종값 입력)';
     if(quick)quick.style.display='none';
-  } else if(reason==='구비 추가'||reason==='기타'){
+  } else if(reason==='구비 추가'||reason==='기타+'){
     if(label)label.textContent='추가 수량';
     if(quick)quick.style.display='flex';
     // 빠른 버튼을 증가 모드로
     _setQuickBtns(true);
   } else {
     // 사용, 폐기 → 차감
-    if(label)label.textContent='사용(차감) 수량';
+    if(label)label.textContent=reason==='기타-'?'차감 수량':reason==='폐기'?'폐기(차감) 수량':'사용(차감) 수량';
     if(quick)quick.style.display='flex';
     _setQuickBtns(false);
   }
@@ -3912,39 +4036,36 @@ function medReasonChange(){
   if(m)updateMedPreview(m,0);
 }
 
+// 빠른 버튼 — 차감 사유면 빨간 "－N"(누를 때마다 N개씩 더 빠짐), 증가 사유면 "＋N"(N개씩 더 늘어남)
+// 입력칸은 '바뀌는 개수'(항상 양수)이고, 미리보기에서 실제 재고 변화를 보여줌
 function _setQuickBtns(isAdd){
   const row=document.getElementById('med-adj-quick');if(!row)return;
-  if(isAdd){
-    row.innerHTML=`
-      <button class="med-adj-btn" onclick="medAdjDelta(-1)">－1</button>
-      <button class="med-adj-btn" onclick="medAdjDelta(+1)">＋1</button>
-      <button class="med-adj-btn" onclick="medAdjDelta(+5)">＋5</button>
-      <button class="med-adj-btn" onclick="medAdjDelta(+10)">＋10</button>`;
-  } else {
-    row.innerHTML=`
-      <button class="med-adj-btn minus" onclick="medAdjDelta(-5)">－5</button>
-      <button class="med-adj-btn minus" onclick="medAdjDelta(-1)">－1</button>
-      <button class="med-adj-btn" onclick="medAdjDelta(+1)">＋1</button>
-      <button class="med-adj-btn" onclick="medAdjDelta(+5)">＋5</button>`;
-  }
+  const cls=isAdd?'med-adj-btn':'med-adj-btn minus';
+  const sign=isAdd?'＋':'－';
+  row.innerHTML=[1,5,10].map(n=>`<button class="${cls}" onclick="medAdjDelta(${n})" title="${n}개 ${isAdd?'추가':'차감'}">${sign}${n}</button>`).join('')
+    +`<button class="med-adj-btn" onclick="medQuickReset()" title="0으로 초기화" style="font-size:12px">↺ 0</button>`;
 }
-
-function medAdjDelta(d){
+// n개를 더 차감/추가 (차감은 현재 재고보다 많이 뺄 수 없음)
+function medAdjDelta(n){
   const reason=document.getElementById('med-reason').value;
   const m=medItems.find(x=>x.id===_medId);if(!m)return;
-  // 사용/폐기는 delta가 음수가 돼야 하므로 절댓값 기준 처리
-  if(reason==='사용'||reason==='폐기'){
-    // 입력값이 "몇 개 사용했는지"므로 양수로 유지, 저장 시 음수 처리
-    const cur=parseInt(document.getElementById('med-direct-qty').value||'0')||0;
-    const next=Math.max(0,cur+d);
-    document.getElementById('med-direct-qty').value=next;
-    updateMedPreview(m,-(next));
+  const input=document.getElementById('med-direct-qty');
+  const cur=parseInt(input.value||'0')||0;
+  if(MED_MINUS.includes(reason)){
+    const next=Math.min(m.qty,cur+n);
+    if(next===cur&&cur>=m.qty){toast(`현재 재고(${m.qty}${medUnit(m)})보다 많이 차감할 수 없어요`,'err');return;}
+    input.value=next;
+    updateMedPreview(m,-next);
   } else {
-    const cur=parseInt(document.getElementById('med-direct-qty').value||'0')||0;
-    const next=Math.max(0,cur+d);
-    document.getElementById('med-direct-qty').value=next;
+    const next=cur+n;
+    input.value=next;
     updateMedPreview(m,next);
   }
+}
+function medQuickReset(){
+  const m=medItems.find(x=>x.id===_medId);if(!m)return;
+  document.getElementById('med-direct-qty').value='';
+  updateMedPreview(m,0);
 }
 
 function medSetDeltaDirect(val){
@@ -3954,7 +4075,7 @@ function medSetDeltaDirect(val){
   if(reason==='수량 정정'){
     // 최종 수량 직접 입력
     updateMedPreview(m,n-m.qty);
-  } else if(reason==='사용'||reason==='폐기'){
+  } else if(MED_MINUS.includes(reason)){
     updateMedPreview(m,-n);
   } else {
     updateMedPreview(m,n);
@@ -3983,7 +4104,7 @@ async function saveMedAdj(){
   let delta;
   if(reason==='수량 정정'){
     delta=rawVal-m.qty;
-  } else if(reason==='사용'||reason==='폐기'){
+  } else if(MED_MINUS.includes(reason)){
     delta=-rawVal;
   } else {
     delta=rawVal;
@@ -3996,13 +4117,13 @@ async function saveMedAdj(){
   const prevQty=m.qty;
   const memo=document.getElementById('med-memo').value.trim();
   m.qty=newQty;
-  const logId='log_'+Date.now();
-  const logEntry={logId,at:new Date().toISOString(),medId:m.id,cat:m.cat,name:m.name,delta,reason,after:m.qty,...(memo&&{memo})};
+  const logId='log_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
+  const logEntry={logId,at:new Date().toISOString(),medId:m.id,cat:m.cat,name:m.name,delta,reason:medReasonLabel(reason),after:m.qty,...(memo&&{memo})};
   medLog.unshift(logEntry);
   const btn=document.querySelector('#modal-med .btn-primary');
   if(btn){btn.disabled=true;btn.textContent='저장 중...';}
   try{
-    await Promise.all([fbPut(`/medicine/${m.id}`,m),fbPut(`/medLog/${logId}`,logEntry)]);
+    await fbCommit([opPut(`/medicine/${m.id}`,m),opPut(`/medLog/${logId}`,logEntry)]);
     closeModal('modal-med');
     buildMedFilters();
     renderMedicine();
@@ -4037,20 +4158,20 @@ function renderMedManageList(){
   if(_medOrderMode){_renderMedOrderList();return;}
   const list=[...medItems]; // 실제 표시 순서 그대로
   document.getElementById('med-manage-count').textContent=`(${list.length}개)`;
-  const hasLog=new Set(medLog.map(l=>l.medId));
   document.getElementById('med-manage-list').innerHTML=list.length
     ? list.map(m=>{
-        const locked=hasLog.has(m.id);
-        const delBtn=locked
-          ?`<span style="display:inline-flex;align-items:center;gap:3px;font-size:10px;opacity:.4">🔒 이력 있음</span>`
-          :`<button class="btn btn-danger btn-sm" onclick="deleteMedItem('${m.id}')">삭제</button>`;
+        const delBtn=`<button class="btn btn-danger btn-sm" onclick="deleteMedItem('${m.id}')">삭제</button>`;
         return `<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border);border-radius:7px;background:var(--surface);font-size:12px;">
-          <span style="background:var(--surface2);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:600;color:var(--text-muted);white-space:nowrap;flex-shrink:0">${esc(m.cat)}</span>
+          <span id="med-cat-view-${m.id}" style="background:var(--surface2);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:600;color:var(--text-muted);white-space:nowrap;flex-shrink:0">${esc(m.cat)}</span>
+          <input id="med-cat-edit-${m.id}" class="fi" list="med-cat-datalist" title="종류" style="display:none;width:90px;flex-shrink:0;padding:4px 8px;font-size:12px" value="${esc(m.cat)}"
+            onkeydown="if(event.key==='Enter')saveMedName('${m.id}');if(event.key==='Escape'){event.preventDefault();cancelMedName('${m.id}')}">
           <span id="med-name-view-${m.id}" style="font-weight:600;flex:1">${esc(m.name)}</span>
-          <input id="med-name-edit-${m.id}" class="fi" style="display:none;flex:1;padding:4px 8px;font-size:12px" value="${esc(m.name)}"
-            onkeydown="if(event.key==='Enter')saveMedName('${m.id}');if(event.key==='Escape')cancelMedName('${m.id}')">
-          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);flex-shrink:0">${m.qty}${medUnit(m)}</span>
-          <button class="btn btn-ghost btn-sm" onclick="startMedNameEdit('${m.id}')" id="med-edit-btn-${m.id}" title="이름 변경">✏️</button>
+          <input id="med-name-edit-${m.id}" class="fi" title="품명" style="display:none;flex:1;min-width:0;padding:4px 8px;font-size:12px" value="${esc(m.name)}"
+            onkeydown="if(event.key==='Enter')saveMedName('${m.id}');if(event.key==='Escape'){event.preventDefault();cancelMedName('${m.id}')}">
+          <span id="med-qty-view-${m.id}" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);flex-shrink:0">${m.qty}${esc(medUnit(m))}</span>
+          <input id="med-unit-edit-${m.id}" class="fi" title="단위" style="display:none;width:52px;flex-shrink:0;padding:4px 6px;font-size:12px;text-align:center" value="${esc(medUnit(m))}"
+            onkeydown="if(event.key==='Enter')saveMedName('${m.id}');if(event.key==='Escape'){event.preventDefault();cancelMedName('${m.id}')}">
+          <button class="btn btn-ghost btn-sm" onclick="startMedNameEdit('${m.id}')" id="med-edit-btn-${m.id}" title="이름·종류·단위 수정">✏️</button>
           <button class="btn btn-primary btn-sm" onclick="saveMedName('${m.id}')" id="med-save-btn-${m.id}" style="display:none">저장</button>
           ${delBtn}
         </div>`;
@@ -4090,7 +4211,7 @@ async function _saveMedOrder(){
   const changed=renumberMedItems();
   buildMedFilters();renderMedicine();
   try{
-    await Promise.all(changed.map(m=>fbPut(`/medicine/${m.id}`,m)));
+    await fbCommit(changed.map(m=>opPut(`/medicine/${m.id}`,m)));
     toast('의약품 표시 순서가 저장되었습니다','ok');
   }catch(e){
     toast('순서 저장 실패 — 네트워크를 확인해주세요','err');
@@ -4102,13 +4223,14 @@ function moveMed(idx,dir){
   const [m]=medItems.splice(idx,1);
   medItems.splice(to,0,m);
   _renderMedOrderList();
+  // 옮긴 품목이 보이도록 목록을 따라 스크롤
+  document.querySelector(`#med-manage-list [data-mi="${to}"]`)?.scrollIntoView({block:'nearest'});
 }
 function _renderMedOrderList(){
   document.getElementById('med-manage-count').textContent=`(${medItems.length}개)`;
   const arrow='background:var(--surface2);border:1px solid var(--border);border-radius:5px;width:26px;height:24px;cursor:pointer;font-size:11px;color:var(--text);flex-shrink:0';
   document.getElementById('med-manage-list').innerHTML=medItems.map((m,i)=>`
-    <div draggable="true" ondragstart="_medDragIdx=${i};this.style.opacity='.35'" ondragend="this.style.opacity=''"
-      ondragover="event.preventDefault()" ondrop="event.preventDefault();_medDrop(${i})"
+    <div class="med-order-row" data-mi="${i}" draggable="true" ondragstart="_medDragIdx=${i};this.style.opacity='.35';event.dataTransfer.effectAllowed='move'" ondragend="this.style.opacity='';_medDragEnd()"
       style="display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--accent);border-radius:7px;background:var(--drag-mode-bg);font-size:12px;cursor:grab">
       <span style="opacity:.5">⠿</span>
       <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);width:18px">${i+1}</span>
@@ -4118,39 +4240,83 @@ function _renderMedOrderList(){
       <button style="${arrow}" onclick="moveMed(${i},1)" ${i===medItems.length-1?'disabled':''} title="아래로">▼</button>
     </div>`).join('');
 }
-function _medDrop(to){
-  if(_medDragIdx===null||_medDragIdx===to){_medDragIdx=null;return;}
-  const [m]=medItems.splice(_medDragIdx,1);
-  medItems.splice(to,0,m);
-  _medDragIdx=null;
-  _renderMedOrderList();
+// 드래그 중: 마우스 위치로 '들어갈 자리'를 계산해 선으로 표시 + 목록 끝에 가까우면 자동 스크롤
+let _medDropAt=null,_medScrollTimer=null,_medScrollSpeed=0;
+function _medClearMarks(){
+  document.querySelectorAll('#med-manage-list .med-order-row').forEach(el=>el.classList.remove('med-drop-before','med-drop-after'));
 }
+function _medDragOver(e){
+  if(!_medOrderMode||_medDragIdx===null)return;
+  e.preventDefault();e.dataTransfer.dropEffect='move';
+  const box=document.getElementById('med-manage-list');
+  const rows=[...box.querySelectorAll('.med-order-row')];
+  // 들어갈 자리: 마우스보다 아래에 중심이 있는 첫 행 앞
+  let at=rows.length;
+  for(let i=0;i<rows.length;i++){const r=rows[i].getBoundingClientRect();if(e.clientY<r.top+r.height/2){at=i;break;}}
+  _medDropAt=at;
+  _medClearMarks();
+  if(at<rows.length)rows[at].classList.add('med-drop-before');else rows[rows.length-1]?.classList.add('med-drop-after');
+  // 자동 스크롤: 목록 위·아래 가장자리 48px 안이면 그쪽으로 스크롤
+  const b=box.getBoundingClientRect(),edge=48;
+  _medScrollSpeed=e.clientY>b.bottom-edge?Math.ceil((e.clientY-(b.bottom-edge))/4):e.clientY<b.top+edge?-Math.ceil(((b.top+edge)-e.clientY)/4):0;
+  if(_medScrollSpeed&&!_medScrollTimer){
+    _medScrollTimer=setInterval(()=>{if(!_medScrollSpeed){clearInterval(_medScrollTimer);_medScrollTimer=null;return;}box.scrollTop+=_medScrollSpeed;},16);
+  }
+}
+function _medDropHandler(e){
+  if(!_medOrderMode||_medDragIdx===null)return;
+  e.preventDefault();
+  const from=_medDragIdx;let to=_medDropAt??from;
+  if(to>from)to--; // 빠진 자리만큼 보정
+  if(to!==from){const [m]=medItems.splice(from,1);medItems.splice(to,0,m);}
+  _medDragEnd();
+  _renderMedOrderList();
+  document.querySelector(`#med-manage-list [data-mi="${to}"]`)?.scrollIntoView({block:'nearest'});
+}
+function _medDragEnd(){
+  _medDragIdx=null;_medDropAt=null;_medScrollSpeed=0;
+  clearInterval(_medScrollTimer);_medScrollTimer=null;
+  _medClearMarks();
+}
+// 목록 상자 전체에서 드래그를 받음 (행 사이 빈틈이나 목록 끝에 놓아도 동작)
+(function(){
+  const box=document.getElementById('med-manage-list');
+  box.addEventListener('dragover',_medDragOver);
+  box.addEventListener('drop',_medDropHandler);
+  box.addEventListener('dragleave',e=>{if(!box.contains(e.relatedTarget)){_medScrollSpeed=0;_medClearMarks();}});
+})();
 
+// ✏️ 수정 모드: 종류·품명·단위 입력칸 표시
+function _medEditToggle(id,on){
+  const g=k=>document.getElementById(`med-${k}-${id}`);
+  ['cat-view','name-view','qty-view','edit-btn'].forEach(k=>{const el=g(k);if(el)el.style.display=on?'none':'';});
+  ['cat-edit','name-edit','unit-edit'].forEach(k=>{const el=g(k);if(el)el.style.display=on?'block':'none';});
+  const sv=g('save-btn');if(sv)sv.style.display=on?'':'none';
+}
 function startMedNameEdit(id){
-  document.getElementById(`med-name-view-${id}`).style.display='none';
-  document.getElementById(`med-name-edit-${id}`).style.display='block';
-  document.getElementById(`med-edit-btn-${id}`).style.display='none';
-  document.getElementById(`med-save-btn-${id}`).style.display='';
+  _medEditToggle(id,true);
   setTimeout(()=>document.getElementById(`med-name-edit-${id}`)?.focus(),50);
 }
 function cancelMedName(id){
   const m=medItems.find(x=>x.id===id);if(!m)return;
   document.getElementById(`med-name-edit-${id}`).value=m.name;
-  document.getElementById(`med-name-view-${id}`).style.display='';
-  document.getElementById(`med-name-edit-${id}`).style.display='none';
-  document.getElementById(`med-edit-btn-${id}`).style.display='';
-  document.getElementById(`med-save-btn-${id}`).style.display='none';
+  document.getElementById(`med-cat-edit-${id}`).value=m.cat;
+  document.getElementById(`med-unit-edit-${id}`).value=medUnit(m);
+  _medEditToggle(id,false);
 }
 async function saveMedName(id){
   if(!isOnline()) return;
   const m=medItems.find(x=>x.id===id);if(!m)return;
   const newName=document.getElementById(`med-name-edit-${id}`).value.trim();
-  if(!newName){toast('품명을 입력해주세요','err');return;}
-  if(newName===m.name){cancelMedName(id);return;}
-  if(medItems.some(x=>x.id!==id&&x.name===newName&&x.cat===m.cat)){toast('이미 동일한 품목이 있습니다','err');return;}
-  saveSnapshot(`의약품 이름 변경: ${m.name} → ${newName}`);
-  const prevName=m.name;
-  m.name=newName;
+  const newCat=document.getElementById(`med-cat-edit-${id}`).value.trim();
+  const newUnit=document.getElementById(`med-unit-edit-${id}`).value.trim();
+  if(!newName||!newCat){toast('종류와 품명을 입력해주세요','err');return;}
+  if(newName===m.name&&newCat===m.cat&&newUnit===medUnit(m)){cancelMedName(id);return;}
+  if(medItems.some(x=>x.id!==id&&x.name===newName&&x.cat===newCat)){toast('이미 동일한 품목이 있습니다','err');return;}
+  saveSnapshot(`의약품 수정: ${m.name}${newName!==m.name?' → '+newName:''}`);
+  const prev={name:m.name,cat:m.cat,unit:m.unit};
+  m.name=newName;m.cat=newCat;
+  if(newUnit)m.unit=newUnit;else delete m.unit; // 단위를 비우면 종류별 기본 단위 사용
   const btn=document.getElementById(`med-save-btn-${id}`);
   if(btn){btn.disabled=true;btn.textContent='저장 중...';}
   try{
@@ -4158,9 +4324,11 @@ async function saveMedName(id){
     renderMedManageList();
     buildMedFilters();
     renderMedicine();
-    toast(`이름 변경 완료: ${newName}`,'ok');
+    // 종류 목록(자동완성)도 갱신
+    document.getElementById('med-cat-datalist').innerHTML=[...new Set(medItems.map(x=>x.cat))].sort().map(c=>`<option value="${esc(c)}">`).join('');
+    toast(`수정 완료: ${newCat} · ${newName}`,'ok');
   }catch(e){
-    m.name=prevName;
+    m.name=prev.name;m.cat=prev.cat;if(prev.unit===undefined)delete m.unit;else m.unit=prev.unit;
     if(btn){btn.disabled=false;btn.textContent='저장';}
     undoStack.pop();updateHistoryBtns();
     toast('저장 실패 — 네트워크를 확인해주세요','err');
@@ -4195,9 +4363,9 @@ async function submitMedAdd(){
   const btn=document.getElementById('med-add-btn');
   if(btn){btn.disabled=true;btn.textContent='저장 중...';}
   try{
-    const tasks=[fbPut(`/medicine/${id}`,newItem),...orderChanged.map(m=>fbPut(`/medicine/${m.id}`,m))];
-    if(logEntry)tasks.push(fbPut(`/medLog/${logEntry.logId}`,logEntry));
-    await Promise.all(tasks);
+    const tasks=[opPut(`/medicine/${id}`,newItem),...orderChanged.map(m=>opPut(`/medicine/${m.id}`,m))];
+    if(logEntry)tasks.push(opPut(`/medLog/${logEntry.logId}`,logEntry));
+    await fbCommit(tasks);
     renderMedManageList();
     buildMedFilters();
     renderMedicine();
@@ -4224,9 +4392,13 @@ async function submitMedAdd(){
 }
 
 async function deleteMedItem(id){
-  if(!confirm('이 품목을 삭제하시겠습니까?\n※ 삭제된 품목은 복구할 수 없습니다.'))return;
-  if(!isOnline()) return;
   const m=medItems.find(x=>x.id===id);if(!m)return;
+  const logCnt=medLog.filter(l=>l.medId===id).length;
+  const msg=logCnt
+    ?`"${m.name}" 품목을 삭제하시겠습니까?\n\n사용·변경 이력 ${logCnt}건은 그대로 남아요.\n(실수로 지웠다면 되돌리기로 복구할 수 있어요)`
+    :`"${m.name}" 품목을 삭제하시겠습니까?\n(실수로 지웠다면 되돌리기로 복구할 수 있어요)`;
+  if(!confirm(msg))return;
+  if(!isOnline()) return;
   saveSnapshot(`의약품 품목 삭제: ${m.name}`);
   const prevItems=[...medItems];
   medItems=medItems.filter(x=>x.id!==id);
