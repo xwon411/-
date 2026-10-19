@@ -16,11 +16,11 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://cals-rental-default-rtdb.firebaseio.com" crossorigin>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <title>농업생명과학대학 학생회 대여 관리</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root{
@@ -89,7 +89,7 @@
   --mob-undo-bg:#6b7280;--mob-undo-bd:#4b5563;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;}
 
 /* ══ 비밀번호 잠금 오버레이 ══ */
 #pw-overlay{
@@ -102,16 +102,16 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
   box-shadow:0 32px 80px rgba(0,0,0,.25);text-align:center;
   border:1px solid var(--border);
 }
-.pw-logo{font-size:11px;font-family:'JetBrains Mono',monospace;letter-spacing:.18em;
-  color:var(--text-muted);text-transform:uppercase;margin-bottom:10px;}
+.pw-logo{font-size:11px;font-family:var(--font);
+  color:var(--text-muted);margin-bottom:10px;}
 .pw-title{font-size:18px;font-weight:900;letter-spacing:-.03em;margin-bottom:4px;}
 .pw-sub{font-size:12px;color:var(--text-muted);margin-bottom:24px;}
 .pw-divider{border:none;border-top:1px solid var(--border);margin:0 0 24px;opacity:.6;}
 .pw-input-wrap{position:relative;margin-bottom:12px;}
 .pw-input{width:100%;padding:11px 40px 11px 14px;border:1.5px solid var(--border);
   background:var(--surface2);color:var(--text);
-  border-radius:8px;font-size:15px;font-family:'JetBrains Mono',monospace;
-  letter-spacing:.12em;outline:none;transition:border-color .15s;text-align:center;}
+  border-radius:8px;font-size:15px;font-family:var(--font);
+  outline:none;transition:border-color .15s;text-align:center;}
 .pw-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(45,80,22,.1);}
 .pw-input.err{border-color:var(--c-danger);animation:shake .35s ease;}
 @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
@@ -120,22 +120,22 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .pw-err{font-size:12px;color:var(--c-danger);font-weight:600;min-height:18px;margin-bottom:10px;}
 .pw-btn{width:100%;padding:11px;background:var(--accent);color:white;border:1px solid rgba(255,255,255,.2);
   border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;
-  font-family:'Noto Sans KR',sans-serif;transition:background .15s;}
+  font-family:var(--font);transition:background .15s;}
 .pw-btn:hover{background:var(--accent-light);}
 .pw-hint{font-size:10px;color:var(--text-light);margin-top:14px;}
 .layout{display:flex;min-height:100vh;}
 .sidebar{width:220px;background:var(--accent);color:white;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:200;border-right:1px solid rgba(0,0,0,.15);}
 .sidebar-logo{padding:24px 20px 18px;border-bottom:1px solid rgba(255,255,255,.12);}
-.sidebar-logo .tag{font-size:9px;font-family:'JetBrains Mono',monospace;letter-spacing:.15em;opacity:.55;text-transform:uppercase;margin-bottom:5px;}
+.sidebar-logo .tag{font-size:9px;font-family:var(--font);opacity:.55;margin-bottom:5px;}
 .sidebar-logo h1{font-size:16px;font-weight:700;line-height:1.3;}
 .nav{flex:1;padding:14px 10px;display:flex;flex-direction:column;gap:2px;}
-.nav-lbl{font-size:9px;letter-spacing:.14em;text-transform:uppercase;opacity:.4;padding:10px 10px 4px;font-family:'JetBrains Mono',monospace;}
-.nav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:500;color:rgba(255,255,255,.7);transition:all .15s;border:1px solid transparent;}
+.nav-lbl{font-size:9px;opacity:.4;padding:10px 10px 4px;font-family:var(--font);}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:500;color:rgba(255,255,255,.7);transition:background-color .12s,border-color .12s,color .12s;border:1px solid transparent;}
 .nav-item:hover{background:rgba(255,255,255,.1);color:white;}
 .nav-item.active{background:rgba(255,255,255,.18);color:white;border-color:rgba(255,255,255,.15);}
-.nav-badge{margin-left:auto;background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;font-family:'JetBrains Mono',monospace;min-width:20px;text-align:center;}
-.sidebar-clock{padding:12px 16px;border-top:1px solid rgba(255,255,255,.1);font-family:'JetBrains Mono',monospace;font-size:11px;opacity:.45;display:flex;align-items:center;gap:6px;}
-.sidebar-util-btn{flex:1;padding:8px 4px;border-radius:7px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);font-size:11px;font-weight:600;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:4px;}
+.nav-badge{margin-left:auto;background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;font-family:var(--font);min-width:20px;text-align:center;}
+.sidebar-clock{padding:12px 16px;border-top:1px solid rgba(255,255,255,.1);font-family:var(--font);font-size:11px;opacity:.45;display:flex;align-items:center;gap:6px;}
+.sidebar-util-btn{flex:1;padding:8px 4px;border-radius:7px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);transition:background-color .12s,border-color .12s,color .12s;display:flex;align-items:center;justify-content:center;gap:4px;}
 .sidebar-util-btn:hover:not(:disabled){background:rgba(255,255,255,.18);color:rgba(255,255,255,.9);border-color:rgba(255,255,255,.35);}
 .sidebar-util-btn:active:not(:disabled){background:rgba(255,255,255,.25);}
 .sidebar-util-btn:disabled{opacity:.3;cursor:not-allowed;}
@@ -144,7 +144,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:26px;}
 .page-title{font-size:22px;font-weight:900;letter-spacing:-.03em;}
 .page-sub{font-size:12px;color:var(--text-muted);margin-top:3px;}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .15s;font-family:'Noto Sans KR',sans-serif;white-space:nowrap;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:background-color .12s,border-color .12s,color .12s;font-family:var(--font);white-space:nowrap;}
 .btn-primary{background:var(--accent);color:white;}.btn-primary:hover{background:var(--accent-light);}
 .btn-ghost{background:var(--surface);color:var(--text);border:1px solid var(--border);}.btn-ghost:hover{background:var(--surface2);}
 .btn-sm{padding:5px 9px;font-size:11px;border-radius:5px;}
@@ -155,7 +155,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .stats-row{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:22px;}
 .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;position:relative;overflow:hidden;}
 .stat-card::after{content:attr(data-icon);position:absolute;bottom:6px;right:10px;font-size:26px;opacity:.08;}
-.stat-label{font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px;}
+.stat-label{font-size:10px;font-weight:600;color:var(--text-muted);margin-bottom:7px;}
 .stat-value{font-size:26px;font-weight:900;letter-spacing:-.04em;}
 .stat-sub{font-size:10px;color:var(--text-muted);margin-top:3px;}
 .stat-avail{font-size:12px;font-weight:700;color:var(--s-returned);margin-top:3px;}
@@ -164,17 +164,17 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .section-title{font-size:13px;font-weight:700;}
 .section-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
 .search-wrap{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:6px 11px;}
-.search-wrap input{background:none;border:none;outline:none;font-size:12px;color:var(--text);width:150px;font-family:'Noto Sans KR',sans-serif;}
+.search-wrap input{background:none;border:none;outline:none;font-size:12px;color:var(--text);width:150px;font-family:var(--font);}
 .search-wrap input::placeholder{color:var(--text-muted);}
-select.flt{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:6px 9px;font-size:12px;color:var(--text);font-family:'Noto Sans KR',sans-serif;cursor:pointer;outline:none;}
+select.flt{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:6px 9px;font-size:12px;color:var(--text);font-family:var(--font);cursor:pointer;outline:none;}
 .tbl-wrap{overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:12px;}
-thead th{padding:9px 13px;text-align:left;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);background:var(--surface2);border-bottom:1px solid var(--border);font-family:'JetBrains Mono',monospace;white-space:nowrap;}
+thead th{padding:9px 13px;text-align:left;font-size:9px;font-weight:700;color:var(--text-muted);background:var(--surface2);border-bottom:1px solid var(--border);font-family:var(--font);white-space:nowrap;}
 tbody tr{border-bottom:1px solid var(--border);transition:background .1s;}
 tbody tr:last-child{border-bottom:none;}
 tbody tr:hover{background:var(--tr-hover);}
 tbody td{padding:10px 13px;vertical-align:middle;}
-.td-name{font-weight:600;}.td-mono{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);}
+.td-name{font-weight:600;}.td-mono{font-family:var(--font);font-size:11px;color:var(--text-muted);}
 .td-sub{font-size:11px;color:var(--text-muted);}.td-actions{display:flex;gap:4px;flex-wrap:wrap;}
 .item-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;}
 .ib-umbrella{background:var(--ib-umbrella-bg);color:var(--c-umbrella);}.ib-charger{background:var(--ib-charger-bg);color:var(--c-charger);}
@@ -190,24 +190,24 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 .sb-unpaid-paid{background:var(--sb-unpaid-paid-bg);color:var(--s-unpaid-paid);}.sb-unpaid-paid::before{background:var(--s-unpaid-paid);}
 .sb-lost-paid{background:var(--sb-lost-paid-bg);color:var(--s-lost-paid);}.sb-lost-paid::before{background:var(--s-lost-paid);}
 @keyframes bl{0%,100%{opacity:1}50%{opacity:.25}}
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(3px);z-index:500;align-items:center;justify-content:center;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;align-items:center;justify-content:center;}
 .modal-overlay.open{display:flex;}
-.modal{background:var(--surface);border-radius:14px;width:480px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.18);animation:mIn .22s cubic-bezier(.34,1.56,.64,1);}
-@keyframes mIn{from{opacity:0;transform:scale(.92) translateY(16px)}to{opacity:1;transform:none}}
+.modal{background:var(--surface);border-radius:14px;width:480px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.18);animation:mIn .12s ease-out;}
+@keyframes mIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .modal-header{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;position:sticky;top:0;background:var(--surface);z-index:10;}
 .modal-title{font-size:15px;font-weight:700;}.modal-sub{font-size:11px;color:var(--text-muted);margin-top:3px;}
 .modal-close{background:none;border:none;cursor:pointer;font-size:18px;color:var(--text-muted);padding:4px;line-height:1;flex-shrink:0;}
 .modal-body{padding:20px 24px;}.modal-footer{padding:12px 24px 20px;display:flex;gap:8px;justify-content:flex-end;}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px;}
 .fg{display:flex;flex-direction:column;gap:5px;}.fg.full{grid-column:1/-1;}
-.fg label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);font-family:'JetBrains Mono',monospace;}
-.fi{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:9px 12px;color:var(--text);font-size:13px;font-family:'Noto Sans KR',sans-serif;outline:none;transition:border-color .15s;width:100%;}
+.fg label{font-size:10px;font-weight:700;color:var(--text-muted);font-family:var(--font);}
+.fi{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:9px 12px;color:var(--text);font-size:13px;font-family:var(--font);outline:none;transition:border-color .15s;width:100%;}
 .fi:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(45,80,22,.08);}
 .fi::placeholder{color:var(--text-muted);}.fi option{background:var(--surface);}
 /* 해제 이력 — 휴대폰에서는 표 대신 카드 */
 .blh-cards{display:none;flex-direction:column;gap:6px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
 .blh-card{background:var(--surface2);border-radius:8px;padding:9px 11px;display:flex;flex-direction:column;gap:5px;}
-.blh-dates{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;}
+.blh-dates{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11px;color:var(--text-muted);font-family:var(--font);}
 .blh-note{font-size:11px;color:var(--text-muted);}
 @media(max-width:768px){.blh-cards{display:flex;}.blh-table{display:none;}}
 /* 의약품 순서 변경 — 들어갈 자리 표시 선 */
@@ -219,20 +219,21 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 .ac-item:last-child{border-bottom:none;}
 .ac-item:hover,.ac-item.active{background:var(--accent-pale);}
 .ac-name{font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px;}
-.ac-sub{font-size:11px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;}
+.ac-sub{font-size:11px;color:var(--text-muted);font-family:var(--font);}
 .ac-bl{font-size:10px;font-weight:700;color:var(--r-warn-cl);background:var(--r-warn-bg);border-radius:10px;padding:1px 6px;}
 .r-warn{display:none;background:var(--r-warn-bg);border:1px solid var(--r-warn-bd);border-radius:7px;padding:9px 13px;font-size:12px;font-weight:600;color:var(--r-warn-cl);}
 .item-type-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;}
-.item-type-btn{padding:9px 4px;border-radius:8px;cursor:pointer;border:2px solid var(--border);background:var(--surface2);text-align:center;font-size:11px;font-weight:600;transition:all .15s;}
+.item-type-btn{padding:9px 4px;border-radius:8px;cursor:pointer;border:2px solid var(--border);background:var(--surface2);text-align:center;font-size:11px;font-weight:600;transition:background-color .12s,border-color .12s,color .12s;}
 .item-type-btn .ico{font-size:18px;margin-bottom:3px;}
+.item-type-btn:not([class*="sel-"]):hover{border-color:var(--accent);background:var(--surface)}
 .item-type-btn.sel-umbrella{border-color:var(--c-umbrella);background:var(--item-sel-umbrella-bg);color:var(--c-umbrella);}
 .item-type-btn.sel-charger{border-color:var(--c-charger);background:var(--item-sel-charger-bg);color:var(--c-charger);}
 .item-type-btn.sel-calculator{border-color:var(--c-calculator);background:var(--item-sel-calculator-bg);color:var(--c-calculator);}
 .item-type-btn.sel-multitap{border-color:var(--c-multitap);background:var(--item-sel-multitap-bg);color:var(--c-multitap);}
 .item-type-btn.sel-heatpack{border-color:var(--c-heatpack);background:var(--item-sel-heatpack-bg);color:var(--c-heatpack);}
 .s5-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
-.s5-opt{padding:12px 4px;border-radius:9px;cursor:pointer;border:2px solid var(--border);background:var(--surface2);text-align:center;font-size:11px;font-weight:600;transition:all .15s;}
-.s5-opt:hover{transform:translateY(-1px);}
+.s5-opt{padding:12px 4px;border-radius:9px;cursor:pointer;border:2px solid var(--border);background:var(--surface2);text-align:center;font-size:11px;font-weight:600;transition:background-color .12s,border-color .12s,color .12s;}
+.s5-opt:not([class*="sel-"]):hover{border-color:var(--accent);background:var(--surface)}
 .s5-opt .s5ico{font-size:20px;margin-bottom:4px;}
 .s5-opt.sel-renting{border-color:var(--s-renting);background:var(--sel-renting-bg);color:var(--s-renting);}
 .s5-opt.sel-returned{border-color:var(--s-returned);background:var(--sel-returned-bg);color:var(--s-returned);}
@@ -242,12 +243,12 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 .s5-opt.sel-unpaid_paid{border-color:var(--s-unpaid-paid);background:var(--sel-unpaid-paid-bg);color:var(--s-unpaid-paid);}
 .s5-opt.sel-lost_paid{border-color:var(--s-lost-paid);background:var(--sel-lost-paid-bg);color:var(--s-lost-paid);}
 .inv-tabs{display:flex;gap:6px;padding:13px 13px 0;flex-wrap:wrap;}
-.inv-tab{padding:5px 13px;border-radius:20px;cursor:pointer;font-size:12px;font-weight:600;border:1px solid var(--border);background:var(--surface2);transition:all .15s;}
+.inv-tab{padding:5px 13px;border-radius:20px;cursor:pointer;font-size:12px;font-weight:600;border:1px solid var(--border);background:var(--surface2);transition:background-color .12s,border-color .12s,color .12s;}
 .inv-tab.active{background:var(--accent);color:white;border-color:var(--accent);}
 .inv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;padding:14px;}
-.inv-item{border:1px solid var(--border);border-radius:8px;padding:8px 4px;text-align:center;font-size:11px;cursor:pointer;transition:all .15s;background:var(--surface);min-width:0;overflow:hidden;word-break:break-all;}
-.inv-item:hover{border-color:var(--accent);transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,0,0,.06);}
-.inv-item .inv-num{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:11px;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.inv-item{border:1px solid var(--border);border-radius:8px;padding:8px 4px;text-align:center;font-size:11px;cursor:pointer;transition:background-color .12s,border-color .12s,color .12s;background:var(--surface);min-width:0;overflow:hidden;word-break:break-all;}
+.inv-item:hover{border-color:var(--accent);}
+.inv-item .inv-num{font-family:var(--font);font-weight:700;font-size:11px;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .inv-item.st-available{background:var(--inv-avail-bg);border-color:var(--inv-avail-bd);}
 .inv-item.st-renting{background:var(--inv-renting-bg);border-color:var(--inv-renting-bd);}
 .inv-item.st-unpaid{background:var(--inv-unpaid-bg);border-color:var(--inv-unpaid-bd);}
@@ -256,8 +257,8 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 .inv-item.st-unpaid-paid{background:var(--inv-unpaid-paid-bg);border-color:var(--inv-unpaid-paid-bd);}
 .inv-item.st-lost-paid{background:var(--inv-lost-paid-bg);border-color:var(--inv-lost-paid-bd);}
 .cond-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
-.cond-opt{padding:12px 4px;border-radius:9px;cursor:pointer;border:2px solid var(--border);background:var(--surface2);text-align:center;font-size:11px;font-weight:600;transition:all .15s;}
-.cond-opt:hover{transform:translateY(-1px);}
+.cond-opt{padding:12px 4px;border-radius:9px;cursor:pointer;border:2px solid var(--border);background:var(--surface2);text-align:center;font-size:11px;font-weight:600;transition:background-color .12s,border-color .12s,color .12s;}
+.cond-opt:not([class*="sel-"]):hover{border-color:var(--accent);background:var(--surface)}
 .cond-opt .cico{font-size:20px;margin-bottom:4px;}
 .cond-opt.sel-available{border-color:var(--s-returned);background:var(--cond-avail-bg);color:var(--s-returned);}
 .cond-opt.sel-unpaid{border-color:var(--s-unpaid);background:var(--cond-unpaid-bg);color:var(--s-unpaid);}
@@ -279,10 +280,10 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 .sms-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;}
 .sms-sent{background:var(--sms-sent-bg);color:var(--sms-sent-cl);}
 .sms-none{background:var(--sms-none-bg);color:var(--sms-none-cl);}
-.sms-last-time{font-size:11px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;}
+.sms-last-time{font-size:11px;color:var(--text-muted);font-family:var(--font);}
 .sms-log-wrap{margin-top:8px;display:flex;flex-direction:column;gap:4px;}
 .sms-log-item{font-size:11px;color:var(--text-muted);display:flex;align-items:flex-start;gap:6px;padding:5px 8px;background:var(--surface2);border-radius:6px;}
-.sms-log-item .sli-time{font-family:'JetBrains Mono',monospace;white-space:nowrap;flex-shrink:0;}
+.sms-log-item .sli-time{font-family:var(--font);white-space:nowrap;flex-shrink:0;}
 .sms-log-item .sli-note{color:var(--text);}
 /* 문자 발송 모달 */
 .sms-modal-info{background:var(--surface2);border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:13px;}
@@ -290,14 +291,14 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 .empty-state .ico{font-size:38px;margin-bottom:11px;opacity:.4;}.empty-state p{font-size:13px;}
 
 /* 페이지네이션 */
-.pg-num{padding:4px 9px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);font-size:12px;font-weight:600;cursor:pointer;font-family:'JetBrains Mono',monospace;color:var(--text-muted);transition:all .15s;}
+.pg-num{padding:4px 9px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);color:var(--text-muted);transition:background-color .12s,border-color .12s,color .12s;}
 .pg-num:hover{border-color:var(--accent);color:var(--accent);}
 .pg-num.active{background:var(--accent);color:white;border-color:var(--accent);}
 /* 물품 목록 관리 */
 .inv-manage-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:6px;padding:14px;max-height:320px;overflow-y:auto;}
-.inv-manage-item{border:1px solid var(--border);border-radius:7px;padding:8px 6px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:space-between;gap:4px;background:var(--surface);transition:all .15s;}
+.inv-manage-item{border:1px solid var(--border);border-radius:7px;padding:8px 6px;text-align:center;font-family:var(--font);font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:space-between;gap:4px;background:var(--surface);transition:background-color .12s,border-color .12s,color .12s;}
 .inv-manage-item .imn{flex:1;text-align:left;}
-.inv-manage-item .del-btn{width:18px;height:18px;border-radius:50%;background:var(--c-danger-bg);color:var(--c-danger);border:none;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;line-height:1;transition:all .15s;}
+.inv-manage-item .del-btn{width:18px;height:18px;border-radius:50%;background:var(--c-danger-bg);color:var(--c-danger);border:none;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;line-height:1;transition:background-color .12s,border-color .12s,color .12s;}
 .inv-manage-item .del-btn:hover{background:var(--c-danger-bg2);}
 /* 드래그 모드 */
 .inv-manage-item.drag-mode{cursor:grab;border-color:var(--accent);background:var(--drag-mode-bg);}
@@ -314,13 +315,13 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 .toast.ok{border-left:3px solid var(--s-returned);}.toast.err{border-left:3px solid var(--s-unpaid);}.toast.inf{border-left:3px solid var(--s-renting);}
 .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:300;padding:4px 0 env(safe-area-inset-bottom,4px);}
 .mobile-nav-inner{display:flex;justify-content:space-around;}
-.mnav-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 4px;cursor:pointer;border-radius:7px;font-size:10px;font-weight:600;color:var(--text-muted);transition:all .15s;min-width:48px;text-align:center;background:none;border:none;font-family:'Noto Sans KR',sans-serif;position:relative;}
+.mnav-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 4px;cursor:pointer;border-radius:7px;font-size:10px;font-weight:600;color:var(--text-muted);transition:background-color .12s,border-color .12s,color .12s;min-width:48px;text-align:center;background:none;border:none;font-family:var(--font);position:relative;}
 .mnav-item .mico{font-size:20px;}.mnav-item.active{color:var(--accent);}
 .mnav-item .mbadge{position:absolute;top:1px;right:2px;background:#ef4444;color:white;font-size:8px;font-weight:700;padding:1px 3px;border-radius:8px;}
 .fab{display:none;position:fixed;bottom:68px;right:16px;width:50px;height:50px;border-radius:50%;background:var(--accent);color:white;font-size:22px;border:none;cursor:pointer;box-shadow:0 4px 16px rgba(45,80,22,.4);align-items:center;justify-content:center;z-index:290;transition:transform .15s;}
 .fab:active{transform:scale(.92);}
 /* 모바일 유틸 버튼 (새로고침 + 테마) */
-.mob-util-btn{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.12);transition:all .15s;font-family:'Noto Sans KR',sans-serif;flex-shrink:0;}
+.mob-util-btn{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.12);transition:background-color .12s,border-color .12s,color .12s;font-family:var(--font);flex-shrink:0;}
 .mob-util-btn:active{transform:scale(.88);}
 .mob-util-btn:disabled{opacity:.5;pointer-events:none;}
 @media(max-width:768px){
@@ -358,7 +359,7 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 .unpaid-mobile-tabs{display:none;}
 @media(max-width:768px){
   .unpaid-mobile-tabs{display:flex;gap:6px;margin-bottom:12px;}
-  .unpaid-tab{flex:1;padding:8px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface2);font-size:12px;font-weight:600;cursor:pointer;font-family:'Noto Sans KR',sans-serif;color:var(--text-muted);transition:all .15s;}
+  .unpaid-tab{flex:1;padding:8px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface2);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);color:var(--text-muted);transition:background-color .12s,border-color .12s,color .12s;}
   .unpaid-tab.active{background:var(--accent);color:white;border-color:var(--accent);}
   .unpaid-section{display:none;}
   .unpaid-section.active{display:block;}
@@ -369,7 +370,7 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 
 /* ══ STATS PAGE ══ */
 .sp-period{display:flex;gap:5px;}
-.sp-btn{padding:4px 11px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text-muted);transition:all .15s;font-family:'Noto Sans KR',sans-serif;}
+.sp-btn{padding:4px 11px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text-muted);transition:background-color .12s,border-color .12s,color .12s;font-family:var(--font);}
 .sp-btn.active{background:var(--accent);color:white;border-color:var(--accent);}
 
 /* 전체 stats 레이아웃: 3열 그리드 */
@@ -377,14 +378,14 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 
 /* 카드 공통 */
 .sc{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;}
-.sc-title{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;font-family:'JetBrains Mono',monospace;}
+.sc-title{font-size:10px;font-weight:700;color:var(--text-muted);margin-bottom:10px;font-family:var(--font);}
 
 /* 회전율 카드 행 — 3열 그리드 위에 full-width */
 .turnover-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px;}
 .tv-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 10px;text-align:center;position:relative;overflow:hidden;}
 .tv-card::before{content:attr(data-ico);position:absolute;right:6px;top:4px;font-size:22px;opacity:.07;}
 .tv-icon{font-size:16px;margin-bottom:3px;}
-.tv-name{font-size:9px;font-weight:700;color:var(--text-muted);letter-spacing:.04em;margin-bottom:7px;}
+.tv-name{font-size:9px;font-weight:700;color:var(--text-muted);margin-bottom:7px;}
 
 /* 도넛 패널 — col-span 1 */
 .donut-panel{display:flex;flex-direction:column;gap:7px;}
@@ -402,7 +403,7 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 .dept-lbl{font-size:10px;color:var(--text-muted);width:130px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .dept-track{flex:1;height:8px;background:var(--surface2);border-radius:20px;overflow:hidden;}
 .dept-fill{height:100%;border-radius:20px;background:var(--accent);transition:width .7s cubic-bezier(.34,1.56,.64,1);}
-.dept-val{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:var(--accent);min-width:18px;text-align:right;}
+.dept-val{font-family:var(--font);font-size:10px;font-weight:700;color:var(--accent);min-width:18px;text-align:right;}
 
 /* 차트 캔버스 높이 */
 .ch140{height:140px;position:relative;}
@@ -427,14 +428,14 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 .med-banner-tag{background:var(--c-warn-light);border:1px solid var(--c-warn-bd);border-radius:20px;padding:2px 9px;font-size:11px;font-weight:600;white-space:nowrap;}
 
 .med-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:7px;padding:10px;}
-.med-card{background:var(--surface);border:1.5px solid var(--border);border-radius:8px;padding:9px 11px;cursor:pointer;transition:all .15s;position:relative;}
-.med-card:hover{border-color:var(--accent);transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,0,0,.07);}
+.med-card{background:var(--surface);border:1.5px solid var(--border);border-radius:8px;padding:9px 11px;cursor:pointer;transition:background-color .12s,border-color .12s,color .12s;position:relative;}
+.med-card:hover{border-color:var(--accent);}
 .med-card.low{border-color:var(--med-low-bd);background:var(--med-low-bg);}
 .med-card.empty{border-color:var(--med-empty-bd);background:var(--med-empty-bg);}
 .med-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:5px;margin-bottom:4px;}
 .med-card-name{font-weight:700;font-size:11.5px;line-height:1.3;word-break:keep-all;}
 .med-cat-badge{font-size:9px;font-weight:600;padding:1px 6px;border-radius:20px;white-space:nowrap;flex-shrink:0;background:var(--accent-pale);color:var(--accent);}
-.med-qty{font-size:20px;font-weight:900;letter-spacing:-.04em;font-family:'JetBrains Mono',monospace;}
+.med-qty{font-size:20px;font-weight:900;letter-spacing:-.04em;font-family:var(--font);}
 .med-qty.low{color:var(--med-qty-low);}
 .med-qty.empty{color:var(--med-qty-empty);}
 .med-unit{font-size:10px;color:var(--text-muted);margin-top:1px;}
@@ -444,13 +445,13 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 
 /* 의약품 조정 모달 */
 .med-adj-row{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:10px 0;}
-.med-adj-btn{min-width:48px;padding:8px 10px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:var(--surface2);color:var(--text);transition:all .15s;font-family:'JetBrains Mono',monospace;}
+.med-adj-btn{min-width:48px;padding:8px 10px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:var(--surface2);color:var(--text);transition:background-color .12s,border-color .12s,color .12s;font-family:var(--font);}
 .med-adj-btn:hover{border-color:var(--accent);background:var(--accent-pale);color:var(--accent);}
 .med-adj-btn.minus{border-color:var(--med-adj-minus-bd);color:var(--med-adj-minus-cl);background:var(--med-adj-minus-bg);}
 .med-adj-btn.minus:hover{background:var(--med-adj-minus-hover);}
 
 /* 이력 테이블 */
-.med-log-change{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;}
+.med-log-change{font-family:var(--font);font-size:12px;font-weight:700;}
 .med-log-change.plus{color:var(--med-log-plus);}
 .med-log-change.minus{color:var(--med-log-minus);}
 
@@ -493,7 +494,7 @@ tbody td{padding:10px 13px;vertical-align:middle;}
     height:32px;padding:0 10px;display:flex;align-items:center;justify-content:center;
     font-size:11px;font-weight:600;cursor:pointer;
     box-shadow:0 2px 8px rgba(0,0,0,.15);color:white;
-    font-family:'Noto Sans KR',sans-serif;transition:all .15s;gap:3px;
+    font-family:var(--font);transition:background-color .12s,border-color .12s,color .12s;gap:3px;
   }
   .mob-undo-btn:disabled{opacity:0.3;pointer-events:none;}
   .mob-undo-btn:active{background:var(--surface2);}
@@ -504,20 +505,271 @@ tbody td{padding:10px 13px;vertical-align:middle;}
   z-index:9998;background:var(--accent);color:#fff;
   padding:8px 16px;border-radius:20px;font-size:12px;font-weight:600;
   box-shadow:0 6px 20px rgba(0,0,0,.22);align-items:center;gap:8px;
-  font-family:'Noto Sans KR',sans-serif;pointer-events:none;
+  font-family:var(--font);pointer-events:none;
 }
 #saving-indicator .spin{
   width:12px;height:12px;border:2px solid rgba(255,255,255,.4);
   border-top-color:#fff;border-radius:50%;animation:savspin .7s linear infinite;flex-shrink:0;
 }
 @keyframes savspin{to{transform:rotate(360deg)}}
+
+/* ═════════ 디자인 B (2026-10) — 이모지 대신 선 아이콘, 색은 상태에만, Pretendard ═════════ */
+:root{--font:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,system-ui,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  --text:#1b1d1a;--text-muted:#6b6f68;--border:#e6e4de;--bg:#f6f5f2;--side-bg:#fbfaf7;--side-hover:#f0efe9}
+body{font-feature-settings:'tnum';letter-spacing:-.005em}
+button,input,select,textarea{font-family:var(--font)}
+.ic{flex-shrink:0;display:block}
+.spin{display:inline-block;width:13px;height:13px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .7s linear infinite;opacity:.7}
+@keyframes spin{to{transform:rotate(360deg)}}
+.page-title{font-weight:700;letter-spacing:-.02em}
+/* 사이드바: 밝게, 초록은 포인트로만 */
+.sidebar{background:var(--side-bg);color:var(--text);border-right:1px solid var(--border)}
+.sidebar-logo{border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;padding:20px 18px}
+.sidebar-logo h1{font-size:15px;font-weight:700;line-height:1.35}
+.logo-tag{font-size:12px;font-weight:700;color:var(--accent);margin-bottom:3px}
+.nav-lbl{font-size:11px;color:var(--text-muted);opacity:1}
+.nav-item{color:#4a4d47;font-weight:500;border:1px solid transparent}
+.nav-item:hover{background:var(--side-hover);color:var(--text)}
+.nav-item.active{background:var(--accent-pale);color:var(--accent);font-weight:600;border-color:transparent}
+.nav-badge{background:#fde2e2;color:#c42020}
+#nav-rental-btn{margin-top:10px;background:var(--accent);color:#fff;justify-content:center;font-weight:600}
+#nav-rental-btn:hover{filter:brightness(1.12)}
+.sidebar-clock{border-top:1px solid var(--border);color:var(--text-muted);opacity:1}
+.clock-notice-btn{margin-left:auto;background:none;border:none;cursor:pointer;padding:4px;border-radius:6px;color:var(--text-muted);display:flex}
+.clock-notice-btn:hover{background:var(--side-hover);color:var(--text)}
+.sidebar-util-btn{display:flex;align-items:center;justify-content:center;gap:5px;border:1px solid var(--border);background:#fff;color:#4a4d47;min-width:0}
+.sidebar-util-btn:hover:not(:disabled){background:var(--side-hover);color:var(--text);border-color:var(--border)}
+.sidebar-util-btn:active:not(:disabled){background:#e8e7e1}
+.sidebar-util-btn:disabled{opacity:.4}
+.hist-lbl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:62px}
+/* 재고 요약 */
+.inv-sum{display:grid;grid-template-columns:repeat(5,1fr) 1.15fr;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;overflow:hidden}
+.is-item{padding:14px 16px;border-right:1px solid var(--border);cursor:pointer;min-width:0;transition:background .12s}
+.is-item:hover{background:#fafaf8}
+.is-nm{font-size:12px;color:var(--text-muted);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.is-nums{display:flex;align-items:baseline;gap:4px;margin-top:6px;white-space:nowrap}
+.is-big{font-size:22px;font-weight:700;letter-spacing:-.02em}
+.is-big.zero{color:var(--s-unpaid)}
+.is-of{font-size:12px;color:var(--text-muted)}
+.is-bar{height:4px;border-radius:2px;background:#ecebe6;margin-top:9px;overflow:hidden}
+.is-bar i{display:block;height:100%;background:var(--accent);border-radius:2px}
+.is-alert{border-right:none;background:#fff6f5}
+.is-alert .is-nm,.is-alert .is-lnk{color:#b42318}
+.is-alert .is-big{color:#c42020}
+.is-lnk{font-size:12px;margin-top:8px;font-weight:600}
+.is-alert.ok{background:var(--surface)}.is-alert.ok .is-big{color:var(--text)}.is-alert.ok .is-nm,.is-alert.ok .is-lnk{color:var(--text-muted)}
+/* 표 */
+table{font-size:13px}
+thead th{font-size:12px;font-weight:600;color:var(--text-muted);background:#fafaf8;padding:10px 12px}
+tbody td{padding:11px 12px;white-space:nowrap}
+.td-mono{font-size:13px;color:var(--text-muted)}
+.td-sub{font-size:13px}
+td.td-sub{white-space:nowrap!important;max-width:none!important;font-size:13px!important}
+.td-actions{flex-wrap:nowrap;gap:6px}
+.btn-sm{font-size:12px;padding:5px 10px;border-radius:6px}
+.btn-ret{background:var(--accent);color:#fff;border:1px solid var(--accent)}
+.btn-ret:hover{filter:brightness(1.12)}
+/* 색 버튼 → 흰 바탕 + 색 글자 */
+.btn-green,.btn-orange,.btn-purple{background:#fff;border:1px solid var(--border)}
+.btn-green:hover,.btn-orange:hover,.btn-purple:hover{background:#fafaf8}
+.btn-danger{background:#fff;border:1px solid #f3c9c9}
+/* 뱃지 */
+.item-badge{background:none!important;color:var(--text)!important;padding:0;font-size:13px;font-weight:500}
+.item-badge{gap:9px}
+.ib-sq{width:26px;height:26px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.ibs-umbrella{background:#e6f4f1;color:#0f766e}.ibs-charger{background:#fbf3e0;color:#a16207}
+.ibs-calculator{background:#eef1f5;color:#475569}.ibs-multitap{background:#eef5e4;color:#4d7c0f}
+.ibs-heatpack{background:#fdeee6;color:#c2410c}
+tbody td:has(.ib-sq){padding-top:8px;padding-bottom:8px}
+@media(max-width:768px){.m-card-row .ib-sq,.m-card-top .ib-sq{width:22px;height:22px;border-radius:6px}.m-card-row .ib-sq svg,.m-card-top .ib-sq svg{width:13px;height:13px}}
+.sbadge{font-size:13px;font-weight:600;padding:0!important;border-radius:0;background:none!important;gap:7px!important}
+.sbadge::before{width:6px!important;height:6px!important}
+.sbadge.sb-renting{color:var(--text)}
+.inv-item .sbadge{font-size:11px;gap:5px!important}
+#tbl-recent .sbadge,#tbl-rentals .sbadge,#tbl-unpaid .sbadge,#tbl-item-cond .sbadge,.m-card .sbadge{font-size:12px;gap:6px!important}
+.sb-unpaid::before{animation:none}
+/* 검색창 */
+.search-wrap{color:var(--text-muted)}
+/* 폼 라벨·소제목 */
+.fg label{font-size:12px;font-weight:600}
+.sc-title{font-size:13px;font-weight:600;color:var(--text)}
+.mini-ic{display:inline-flex;vertical-align:-1px}
+/* 물품 고르는 버튼 (이모지 뺀 뒤 높이) */
+.item-type-btn{padding:12px 4px;font-weight:600}
+.cond-opt,.s5-opt{display:flex;align-items:center;justify-content:center;min-height:46px}
+/* 물품 현황 칸: 가능은 흰 칸, 사용 중인 칸만 상태색을 옅게 */
+.inv-item{background:var(--surface)!important;border:1px solid var(--border)!important;padding:10px 6px}
+.inv-item .inv-num{font-size:15px;font-weight:700}
+.inv-item.st-renting{background:#f3f7ff!important;border-color:#dbeafe!important}
+.inv-item.st-unpaid{background:#fff5f5!important;border-color:#fee2e2!important}
+.inv-item.st-broken{background:#fff4f6!important;border-color:#ffe4e6!important}
+.inv-item.st-lost{background:#f8f5ff!important;border-color:#ede9fe!important}
+.inv-item.st-unpaid-paid{background:#fff8f1!important;border-color:#ffedd5!important}
+.inv-item.st-lost-paid{background:#f8f5ff!important;border-color:#ede9fe!important}
+.inv-item:hover{border-color:var(--accent)!important}
+.inv-item.st-available .sbadge{background:none}
+/* 통계 */
+.tv-card{text-align:left}.tv-card::after,.tv-card::before{display:none!important}
+.tv-name{font-size:13px;font-weight:600}
+.stats-layout>*{min-width:0}
+.tv-card [style*="--c-"]{color:var(--text)!important;font-weight:700!important}
+/* 토스트 아이콘 */
+.toast{display:flex;align-items:center;gap:8px}
+.t-ic{display:flex}
+.toast.ok .t-ic{color:#16a34a}.toast.err .t-ic{color:#dc2626}
+/* 휴대폰 */
+.ms-item,.more-sheet-bg{display:none}
+@media(max-width:768px){
+  .inv-sum{grid-template-columns:repeat(3,1fr)}
+  .is-item{border-bottom:1px solid var(--border);padding:11px 12px}
+  .is-item:nth-child(3n){border-right:none}
+  .is-item:nth-last-child(-n+3){border-bottom:none}
+  .is-big{font-size:19px}
+  .mnav-item{min-width:56px;position:relative}
+  .mnav-item .mico{display:flex;justify-content:center;align-items:center;height:22px;font-size:inherit}
+  .mob-util-btn{display:flex;align-items:center;justify-content:center}
+  .mob-undo-btn{width:34px;height:34px;padding:0;border-radius:50%;background:var(--surface);border:1px solid var(--border);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+  .m-card-row{gap:6px}
+  .m-k{font-size:11px;color:var(--text-muted);min-width:26px}
+  .m-sub{font-weight:400;color:var(--text-muted)}
+  .more-sheet-bg{display:block;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:400;opacity:0;pointer-events:none;transition:opacity .2s}
+  .more-sheet-bg.open{opacity:1;pointer-events:auto}
+  .more-sheet{position:absolute;left:0;right:0;bottom:0;background:var(--surface);border-radius:16px 16px 0 0;padding:10px 10px calc(14px + env(safe-area-inset-bottom));transform:translateY(100%);transition:transform .22s ease}
+  .more-sheet-bg.open .more-sheet{transform:none}
+  .more-sheet::before{content:'';display:block;width:36px;height:4px;border-radius:2px;background:var(--border);margin:2px auto 10px}
+  .ms-item{display:flex;align-items:center;gap:12px;width:100%;padding:14px 12px;border:none;background:none;border-radius:10px;font-size:15px;font-weight:500;color:var(--text);cursor:pointer;text-align:left}
+  .ms-item:active,.ms-item.active{background:var(--accent-pale);color:var(--accent)}
+  .ms-badge{margin-left:auto;background:#fde2e2;color:#c42020;font-size:12px;font-weight:700;padding:1px 8px;border-radius:10px}
+}
+
+.main{min-width:0}
+
+/* 대여제한: 2열 카드, 색은 상태 표시와 문자 발송 버튼에만 */
+.bl-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;padding:0;margin-top:12px;align-items:start}
+#bl-grid>.empty-state{grid-column:1/-1}
+.bl-card{padding:20px 22px;gap:0}
+.bl-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.bl-name{font-size:16px;font-weight:700;line-height:1.3}.bl-meta{font-size:12.5px;color:var(--text-muted);margin-top:4px}
+.bl-rows{margin-top:16px;display:flex;flex-direction:column;gap:8px}
+.bl-row{display:flex;gap:14px;align-items:baseline}
+.bl-k{width:26px;flex-shrink:0;font-size:12px;color:var(--text-muted)}
+.bl-tags{display:flex;flex-direction:column;gap:6px;margin:0}
+.bl-tags .sbadge{font-size:12px;font-weight:500}
+.bl-sms-line{font-size:12px;color:var(--text-muted);line-height:1.5}.bl-sms-line b{color:var(--text);font-weight:500}
+.bl-sms-none{color:var(--text-muted)}
+.bl-link{background:none;border:none;padding:0;font:inherit;color:var(--text-muted);text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+.bl-link:hover{color:var(--text)}
+.bl-card .sms-log-wrap{margin-left:42px}
+.bl-foot{display:flex;align-items:center;gap:6px;margin-top:18px;padding-top:14px;border-top:1px solid var(--border)}
+.bl-foot .bl-actions{flex:1;display:flex;flex-wrap:wrap;gap:6px;margin:0}
+@media(max-width:768px){.bl-grid{grid-template-columns:minmax(0,1fr)}.bl-card{padding:16px 18px}.bl-foot{flex-wrap:wrap}.bl-foot>.btn-primary{margin-left:auto}}
+
+/* 통계: 물품 카드 아이콘, 물품 상태 가로 막대, 일별 추이 물품 선택 */
+.tv-card{padding:14px 14px 12px}
+.tv-name .item-badge{font-size:12.5px;gap:8px}.tv-name .ib-sq{width:22px;height:22px;border-radius:6px}.tv-name .ib-sq svg{width:13px;height:13px}
+.tv-card [style*="font-size:12px"]{font-size:11px!important}
+.sbar-row{display:flex;flex-direction:column;gap:5px}
+.sbar-top{display:flex;align-items:center;justify-content:space-between}
+.sbar-top .donut-name{margin:0}
+.sbar-top .ib-sq{width:20px;height:20px;border-radius:5px}.sbar-top .ib-sq svg{width:12px;height:12px}
+.sbar-top .item-badge{font-size:inherit;gap:7px}
+.sbar-tot{font-size:10px;color:var(--text-muted)}
+.sbar{display:flex;gap:2px;height:8px;border-radius:4px;overflow:hidden}
+.sbar i{display:block;height:100%;min-width:3px}
+.donut-panel{gap:14px}
+.daily-chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:10px}
+.daily-chips .inv-tab{display:inline-flex;align-items:center;gap:6px;font-family:var(--font)}
+.dc-dot{width:7px;height:7px;border-radius:50%;display:inline-block}
+
+/* 상태 변경 창: 의미별 묶음 + 점 */
+#status-modal-sub{display:none}
+#status-info-box{background:none!important;padding:0!important;margin-bottom:18px!important;font-size:14px!important}
+#status-info-box strong{font-size:16px}
+.si-m{color:var(--text-muted);font-size:14px}
+.si-item{display:flex;align-items:center;gap:4px;margin-top:8px;font-size:13.5px}.si-item b{font-weight:600}
+.si-item .ib-sq{width:22px;height:22px;border-radius:6px}.si-item .ib-sq svg{width:13px;height:13px}.si-item .item-badge{gap:7px}
+.si-dates{font-size:12.5px;color:var(--text-muted);margin-top:6px}
+#s5-opts{display:flex;flex-direction:column;gap:8px}
+.s5-row{display:flex;align-items:center;gap:12px}
+.s5-gk{width:26px;flex-shrink:0;font-size:12px;color:var(--text-muted)}
+.s5-ops{display:flex;gap:6px;flex:1}
+#s5-opts .s5-opt{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:10px 8px;min-height:0;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-size:13px;font-weight:600;white-space:nowrap}
+#s5-opts .s5-opt[class*="sel-"]{border:1.5px solid var(--text);background:#fafaf8;color:var(--text)}
+#s5-opts .s5-opt:not([class*="sel-"]):hover{border-color:var(--accent)}
+.s5-dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex-shrink:0}
+@media(max-width:768px){#s5-opts .s5-opt{padding:10px 4px;font-size:12.5px;gap:5px}}
+
+/* 페이지 제목 아래 설명 숨김 */
+.page-sub{display:none}
+/* 물품 상태 창: 4칸 버튼 + 점 */
+#inv-cond-opts{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.modal-footer .btn{justify-content:center}
+#inv-cond-opts .cond-opt{display:flex;align-items:center;justify-content:center;gap:7px;padding:10px 6px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-size:13px;font-weight:600;white-space:nowrap}
+#inv-cond-opts .cond-opt[class*="sel-"]{border:1.5px solid var(--text);background:#fafaf8;color:var(--text)}
+#inv-cond-opts .cond-opt:not([class*="sel-"]):hover{border-color:var(--accent)}
+@media(max-width:768px){#inv-cond-opts{grid-template-columns:repeat(3,minmax(0,1fr))}#inv-cond-opts .cond-opt{font-size:12.5px;gap:5px;padding:10px 4px}}
+/* 표 첫 칸·마지막 칸 여백을 섹션 제목과 맞춤 */
+.section-header{padding-left:20px;padding-right:20px}
+thead th:first-child,tbody td:first-child{padding-left:20px}
+thead th:last-child,tbody td:last-child{padding-right:20px}
+/* 표 글씨 크기 통일 (버튼 제외) */
+#tbl-recent td,#tbl-rentals td,#tbl-unpaid td,#tbl-item-cond td{font-size:12px!important}
+#tbl-recent td :not(.btn):not(svg):not(path),#tbl-rentals td :not(.btn):not(svg):not(path),#tbl-unpaid td :not(.btn):not(svg):not(path),#tbl-item-cond td :not(.btn):not(svg):not(path){font-size:12px!important}
+/* 통계 학부별 막대: 모던 에메랄드 */
+.dept-fill{background:#4aa982}.dept-val{color:var(--text)}
+
+/* 해제 이력 카드 */
+.blh-list{display:flex;flex-direction:column;gap:10px;flex:1;min-width:0}
+.blh-what{display:flex;align-items:center;gap:6px;font-size:12px}.blh-what b{font-weight:600}
+.blh-what .ib-sq{width:20px;height:20px;border-radius:5px}.blh-what .ib-sq svg{width:12px;height:12px}.blh-what .item-badge{font-size:12px!important;gap:6px}
+.blh-when{font-size:12px;color:var(--text-muted);margin-top:3px}
+.blh-more{flex-direction:column;gap:10px}
+.blh-toggle{font-size:12px}
+.blh-sep{color:var(--text-muted);margin:0 -8px;font-size:12px}
+#bl-history-grid .bl-rows .sbadge{font-size:12px;font-weight:500}
+/* 대여 등록·편집: 물품 고르는 버튼 */
+.item-type-grid{grid-template-columns:repeat(5,minmax(0,1fr))}
+.item-type-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:10px 4px!important;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-size:12px;font-weight:600;white-space:nowrap;min-width:0}
+.item-type-btn[class*="sel-"]{border:1.5px solid var(--text);background:#fafaf8;color:var(--text)}
+.item-type-btn .ib-sq{width:20px;height:20px;border-radius:5px}.item-type-btn .ib-sq svg{width:12px;height:12px}
+@media(max-width:768px){.item-type-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+/* 로그인 */
+#pw-overlay{background:#2f3a2b}
+.pw-box{box-shadow:0 24px 60px rgba(0,0,0,.3)}
+.pw-logo{font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px}
+.pw-title{font-size:20px;font-weight:700;letter-spacing:-.02em}
+.pw-btn{border:none}
+/* 의약품: 수량 버튼·종류 표시 */
+.med-adj-btn{background:var(--surface)}
+.med-adj-btn.minus{background:var(--surface);border-color:var(--border)}
+.med-adj-btn.minus:hover{background:#fff5f5}
+.med-cat-badge{background:none;padding:0;font-size:11px;font-weight:500;color:var(--text-muted)}
+/* 의약품 재고: 작은 칸 */
+.med-grid{grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:8px;padding:14px}
+.med-card{padding:9px 11px;border:1px solid var(--border);min-width:0}
+.med-card.low{background:#fff8f1;border-color:#ffedd5}
+.med-card.empty{background:#fff5f5;border-color:#fee2e2}
+.mc-top{display:flex;justify-content:space-between;align-items:baseline;gap:6px}
+.mc-nm{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.mc-q{font-size:16px;font-weight:700;white-space:nowrap}.mc-q small{font-size:11px;font-weight:500;color:var(--text-muted);margin-left:1px}
+.mc-q.low{color:#c2410c}.mc-q.empty{color:#dc2626}
+.mc-cat{font-size:11px;color:var(--text-muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.med-card:hover,.med-card.low:hover,.med-card.empty:hover{border-color:var(--accent)}
+/* 재고 부족 줄: 한 줄 요약 */
+.med-banner{background:var(--surface);border:1px solid var(--border);padding:10px 16px;gap:12px;flex-wrap:nowrap;align-items:center}
+.mb-ic{color:#c2410c;display:flex}
+.mb-txt{flex:1;font-size:13px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mb-txt b{font-weight:700}.mb-e{color:#dc2626;font-weight:600}.mb-l{color:#c2410c;font-weight:600}.mb-names{color:var(--text-muted);margin-left:8px}
+.mb-btn{border:1px solid var(--border);background:var(--surface);border-radius:7px;padding:5px 11px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;color:var(--text)}
+.mb-btn.on{background:var(--text);color:#fff;border-color:var(--text)}
+@media(max-width:768px){.med-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding:10px}.med-card{padding:9px 11px}.mb-names{display:none}}
 </style>
 </head>
 <body>
 <!-- ══ 비밀번호 잠금 오버레이 ══ -->
 <div id="pw-overlay">
   <div class="pw-box">
-    <div class="pw-logo">SNU CALS · Student Council</div>
+    <div class="pw-logo">SNU CALS</div>
     <div class="pw-title">관리자 로그인</div>
     <div class="pw-sub">농업생명과학대학 학생회 대여 관리 시스템</div>
     <hr class="pw-divider">
@@ -526,10 +778,10 @@ tbody td{padding:10px 13px;vertical-align:middle;}
         placeholder="비밀번호 입력"
         onkeydown="if(event.key==='Enter')checkPw()"
         autocomplete="current-password">
-      <button class="pw-toggle" onclick="togglePwVis()" id="pw-toggle-btn">👁️</button>
+      <button class="pw-toggle" onclick="togglePwVis()" id="pw-toggle-btn" aria-label="비밀번호 보기"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
     </div>
     <div class="pw-err" id="pw-err"></div>
-    <button class="pw-btn" onclick="checkPw()">🔓 로그인</button>
+    <button class="pw-btn" onclick="checkPw()">로그인</button>
     <hr class="pw-divider" style="margin-top:20px;margin-bottom:12px;">
     <div class="pw-hint">비밀번호를 모르는 경우 학생회 관리자에게 문의하세요</div>
   </div>
@@ -538,40 +790,34 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 <div class="layout">
 <aside class="sidebar">
   <div class="sidebar-logo">
-    <div class="tag">SNU CALS · Student Council</div>
-    <h1>농업생명과학대학<br>대여 관리</h1>
+    <div><div class="logo-tag">SNU CALS</div>
+    <h1>농업생명과학대학<br>대여 관리</h1></div>
   </div>
   <nav class="nav">
     <div class="nav-lbl">메뉴</div>
-    <div class="nav-item active" onclick="showPage('dashboard')">📊 대시보드</div>
-    <div class="nav-item" onclick="showPage('rentals')">📋 대여 현황</div>
-    <div class="nav-item" onclick="showPage('inventory')">🗂️ 물품 현황</div>
-    <div class="nav-item" onclick="showPage('unpaid')">📦 물품 관리 <span class="nav-badge" id="badge-unpaid">0</span></div>
-    <div class="nav-item" onclick="showPage('blacklist')">🚫 대여제한시스템 <span class="nav-badge" id="badge-bl" style="display:none">0</span></div>
-    <div class="nav-item" onclick="showPage('stats')">📈 통계</div>
-    <div class="nav-item" onclick="showPage('medicine')">💊 의약품 관리 <span class="nav-badge" id="badge-med" style="display:none">0</span></div>
-    <div class="nav-item" id="nav-rental-btn" onclick="openRentalModal()">＋ 대여 등록</div>
+    <div class="nav-item active" onclick="showPage('dashboard')"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>대시보드</div>
+    <div class="nav-item" onclick="showPage('rentals')"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4M12 16h4M8 11h.01M8 16h.01"/></svg>대여 현황</div>
+    <div class="nav-item" onclick="showPage('inventory')"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></svg>물품 현황</div>
+    <div class="nav-item" onclick="showPage('unpaid')"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4M12 17h.01"/></svg>물품 관리 <span class="nav-badge" id="badge-unpaid">0</span></div>
+    <div class="nav-item" onclick="showPage('blacklist')"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg>대여제한시스템 <span class="nav-badge" id="badge-bl" style="display:none">0</span></div>
+    <div class="nav-item" onclick="showPage('stats')"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-3"/></svg>통계</div>
+    <div class="nav-item" onclick="showPage('medicine')"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg>의약품 관리 <span class="nav-badge" id="badge-med" style="display:none">0</span></div>
+    <div class="nav-item" id="nav-rental-btn" onclick="openRentalModal()"><svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5v14"/></svg>대여 등록</div>
   </nav>
   <div class="sidebar-clock">
     <span id="sync-dot" style="width:6px;height:6px;border-radius:50%;background:#9ca3af;flex-shrink:0;transition:background .5s"></span>
     <span id="clock-time">--:--:--</span>
     <span id="offline-label" style="display:none;margin-left:auto;font-size:10px;background:#dc2626;color:white;padding:1px 6px;border-radius:10px;font-weight:700">오프라인</span>
-    <button onclick="openNoticeModal()" title="학생 페이지 안내 수정"
-      style="margin-left:auto;background:none;border:none;cursor:pointer;font-size:13px;padding:2px 4px;line-height:1;border-radius:5px;color:inherit;transition:background .15s"
-      onmouseover="this.style.background='rgba(255,255,255,.15)'" onmouseout="this.style.background='none'">📢</button>
+    <button class="clock-notice-btn" onclick="openNoticeModal()" title="학생 페이지 안내 수정"><svg class="ic" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg></button>
   </div>
   <div style="padding:0 10px 4px;display:flex;gap:6px">
     <button id="undo-btn" class="sidebar-util-btn" onclick="undoAction()" disabled>
-      ↩ 되돌리기
-    </button>
+<svg class="ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg><span>되돌리기</span></button>
     <button id="redo-btn" class="sidebar-util-btn" onclick="redoAction()" disabled>
-      앞으로 ↪
-    </button>
+<span>앞으로</span><svg class="ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 14 5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></svg></button>
   </div>
   <div style="padding:0 10px 12px">
-    <button id="refresh-btn" class="sidebar-util-btn" style="width:100%;color:rgba(255,255,255,.6);gap:5px;" onclick="refreshData()">
-      🔄 새로고침
-    </button>
+    <button id="refresh-btn" class="sidebar-util-btn" style="width:100%" onclick="refreshData()"><svg class="ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg><span>새로고침</span></button>
   </div>
 </aside>
 <main class="main">
@@ -580,20 +826,13 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 <div class="page active" id="page-dashboard">
   <div class="page-header">
     <div><div class="page-title">대시보드</div><div class="page-sub">전체 대여 현황 요약</div></div>
-    <button class="btn btn-primary" onclick="openRentalModal()">＋ 대여 등록</button>
+    <button class="btn btn-primary" onclick="openRentalModal()"><svg class="ic" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5v14"/></svg>대여 등록</button>
   </div>
-  <div class="stats-row">
-    <div class="stat-card" data-icon="☂️"><div class="stat-label">약속우산</div><div class="stat-value" id="st-umbrella" style="color:var(--c-umbrella)">0</div><div class="stat-sub">대여중</div><div class="stat-avail">가능 <span id="av-umbrella">0</span>개</div></div>
-    <div class="stat-card" data-icon="🔌"><div class="stat-label">충전기</div><div class="stat-value" id="st-charger" style="color:var(--c-charger)">0</div><div class="stat-sub">대여중</div><div class="stat-avail">가능 <span id="av-charger">0</span>개</div></div>
-    <div class="stat-card" data-icon="🧮"><div class="stat-label">공학용 계산기</div><div class="stat-value" id="st-calculator" style="color:var(--c-calculator)">0</div><div class="stat-sub">대여중</div><div class="stat-avail">가능 <span id="av-calculator">0</span>개</div></div>
-    <div class="stat-card" data-icon="🔋"><div class="stat-label">멀티탭</div><div class="stat-value" id="st-multitap" style="color:var(--c-multitap)">0</div><div class="stat-sub">대여중</div><div class="stat-avail">가능 <span id="av-multitap">0</span>개</div></div>
-    <div class="stat-card" data-icon="🌡️"><div class="stat-label">찜질팩</div><div class="stat-value" id="st-heatpack" style="color:var(--c-heatpack)">0</div><div class="stat-sub">대여중</div><div class="stat-avail">가능 <span id="av-heatpack">0</span>개</div></div>
-    <div class="stat-card" data-icon="⚠️"><div class="stat-label">미납/고장/분실</div><div class="stat-value" id="st-unpaid" style="color:var(--s-unpaid)">0</div><div class="stat-sub">처리 필요</div></div>
-  </div>
+  <div class="inv-sum" id="inv-sum"></div>
   <div class="section">
-    <div class="section-header"><div class="section-title">🕐 최근 대여 내역</div><button class="btn btn-ghost btn-sm" onclick="showPage('rentals')">전체 보기</button></div>
+    <div class="section-header"><div class="section-title">대여중 · 미납 <span id="recent-count" style="font-weight:400;color:var(--text-muted);font-size:12px"></span></div><button class="btn btn-ghost btn-sm" onclick="showPage('rentals')">전체 보기</button></div>
     <div class="tbl-wrap"><table>
-      <thead><tr><th>이름</th><th>연락처</th><th>학부</th><th>물품</th><th>번호</th><th>대여일시</th><th>상태</th><th>처리</th></tr></thead>
+      <thead><tr><th>이름</th><th>연락처</th><th>학부</th><th>물품</th><th>번호</th><th>대여일시</th><th>반납 기한</th><th>상태</th><th>처리</th></tr></thead>
       <tbody id="tbl-recent"></tbody>
     </table></div>
   </div>
@@ -603,13 +842,13 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 <div class="page" id="page-rentals">
   <div class="page-header">
     <div><div class="page-title">대여 현황</div><div class="page-sub">전체 대여 내역</div></div>
-    <button class="btn btn-primary" onclick="openRentalModal()">＋ 대여 등록</button>
+    <button class="btn btn-primary" onclick="openRentalModal()"><svg class="ic" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5v14"/></svg>대여 등록</button>
   </div>
   <div class="section">
     <div class="section-header">
-      <div class="section-title">📋 전체 내역</div>
+      <div class="section-title">전체 내역</div>
       <div class="section-actions">
-        <div class="search-wrap">🔍<input type="text" id="s-search" placeholder="이름, 연락처 검색" oninput="_invNumFilter='';renderRentals(true)"></div>
+        <div class="search-wrap"><svg class="ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input type="text" id="s-search" placeholder="이름, 연락처 검색" oninput="_invNumFilter='';renderRentals(true)"></div>
         <select class="flt" id="s-item" onchange="_invNumFilter='';renderRentals(true)">
           <option value="">전체 물품</option>
           <option value="umbrella">약속우산</option><option value="charger">충전기</option>
@@ -630,7 +869,7 @@ tbody td{padding:10px 13px;vertical-align:middle;}
           <option value="0">일요일</option><option value="1">월요일</option><option value="2">화요일</option>
           <option value="3">수요일</option><option value="4">목요일</option><option value="5">금요일</option><option value="6">토요일</option>
         </select>
-        <button class="btn btn-ghost btn-sm" onclick="exportCSV()">⬇️ CSV 다운로드</button>
+        <button class="btn btn-ghost btn-sm" onclick="exportCSV()">CSV 다운로드</button>
       </div>
     </div>
     <div class="tbl-wrap"><table>
@@ -653,7 +892,7 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 <div class="page" id="page-inventory">
   <div class="page-header">
     <div><div class="page-title">물품 현황</div><div class="page-sub">물품 클릭 → 상태 변경</div></div>
-    <button class="btn btn-ghost" onclick="openManageModal()">⚙️ 물품 목록 관리</button>
+    <button class="btn btn-ghost" onclick="openManageModal()">물품 목록 관리</button>
   </div>
   <div class="section">
     <div class="inv-tabs" id="inv-tabs"></div>
@@ -670,13 +909,13 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 
   <!-- 모바일 섹션 탭 -->
   <div class="unpaid-mobile-tabs">
-    <button class="unpaid-tab active" id="utab-1" onclick="switchUnpaidTab(1)">👤 대여 이상 내역</button>
-    <button class="unpaid-tab" id="utab-2" onclick="switchUnpaidTab(2)">🔧 물품 자체 이상</button>
+    <button class="unpaid-tab active" id="utab-1" onclick="switchUnpaidTab(1)">대여 이상 내역</button>
+    <button class="unpaid-tab" id="utab-2" onclick="switchUnpaidTab(2)">물품 자체 이상</button>
   </div>
 
   <!-- 섹션 1: 대여 기록 기반 이상 목록 (사람 정보 있음) -->
   <div class="section unpaid-section" id="unpaid-sec-1" style="margin-bottom:16px">
-    <div class="section-header"><div class="section-title">👤 대여 이상 내역 (미납·고장·분실)</div></div>
+    <div class="section-header"><div class="section-title">대여 이상 내역 (미납·고장·분실)</div></div>
     <div class="tbl-wrap"><table>
       <thead><tr><th>이름</th><th>연락처</th><th>학부</th><th>물품</th><th>번호</th><th>대여일시</th><th>경과일</th><th>상태</th><th>처리</th></tr></thead>
       <tbody id="tbl-unpaid"></tbody>
@@ -685,7 +924,7 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 
   <!-- 섹션 2: 물품현황에서 직접 처리한 고장/분실 (사람 정보 없음) -->
   <div class="section unpaid-section" id="unpaid-sec-2">
-    <div class="section-header"><div class="section-title">🔧 물품 자체 이상 (직접 처리)</div></div>
+    <div class="section-header"><div class="section-title">물품 자체 이상 (직접 처리)</div></div>
     <div class="tbl-wrap"><table>
       <thead><tr><th>물품</th><th>번호</th><th>상태</th><th>처리</th></tr></thead>
       <tbody id="tbl-item-cond"></tbody>
@@ -695,18 +934,18 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 
 <!-- BLACKLIST -->
 <div class="page" id="page-blacklist">
-  <div class="page-header"><div><div class="page-title">🚫 대여 제한 시스템</div><div class="page-sub">미납·분실 대상자 — 납부 시 자동 해제</div></div></div>
+  <div class="page-header"><div><div class="page-title">대여 제한 시스템</div><div class="page-sub">미납·분실 대상자 — 납부 시 자동 해제</div></div></div>
   <!-- 탭 -->
   <div style="display:flex;gap:0;margin-bottom:14px;border-bottom:2px solid var(--border);">
-    <button id="bl-tab-active" onclick="switchBlTab('active')" style="padding:8px 18px;font-size:13px;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:2px solid var(--accent);color:var(--accent);margin-bottom:-2px;font-family:'Noto Sans KR',sans-serif;">🚫 현재 등재</button>
-    <button id="bl-tab-history" onclick="switchBlTab('history')" style="padding:8px 18px;font-size:13px;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;color:var(--text-muted);margin-bottom:-2px;font-family:'Noto Sans KR',sans-serif;">📋 해제 이력</button>
+    <button id="bl-tab-active" onclick="switchBlTab('active')" style="padding:8px 18px;font-size:13px;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:2px solid var(--accent);color:var(--accent);margin-bottom:-2px;font-family:var(--font);">현재 등재</button>
+    <button id="bl-tab-history" onclick="switchBlTab('history')" style="padding:8px 18px;font-size:13px;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;color:var(--text-muted);margin-bottom:-2px;font-family:var(--font);">해제 이력</button>
   </div>
   <!-- 현재 등재 필터 -->
   <div id="bl-filter-wrap" class="section" style="margin-bottom:14px">
     <div class="section-header">
       <div class="section-title">필터</div>
       <div class="section-actions">
-        <div class="search-wrap">🔍<input type="text" id="bl-search" placeholder="이름, 연락처, 학부" oninput="renderBlacklist()" style="width:180px"></div>
+        <div class="search-wrap"><svg class="ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input type="text" id="bl-search" placeholder="이름, 연락처, 학부" oninput="renderBlacklist()" style="width:180px"></div>
         <select class="flt" id="bl-filter" onchange="renderBlacklist()">
           <option value="">전체 사유</option><option value="unpaid">미납</option><option value="long">장기미납 (기한 후 7일 이상)</option><option value="lost">분실</option>
         </select>
@@ -728,7 +967,7 @@ tbody td{padding:10px 13px;vertical-align:middle;}
       <div class="section-header">
         <div class="section-title">필터</div>
         <div class="section-actions">
-          <div class="search-wrap">🔍<input type="text" id="bl-history-search" placeholder="이름, 연락처, 학부" oninput="renderBlHistory()" style="width:180px"></div>
+          <div class="search-wrap"><svg class="ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input type="text" id="bl-history-search" placeholder="이름, 연락처, 학부" oninput="renderBlHistory()" style="width:180px"></div>
           <select class="flt" id="bl-history-day" onchange="renderBlHistory()">
             <option value="">전체 요일</option>
             <option value="1">월요일</option><option value="2">화요일</option><option value="3">수요일</option>
@@ -744,7 +983,7 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 <!-- ══ STATS PAGE ══ -->
 <div class="page" id="page-stats">
   <div class="page-header" style="margin-bottom:12px">
-    <div><div class="page-title">📈 통계</div><div class="page-sub">물품 대여 현황 분석</div></div>
+    <div><div class="page-title">통계</div><div class="page-sub">물품 대여 현황 분석</div></div>
     <div class="sp-period">
       <div class="sp-btn active" data-p="all" onclick="setPeriod('all')">전체</div>
       <div class="sp-btn" data-p="7"   onclick="setPeriod('7')">7일</div>
@@ -760,29 +999,30 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 
     <!-- 열1: 물품별 실시간 현황 도넛 -->
     <div class="sc">
-      <div class="sc-title">🔴 실시간 물품 상태</div>
+      <div class="sc-title">실시간 물품 상태</div>
       <div class="donut-panel" id="st-donuts"></div>
     </div>
 
     <!-- 열2: 학부별 바 -->
     <div class="sc">
-      <div class="sc-title">🏫 학부별 대여 건수</div>
+      <div class="sc-title">학부별 대여 건수</div>
       <div class="dept-rows" id="st-dept"></div>
     </div>
 
     <!-- 열3: 시간대별 -->
     <div class="sc">
-      <div class="sc-title">🕐 시간대별 분포</div>
+      <div class="sc-title">시간대별 분포</div>
       <div class="ch140"><canvas id="chart-hour"></canvas></div>
     </div>
 
     <!-- 일별 추이 (전체 너비) -->
     <div class="sc sc-full">
       <div class="sc-title" style="display:flex;align-items:center;justify-content:space-between">
-        <span>📅 일별 대여 추이 <span id="st-line-range" style="font-size:9px;font-weight:400;color:var(--text-muted);text-transform:none;letter-spacing:0;margin-left:4px"></span></span>
-        <button class="btn btn-ghost btn-sm" onclick="openChartDetail()" style="font-size:11px;padding:4px 10px;">🔍 자세히 보기</button>
+        <span>일별 대여 추이 <span id="st-line-range" style="font-size:9px;font-weight:400;color:var(--text-muted);text-transform:none;letter-spacing:0;margin-left:4px"></span></span>
+        <button class="btn btn-ghost btn-sm" onclick="openChartDetail()" style="font-size:11px;padding:4px 10px;">자세히 보기</button>
       </div>
       <div class="ch120"><canvas id="chart-daily"></canvas></div>
+      <div class="daily-chips" id="st-daily-chips"></div>
     </div>
 
   </div>
@@ -791,22 +1031,19 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 <!-- MEDICINE PAGE -->
 <div class="page" id="page-medicine">
   <div class="page-header">
-    <div><div class="page-title">💊 의약품 관리</div><div class="page-sub">재고 현황 및 사용 이력</div></div>
+    <div><div class="page-title">의약품 관리</div><div class="page-sub">재고 현황 및 사용 이력</div></div>
   </div>
   <!-- 부족 인라인 알림 (의약품 페이지 전용, 대시보드 배너와 별개) -->
-  <div id="med-page-banner" class="med-banner" style="display:none">
-    <span>💊 <strong>재고 부족 품목</strong> —</span>
-    <div class="med-banner-items" id="med-page-banner-items"></div>
-  </div>
+  <div id="med-page-banner" class="med-banner" style="display:none"></div>
   <!-- 카테고리 탭 -->
   <div class="section" style="overflow:visible">
     <div class="section-header">
-      <div class="section-title">📦 재고 현황</div>
+      <div class="section-title">재고 현황</div>
       <div class="section-actions">
         <select class="flt" id="med-cat-filter" onchange="renderMedicine()">
           <option value="" id="med-cat-all">전체 종류</option>
         </select>
-        <button class="btn btn-ghost btn-sm" onclick="openMedManageModal()">⚙️ 품목 관리</button>
+        <button class="btn btn-ghost btn-sm" onclick="openMedManageModal()">품목 관리</button>
       </div>
     </div>
     <div class="med-grid" id="med-grid"></div>
@@ -816,12 +1053,12 @@ tbody td{padding:10px 13px;vertical-align:middle;}
     <!-- 이력 (절반) -->
     <div class="section" style="margin-bottom:0">
       <div class="section-header">
-        <div class="section-title">📋 사용·변경 이력</div>
+        <div class="section-title">사용·변경 이력</div>
         <div class="section-actions">
           <select class="flt" id="med-log-filter" onchange="renderMedLog()" style="max-width:120px">
             <option value="">전체</option>
           </select>
-          <button class="btn btn-ghost btn-sm" onclick="clearMedLog()">🗑</button>
+          <button class="btn btn-ghost btn-sm" onclick="clearMedLog()" title="이력 전체 삭제" aria-label="이력 전체 삭제"><svg class="ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
         </div>
       </div>
       <div class="tbl-wrap" style="max-height:340px;overflow-y:auto"><table>
@@ -832,7 +1069,7 @@ tbody td{padding:10px 13px;vertical-align:middle;}
     <!-- 통계 -->
     <div class="section" style="margin-bottom:0">
       <div class="section-header">
-        <div class="section-title">📊 사용 통계</div>
+        <div class="section-title">사용 통계</div>
         <div class="section-actions">
           <select class="flt" id="med-stat-period" onchange="renderMedStats()">
             <option value="7">최근 7일</option>
@@ -845,7 +1082,7 @@ tbody td{padding:10px 13px;vertical-align:middle;}
       <div style="padding:12px 14px;display:flex;flex-direction:column;gap:14px">
         <!-- 총 사용량 상위 바 차트 -->
         <div>
-          <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;font-family:'JetBrains Mono',monospace;margin-bottom:8px">사용량 TOP 8</div>
+          <div style="font-size:10px;font-weight:700;color:var(--text-muted);font-family:var(--font);margin-bottom:8px">사용량 TOP 8</div>
           <div id="med-stat-bars" style="display:flex;flex-direction:column;gap:5px"></div>
         </div>
         <!-- 사유별 도넛 -->
@@ -854,13 +1091,13 @@ tbody td{padding:10px 13px;vertical-align:middle;}
             <canvas id="med-stat-donut"></canvas>
           </div>
           <div>
-            <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;font-family:'JetBrains Mono',monospace;margin-bottom:6px">사유별 건수</div>
+            <div style="font-size:10px;font-weight:700;color:var(--text-muted);font-family:var(--font);margin-bottom:6px">사유별 건수</div>
             <div id="med-stat-legend" style="display:flex;flex-direction:column;gap:4px"></div>
           </div>
         </div>
         <!-- 일별 사용 추이 -->
         <div>
-          <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;font-family:'JetBrains Mono',monospace;margin-bottom:6px">일별 사용 추이</div>
+          <div style="font-size:10px;font-weight:700;color:var(--text-muted);font-family:var(--font);margin-bottom:6px">일별 사용 추이</div>
           <div style="height:80px;position:relative"><canvas id="med-stat-line"></canvas></div>
         </div>
       </div>
@@ -883,18 +1120,18 @@ tbody td{padding:10px 13px;vertical-align:middle;}
       <div class="fg full">
         <label>대여 물품 *</label>
         <div class="item-type-grid">
-          <div class="item-type-btn" data-t="umbrella" onclick="selectItemType('umbrella')"><div class="ico">☂️</div>약속우산</div>
-          <div class="item-type-btn" data-t="charger" onclick="selectItemType('charger')"><div class="ico">🔌</div>충전기</div>
-          <div class="item-type-btn" data-t="calculator" onclick="selectItemType('calculator')"><div class="ico">🧮</div>계산기</div>
-          <div class="item-type-btn" data-t="multitap" onclick="selectItemType('multitap')"><div class="ico">🔋</div>멀티탭</div>
-          <div class="item-type-btn" data-t="heatpack" onclick="selectItemType('heatpack')"><div class="ico">🌡️</div>찜질팩</div>
+          <div class="item-type-btn" data-t="umbrella" onclick="selectItemType('umbrella')">약속우산</div>
+          <div class="item-type-btn" data-t="charger" onclick="selectItemType('charger')">충전기</div>
+          <div class="item-type-btn" data-t="calculator" onclick="selectItemType('calculator')">계산기</div>
+          <div class="item-type-btn" data-t="multitap" onclick="selectItemType('multitap')">멀티탭</div>
+          <div class="item-type-btn" data-t="heatpack" onclick="selectItemType('heatpack')">찜질팩</div>
         </div>
       </div>
-      <div class="fg full" id="item-num-wrap" style="display:none"><label>물품 번호 *</label><select class="fi" id="f-item-num"></select></div>
+      <div class="fg full" id="item-num-wrap" style="display:none"><label>물품 번호 *</label><select class="fi" id="f-item-num" onchange="prefetchLock(selItemType,this.value)"></select></div>
       <div class="fg full"><label>메모</label><input class="fi" id="f-note" placeholder="특이사항"></div>
     </div>
   </div>
-  <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-rental')">취소</button><button class="btn btn-primary" id="rental-submit-btn" onclick="submitRental()">✅ 등록</button></div>
+  <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-rental')">취소</button><button class="btn btn-primary" id="rental-submit-btn" onclick="submitRental()">등록</button></div>
 </div>
 </div>
 
@@ -912,7 +1149,7 @@ tbody td{padding:10px 13px;vertical-align:middle;}
     <div class="fg" id="return-date-wrap" style="display:none;margin-top:13px"><label>반납 일시</label><input class="fi" type="datetime-local" id="f-return-date"></div>
     <div class="fg" style="margin-top:12px"><label>메모</label><input class="fi" id="f-status-note" placeholder="사유"></div>
   </div>
-  <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-status')">취소</button><button class="btn btn-ghost" onclick="closeModal('modal-status');openEditModal(editId)">편집</button><button class="btn btn-primary" onclick="applyStatus()">저장</button></div>
+  <div class="modal-footer"><button class="btn btn-danger btn-sm" style="margin-right:auto;align-self:center" onclick="deleteFromStatusModal()" title="이 대여 기록 삭제">기록 삭제</button><button class="btn btn-ghost" onclick="closeModal('modal-status')">취소</button><button class="btn btn-ghost" onclick="closeModal('modal-status');openEditModal(editId)">편집</button><button class="btn btn-primary" onclick="applyStatus()">저장</button></div>
 </div>
 </div>
 
@@ -920,7 +1157,7 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 <div class="modal-overlay" id="modal-edit">
 <div class="modal" style="width:420px">
   <div class="modal-header">
-    <div><div class="modal-title">✏️ 대여 기록 편집</div><div class="modal-sub" id="edit-modal-sub"></div></div>
+    <div><div class="modal-title">대여 기록 편집</div><div class="modal-sub" id="edit-modal-sub"></div></div>
     <button class="modal-close" onclick="closeModal('modal-edit')">✕</button>
   </div>
   <div class="modal-body">
@@ -931,11 +1168,11 @@ tbody td{padding:10px 13px;vertical-align:middle;}
       <div class="fg full">
         <label>대여 물품 *</label>
         <div class="item-type-grid" id="e-item-type-grid">
-          <div class="item-type-btn" data-t="umbrella" onclick="editSelectItemType('umbrella')"><div class="ico">☂️</div>약속우산</div>
-          <div class="item-type-btn" data-t="charger" onclick="editSelectItemType('charger')"><div class="ico">🔌</div>충전기</div>
-          <div class="item-type-btn" data-t="calculator" onclick="editSelectItemType('calculator')"><div class="ico">🧮</div>계산기</div>
-          <div class="item-type-btn" data-t="multitap" onclick="editSelectItemType('multitap')"><div class="ico">🔋</div>멀티탭</div>
-          <div class="item-type-btn" data-t="heatpack" onclick="editSelectItemType('heatpack')"><div class="ico">🌡️</div>찜질팩</div>
+          <div class="item-type-btn" data-t="umbrella" onclick="editSelectItemType('umbrella')">약속우산</div>
+          <div class="item-type-btn" data-t="charger" onclick="editSelectItemType('charger')">충전기</div>
+          <div class="item-type-btn" data-t="calculator" onclick="editSelectItemType('calculator')">계산기</div>
+          <div class="item-type-btn" data-t="multitap" onclick="editSelectItemType('multitap')">멀티탭</div>
+          <div class="item-type-btn" data-t="heatpack" onclick="editSelectItemType('heatpack')">찜질팩</div>
         </div>
       </div>
       <div class="fg full"><label>물품 번호 *</label><select class="fi" id="e-item-num"></select></div>
@@ -945,7 +1182,7 @@ tbody td{padding:10px 13px;vertical-align:middle;}
   </div>
   <div class="modal-footer">
     <button class="btn btn-ghost" onclick="closeModal('modal-edit')">취소</button>
-    <button class="btn btn-primary" onclick="saveEditRental()">💾 저장</button>
+    <button class="btn btn-primary" onclick="saveEditRental()">저장</button>
   </div>
 </div>
 </div>
@@ -966,7 +1203,7 @@ tbody td{padding:10px 13px;vertical-align:middle;}
     <button class="btn btn-ghost" onclick="goInvRentals()" style="margin-right:auto">대여기록</button>
     <button class="btn btn-ghost" onclick="closeModal('modal-inv')">취소</button>
     <button class="btn btn-green" id="inv-unpaid-return-btn" style="display:none;width:82px" onclick="quickUnpaidReturnFromInv()">납부+반납</button>
-    <button class="btn btn-green" id="inv-return-btn" style="display:none;width:82px" onclick="quickReturnFromInv()">✅ 반납</button>
+    <button class="btn btn-green" id="inv-return-btn" style="display:none;width:82px" onclick="quickReturnFromInv()">반납</button>
     <button class="btn btn-primary" id="inv-rent-btn" style="display:none;width:82px" onclick="openRentalFromInv()">대여하기</button>
     <button class="btn btn-primary" id="inv-apply-btn" style="width:82px" onclick="applyInvCond()">저장</button>
   </div>
@@ -979,8 +1216,8 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 <div class="modal" style="width:500px">
   <div class="modal-header">
     <div>
-      <div class="modal-title">⚙️ 물품 목록 관리</div>
-      <div class="modal-sub">물품 번호 추가 · 삭제 (📋 대여 기록 있는 물품, 삭제 시 이력은 유지됨)</div>
+      <div class="modal-title">물품 목록 관리</div>
+      <div class="modal-sub">물품 번호 추가 · 삭제 (<span class="mini-ic"><svg class="ic" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span> 대여 기록 있는 물품, 삭제 시 이력은 유지됨)</div>
     </div>
     <button class="modal-close" onclick="closeModal('modal-manage')">✕</button>
   </div>
@@ -988,17 +1225,17 @@ tbody td{padding:10px 13px;vertical-align:middle;}
     <!-- 물품 종류 탭 -->
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px" id="manage-tabs"></div>
     <!-- 현재 목록 -->
-    <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);font-family:'JetBrains Mono',monospace;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
+    <div style="font-size:10px;font-weight:700;color:var(--text-muted);font-family:var(--font);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
       <span>현재 목록 <span id="manage-count" style="color:var(--accent)"></span></span>
       <button id="drag-mode-btn" class="btn btn-ghost btn-sm" onclick="toggleDragMode()" style="font-size:11px">⇅ 순서 변경</button>
     </div>
-    <div class="drag-mode-banner" id="drag-mode-banner">✋ 드래그로 순서를 바꾸세요 — 완료 후 "순서 변경 완료" 클릭</div>
+    <div class="drag-mode-banner" id="drag-mode-banner">드래그로 순서를 바꾸세요 — 완료 후 "순서 변경 완료" 클릭</div>
     <div class="inv-manage-grid" id="manage-list"></div>
     <!-- 추가 입력 -->
     <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:14px">
-      <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);font-family:'JetBrains Mono',monospace;margin-bottom:8px">새 번호 추가</div>
+      <div style="font-size:10px;font-weight:700;color:var(--text-muted);font-family:var(--font);margin-bottom:8px">새 번호 추가</div>
       <div class="inv-add-row">
-        <input class="fi" id="manage-new-num" placeholder="예: A-51 또는 77" style="font-family:'JetBrains Mono',monospace" onkeydown="if(event.key==='Enter')addItemNum()">
+        <input class="fi" id="manage-new-num" placeholder="예: A-51 또는 77" style="font-family:var(--font)" onkeydown="if(event.key==='Enter')addItemNum()">
         <button class="btn btn-primary btn-sm" onclick="addItemNum()">＋ 추가</button>
       </div>
     </div>
@@ -1014,14 +1251,14 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 <div class="modal" style="width:520px">
   <div class="modal-header">
     <div>
-      <div class="modal-title">⚙️ 의약품 품목 관리</div>
+      <div class="modal-title">의약품 품목 관리</div>
       <div class="modal-sub">품목 추가 · 삭제 (삭제해도 사용 이력은 그대로 남아요)</div>
     </div>
     <button class="modal-close" onclick="closeModal('modal-med-manage')">✕</button>
   </div>
   <div class="modal-body" style="padding:16px 20px">
     <!-- 현재 품목 목록 -->
-    <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);font-family:'JetBrains Mono',monospace;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
+    <div style="font-size:10px;font-weight:700;color:var(--text-muted);font-family:var(--font);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
       <span>현재 품목 <span id="med-manage-count" style="color:var(--accent)"></span></span>
       <button id="med-order-btn" class="btn btn-ghost btn-sm" onclick="toggleMedOrderMode()" style="font-size:11px">⇅ 표시 순서 변경</button>
     </div>
@@ -1029,7 +1266,7 @@ tbody td{padding:10px 13px;vertical-align:middle;}
     <div id="med-manage-list" style="display:flex;flex-direction:column;gap:4px;max-height:280px;overflow-y:auto;margin-bottom:14px"></div>
     <!-- 새 품목 추가 -->
     <div style="border-top:1px solid var(--border);padding-top:14px">
-      <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);font-family:'JetBrains Mono',monospace;margin-bottom:10px">새 품목 추가</div>
+      <div style="font-size:10px;font-weight:700;color:var(--text-muted);font-family:var(--font);margin-bottom:10px">새 품목 추가</div>
       <div class="form-grid">
         <div class="fg">
           <label>종류 *</label>
@@ -1063,7 +1300,7 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 <div class="modal" style="width:400px">
   <div class="modal-header">
     <div>
-      <div class="modal-title">✉️ 문자 발송 기록</div>
+      <div class="modal-title">문자 발송 기록</div>
       <div class="modal-sub" id="sms-modal-sub"></div>
     </div>
     <button class="modal-close" onclick="closeModal('modal-sms')">✕</button>
@@ -1076,13 +1313,13 @@ tbody td{padding:10px 13px;vertical-align:middle;}
     </div>
     <!-- 발송 이력 -->
     <div id="sms-log-section" style="display:none">
-      <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);font-family:'JetBrains Mono',monospace;margin-bottom:8px">발송 이력</div>
+      <div style="font-size:10px;font-weight:700;color:var(--text-muted);font-family:var(--font);margin-bottom:8px">발송 이력</div>
       <div id="sms-log-items" class="sms-log-wrap"></div>
     </div>
   </div>
   <div class="modal-footer">
     <button class="btn btn-ghost" onclick="closeModal('modal-sms')">취소</button>
-    <button class="btn btn-primary" onclick="confirmSmsSent()">✉️ 발송 기록 저장</button>
+    <button class="btn btn-primary" onclick="confirmSmsSent()">발송 기록 저장</button>
   </div>
 </div>
 </div>
@@ -1101,7 +1338,7 @@ tbody td{padding:10px 13px;vertical-align:middle;}
     <!-- 현재 재고 표시 -->
     <div style="background:var(--surface2);border-radius:8px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;">
       <span style="font-size:12px;color:var(--text-muted);">현재 재고</span>
-      <span style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:900;" id="med-modal-cur">0</span>
+      <span style="font-family:var(--font);font-size:20px;font-weight:900;" id="med-modal-cur">0</span>
       <span style="font-size:12px;color:var(--text-muted);" id="med-modal-unit">정</span>
     </div>
     <!-- 사유 선택 -->
@@ -1122,7 +1359,7 @@ tbody td{padding:10px 13px;vertical-align:middle;}
     <div class="fg" style="margin-top:10px">
       <label id="med-direct-label">사용 수량 직접 입력</label>
       <input class="fi" type="number" id="med-direct-qty" placeholder="0" min="0"
-        style="font-family:'JetBrains Mono',monospace;font-size:16px;text-align:center;"
+        style="font-family:var(--font);font-size:16px;text-align:center;"
         oninput="medSetDeltaDirect(this.value)">
     </div>
     <!-- 결과 미리보기 -->
@@ -1135,7 +1372,7 @@ tbody td{padding:10px 13px;vertical-align:middle;}
   </div>
   <div class="modal-footer">
     <button class="btn btn-ghost" onclick="closeModal('modal-med')">취소</button>
-    <button class="btn btn-primary" onclick="saveMedAdj()">💾 저장</button>
+    <button class="btn btn-primary" onclick="saveMedAdj()">저장</button>
   </div>
 </div>
 </div>
@@ -1144,11 +1381,12 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 <div class="modal-overlay" id="modal-chart-detail" onclick="closeChartDetail()">
   <div class="modal" style="max-width:860px;width:calc(100vw - 32px);" onclick="event.stopPropagation()">
     <div class="modal-header">
-      <div class="modal-title">📅 일별 대여 추이 <span id="chart-detail-range" style="font-size:11px;font-weight:400;color:var(--text-muted);margin-left:6px"></span></div>
+      <div class="modal-title">일별 대여 추이 <span id="chart-detail-range" style="font-size:11px;font-weight:400;color:var(--text-muted);margin-left:6px"></span></div>
       <button class="modal-close" onclick="closeChartDetail()">✕</button>
     </div>
     <div class="modal-body" style="padding:20px;">
       <div style="position:relative;height:360px"><canvas id="chart-daily-detail"></canvas></div>
+      <div class="daily-chips" id="detail-daily-chips"></div>
     </div>
   </div>
 </div>
@@ -1157,7 +1395,7 @@ tbody td{padding:10px 13px;vertical-align:middle;}
 <div class="modal-overlay" id="modal-notice">
 <div class="modal" style="width:460px">
   <div class="modal-header">
-    <div><div class="modal-title">📢 학생 페이지 안내</div><div class="modal-sub">학생용 대여 현황 페이지 하단 '대여 안내'에 표시돼요</div></div>
+    <div><div class="modal-title">학생 페이지 안내</div><div class="modal-sub">학생용 대여 현황 페이지 하단 '대여 안내'에 표시돼요</div></div>
     <button class="modal-close" onclick="closeModal('modal-notice')">✕</button>
   </div>
   <div class="modal-body">
@@ -1167,34 +1405,39 @@ tbody td{padding:10px 13px;vertical-align:middle;}
       <div class="fg full"><label>대여 기간 <span style="font-weight:400;opacity:.6">(한 줄에 하나씩)</span></label><textarea class="fi" id="n-periods" rows="3" style="resize:vertical;line-height:1.6"></textarea></div>
       <div class="fg full"><label>문의</label><input class="fi" id="n-contact"></div>
     </div>
-    <button class="btn btn-ghost btn-sm" style="margin-top:12px" onclick="fillNoticeForm(PUBLIC_INFO_EXAMPLE)">📝 예시 문구로 채우기</button>
+    <button class="btn btn-ghost btn-sm" style="margin-top:12px" onclick="fillNoticeForm(PUBLIC_INFO_EXAMPLE)">예시 문구로 채우기</button>
   </div>
   <div class="modal-footer">
     <button class="btn btn-ghost" onclick="closeModal('modal-notice')">취소</button>
-    <button class="btn btn-primary" id="notice-save-btn" onclick="saveNotice()">💾 저장</button>
+    <button class="btn btn-primary" id="notice-save-btn" onclick="saveNotice()">저장</button>
   </div>
 </div>
 </div>
 
 <!-- MOBILE NAV -->
 <div class="mobile-undo-btns">
-  <button class="mob-util-btn" onclick="openNoticeModal()" title="학생 페이지 안내 수정">📢</button>
-  <button class="mob-util-btn" id="mob-refresh-btn" onclick="refreshData()" title="새로고침">🔄</button>
-  <button class="mob-undo-btn" id="mob-undo-btn" onclick="undoAction()" disabled>↩ 되돌리기</button>
-  <button class="mob-undo-btn" id="mob-redo-btn" onclick="redoAction()" disabled>앞으로 ↪</button>
+  <button class="mob-util-btn" onclick="openNoticeModal()" title="학생 페이지 안내 수정" aria-label="학생 페이지 안내 수정"><svg class="ic" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg></button>
+  <button class="mob-util-btn" id="mob-refresh-btn" onclick="refreshData()" title="새로고침" aria-label="새로고침"><svg class="ic" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg></button>
+  <button class="mob-undo-btn" id="mob-undo-btn" onclick="undoAction()" disabled aria-label="되돌리기"><svg class="ic" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button>
+  <button class="mob-undo-btn" id="mob-redo-btn" onclick="redoAction()" disabled aria-label="앞으로"><svg class="ic" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 14 5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></svg></button>
 </div>
 <nav class="mobile-nav">
   <div class="mobile-nav-inner">
-    <button class="mnav-item active" id="mnav-dashboard" onclick="showPage('dashboard')"><span class="mico">📊</span>대시보드</button>
-    <button class="mnav-item" id="mnav-rentals" onclick="showPage('rentals')"><span class="mico">📋</span>대여</button>
-    <button class="mnav-item" id="mnav-inventory" onclick="showPage('inventory')"><span class="mico">🗂️</span>물품</button>
-    <button class="mnav-item" id="mnav-unpaid" onclick="showPage('unpaid')"><span class="mico">📦</span>물품관리<span class="mbadge" id="mbadge-unpaid" style="display:none">0</span></button>
-    <button class="mnav-item" id="mnav-blacklist" onclick="showPage('blacklist')"><span class="mico">🚫</span>대여제한시스템<span class="mbadge" id="mbadge-bl" style="display:none">0</span></button>
-    <button class="mnav-item" id="mnav-stats" onclick="showPage('stats')"><span class="mico">📈</span>통계</button>
-    <button class="mnav-item" id="mnav-medicine" onclick="showPage('medicine')"><span class="mico">💊</span>의약품<span class="mbadge" id="mbadge-med" style="display:none">0</span></button>
+    <button class="mnav-item active" id="mnav-dashboard" onclick="showPage('dashboard')"><span class="mico"><svg class="ic" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg></span>대시보드</button>
+    <button class="mnav-item" id="mnav-rentals" onclick="showPage('rentals')"><span class="mico"><svg class="ic" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4M12 16h4M8 11h.01M8 16h.01"/></svg></span>대여</button>
+    <button class="mnav-item" id="mnav-inventory" onclick="showPage('inventory')"><span class="mico"><svg class="ic" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></svg></span>물품</button>
+    <button class="mnav-item" id="mnav-unpaid" onclick="showPage('unpaid')"><span class="mico"><svg class="ic" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4M12 17h.01"/></svg></span>미납<span class="mbadge" id="mbadge-unpaid" style="display:none">0</span></button>
+    <button class="mnav-item" id="mnav-more" onclick="toggleMoreSheet()"><span class="mico"><svg class="ic" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></span>더보기<span class="mbadge" id="mbadge-more" style="display:none">0</span></button>
   </div>
 </nav>
-<button class="fab" onclick="openRentalModal()">＋</button>
+<div class="more-sheet-bg" id="more-sheet" onclick="if(event.target===this)toggleMoreSheet(false)">
+  <div class="more-sheet">
+    <button class="ms-item" id="mnav-blacklist" onclick="toggleMoreSheet(false);showPage('blacklist')"><svg class="ic" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg><span>대여제한시스템</span><span class="ms-badge" id="mbadge-bl" style="display:none">0</span></button>
+    <button class="ms-item" id="mnav-stats" onclick="toggleMoreSheet(false);showPage('stats')"><svg class="ic" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-3"/></svg><span>통계</span></button>
+    <button class="ms-item" id="mnav-medicine" onclick="toggleMoreSheet(false);showPage('medicine')"><svg class="ic" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg><span>의약품 관리</span><span class="ms-badge" id="mbadge-med" style="display:none">0</span></button>
+  </div>
+</div>
+<button class="fab" onclick="openRentalModal()" aria-label="대여 등록"><svg class="ic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5v14"/></svg></button>
 
 <script>
 // ══ DATA ══
@@ -1202,7 +1445,10 @@ const DEPTS=['식물생산과학부','산림과학부','식품·동물생명공�
   '조경·지역시스템공학부','바이오시스템·소재학부','농경제사회학부','스마트시스템과학과'];
 
 const ITEM_LABELS={umbrella:'약속우산',charger:'충전기',calculator:'공학용 계산기',multitap:'멀티탭',heatpack:'찜질팩'};
-const ITEM_ICONS={umbrella:'☂️',charger:'🔌',calculator:'🧮',multitap:'🔋',heatpack:'🌡️'};
+const ICO_PATHS={"dash": "<rect x=\"3\" y=\"3\" width=\"7\" height=\"9\" rx=\"1\"/><rect x=\"14\" y=\"3\" width=\"7\" height=\"5\" rx=\"1\"/><rect x=\"14\" y=\"12\" width=\"7\" height=\"9\" rx=\"1\"/><rect x=\"3\" y=\"16\" width=\"7\" height=\"5\" rx=\"1\"/>", "list": "<rect x=\"8\" y=\"2\" width=\"8\" height=\"4\" rx=\"1\"/><path d=\"M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2\"/><path d=\"M12 11h4M12 16h4M8 11h.01M8 16h.01\"/>", "box": "<path d=\"M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z\"/><path d=\"m3.3 7 8.7 5 8.7-5M12 22V12\"/>", "alert": "<path d=\"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3\"/><path d=\"M12 9v4M12 17h.01\"/>", "ban": "<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"m4.9 4.9 14.2 14.2\"/>", "chart": "<path d=\"M3 3v18h18\"/><path d=\"M18 17V9M13 17V5M8 17v-3\"/>", "pill": "<path d=\"m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z\"/><path d=\"m8.5 8.5 7 7\"/>", "plus": "<path d=\"M5 12h14M12 5v14\"/>", "mega": "<path d=\"m3 11 18-5v12L3 14v-3z\"/><path d=\"M11.6 16.8a3 3 0 1 1-5.8-1.6\"/>", "refresh": "<path d=\"M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8\"/><path d=\"M21 3v5h-5\"/><path d=\"M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16\"/><path d=\"M8 16H3v5\"/>", "undo": "<path d=\"M9 14 4 9l5-5\"/><path d=\"M4 9h10.5a5.5 5.5 0 0 1 0 11H11\"/>", "redo": "<path d=\"m15 14 5-5-5-5\"/><path d=\"M20 9H9.5a5.5 5.5 0 0 0 0 11H13\"/>", "more": "<circle cx=\"12\" cy=\"12\" r=\"1\"/><circle cx=\"19\" cy=\"12\" r=\"1\"/><circle cx=\"5\" cy=\"12\" r=\"1\"/>", "trash": "<path d=\"M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2\"/>", "search": "<circle cx=\"11\" cy=\"11\" r=\"8\"/><path d=\"m21 21-4.3-4.3\"/>", "edit": "<path d=\"M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z\"/>", "note": "<path d=\"M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z\"/>", "lock": "<rect x=\"3\" y=\"11\" width=\"18\" height=\"11\" rx=\"2\"/><path d=\"M7 11V7a5 5 0 0 1 10 0v4\"/>", "clock": "<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M12 6v6l4 2\"/>", "eye": "<path d=\"M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/>", "eyeoff": "<path d=\"M9.88 9.88a3 3 0 1 0 4.24 4.24\"/><path d=\"M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68\"/><path d=\"M6.61 6.61A13.53 13.53 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61\"/><path d=\"m2 2 20 20\"/>", "check": "<path d=\"M20 6 9 17l-5-5\"/>", "x": "<path d=\"M18 6 6 18M6 6l12 12\"/>", "info": "<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M12 16v-4M12 8h.01\"/>", "phone": "<path d=\"M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z\"/>"};
+const ICO=Object.fromEntries(Object.entries(ICO_PATHS).map(([k,v])=>[k,`<svg class="ic" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${v}</svg>`]));
+// 휴대폰 하단 '더보기' 메뉴 (대여제한·통계·의약품)
+function toggleMoreSheet(force){const el=document.getElementById('more-sheet');if(!el)return;el.classList.toggle('open',force===undefined?!el.classList.contains('open'):force);}
 
 // 기본 물품 목록 (Firebase에 없으면 이 값 사용)
 const DEFAULT_ITEM_NUMBERS={
@@ -1225,13 +1471,13 @@ let ITEM_NUMBERS=JSON.parse(JSON.stringify(DEFAULT_ITEM_NUMBERS));
 // broken   → 고장 (물품 대여불가, 사람 무관)
 // lost     → 분실 (물품 대여불가 영구, 사람 블랙리스트)
 const S5=[
-  {v:'renting',     l:'대여중',              cl:'sb-renting',     ico:'📦'},
-  {v:'returned',    l:'반납완료',            cl:'sb-returned',    ico:'✅'},
-  {v:'unpaid',      l:'미납',                cl:'sb-unpaid',      ico:'⚠️'},
-  {v:'broken',      l:'고장',                cl:'sb-broken',      ico:'🔧'},
-  {v:'lost',        l:'분실',                cl:'sb-lost',        ico:'❌'},
-  {v:'unpaid_paid', l:'미납 (연체료 납부)',  cl:'sb-unpaid-paid', ico:'🟠'},
-  {v:'lost_paid',   l:'분실 (분실비 납부)',  cl:'sb-lost-paid',   ico:'💜'}
+  {v:'renting',     l:'대여중',              cl:'sb-renting'},
+  {v:'returned',    l:'반납완료',            cl:'sb-returned'},
+  {v:'unpaid',      l:'미납',                cl:'sb-unpaid'},
+  {v:'broken',      l:'고장',                cl:'sb-broken'},
+  {v:'lost',        l:'분실',                cl:'sb-lost'},
+  {v:'unpaid_paid', l:'미납 (연체료 납부)',  cl:'sb-unpaid-paid'},
+  {v:'lost_paid',   l:'분실 (분실비 납부)',  cl:'sb-lost-paid'}
 ];
 const BL_STATUS=['unpaid','lost']; // 블랙리스트 등록 상태 (납부완료 상태는 제외)
 
@@ -1380,32 +1626,29 @@ async function applySnapshot(snap,prefix){
   }
 }
 function updateHistoryBtns(){
-  _updateBtn('undo-btn',undoStack,'↩ 되돌리기');
-  _updateBtn('mob-undo-btn',undoStack,'↩ 되돌리기');
-  _updateBtn('mob-redo-btn',redoStack,'앞으로 ↪');
-  _updateBtn('redo-btn',redoStack,'앞으로 ↪');
+  _updateBtn('undo-btn',undoStack,'undo','되돌리기',true);
+  _updateBtn('mob-undo-btn',undoStack,'undo','되돌리기',false);
+  _updateBtn('mob-redo-btn',redoStack,'redo','앞으로',false);
+  _updateBtn('redo-btn',redoStack,'redo','앞으로',true);
 }
-function _updateBtn(id,stack,def){
+function _updateBtn(id,stack,ic,def,withText){
   const btn=document.getElementById(id);if(!btn)return;
   const has=stack.length>0;
   const last=has?stack[stack.length-1].label:'';
   btn.disabled=!has;
-  btn.style.color=has?'rgba(255,255,255,.9)':'rgba(255,255,255,.35)';
-  btn.style.background=has?'rgba(255,255,255,.18)':'rgba(255,255,255,.06)';
-  btn.style.borderColor=has?'rgba(255,255,255,.35)':'rgba(255,255,255,.12)';
-  btn.style.cursor=has?'pointer':'default';
-  btn.innerHTML=has
-    ?`${def.startsWith('↩')?'↩':'↪'} <span style="font-size:10px;opacity:.75;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:68px;display:inline-block;vertical-align:middle">${esc(last)}</span>`
-    :def;
+  btn.title=has?`${def}: ${last}`:def;
+  if(!withText){btn.innerHTML=ICO[ic];return;}
+  const txt=has?`<span class="hist-lbl">${esc(last)}</span>`:`<span>${def}</span>`;
+  btn.innerHTML=ic==='undo'?ICO.undo+txt:txt+ICO.redo;
 }
 function setHistoryLoading(v){
   ['undo-btn','redo-btn','mob-undo-btn','mob-redo-btn'].forEach(id=>{
     const btn=document.getElementById(id);if(!btn)return;
-    btn.disabled=v;if(v)btn.innerHTML='⏳';
+    btn.disabled=v;if(v)btn.innerHTML='<span class="spin"></span>';
   });
 }
 
-function sInfo(v){return S5.find(s=>s.v===v)||{v,l:v,cl:'sb-renting',ico:'?'};}
+function sInfo(v){return S5.find(s=>s.v===v)||{v,l:v,cl:'sb-renting'};}
 function sBadge(v){const s=sInfo(v);return `<span class="sbadge ${s.cl}">${s.l}</span>`;}
 // 반납 기한 — 약속우산: 대여 7일째 18:00 / 그 외: 대여 당일 18:00 (18시 이후 대여면 다음 날 18:00)
 // (학생 페이지 public.html의 반납 기한·자동 미납 기준과 동일)
@@ -1421,10 +1664,21 @@ function isLongUnpaid(r){return r.status==='unpaid'&&r.date&&(Date.now()-dueDate
 // 대여 기록 기반 배지 — 반납 기한이 지나고 7일 이상이면 장기미납으로 시각적 구분
 function sBadgeR(r){
   if(isLongUnpaid(r))
-    return `<span class="sbadge sb-unpaid">⏰ 장기미납</span>`;
+    return `<span class="sbadge sb-unpaid">장기미납</span>`;
   return sBadge(r.status);
 }
-function itemBadge(t){return `<span class="item-badge ib-${t}">${ITEM_ICONS[t]} ${ITEM_LABELS[t]}</span>`;}
+// 물품 구분 — 옅은 색 네모 안에 물품 아이콘 + 이름
+const ITEM_ICO={
+  umbrella:'<path d="M22 12a10 10 0 0 0-20 0Z"/><path d="M12 12v8a2 2 0 0 0 4 0"/><path d="M12 2v1"/>',
+  charger:'<path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/>',
+  calculator:'<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M16 14v4M16 10h.01M12 10h.01M8 10h.01M12 14h.01M8 14h.01M12 18h.01M8 18h.01"/>',
+  multitap:'<rect x="2" y="8" width="20" height="8" rx="2"/><circle cx="7" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="17" cy="12" r="1.2"/>',
+  heatpack:'<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>'
+};
+function itemBadge(t){
+  const ic=ITEM_ICO[t]?`<span class="ib-sq ibs-${t}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ITEM_ICO[t]}</svg></span>`:'';
+  return `<span class="item-badge ib-${t}">${ic}${ITEM_LABELS[t]||t}</span>`;
+}
 // XSS 방지: 사용자 입력값을 HTML에 삽입할 때 반드시 사용
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 function escJs(s){return String(s==null?'':s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"').replace(/\r/g,'\\r').replace(/\n/g,'\\n');}
@@ -1512,7 +1766,7 @@ let _opLock=false; // 저장 처리 중 중복 클릭 방지 잠금
 // ══ INIT ══
 async function init(){
   document.getElementById('tbl-recent').innerHTML=
-    `<tr><td colspan="8" style="text-align:center;padding:28px;color:var(--text-muted);font-size:13px">⏳ 불러오는 중...</td></tr>`;
+    `<tr><td colspan="9" style="text-align:center;padding:28px;color:var(--text-muted);font-size:13px">불러오는 중...</td></tr>`;
   try{
     const [rData,iData,nData,sData]=await Promise.all([fbGet('/rentals'),fbGet('/itemStatus'),fbGet('/itemNumbers'),fbGet('/smsLog')]);
     rentals=rData?Object.values(rData).sort((a,b)=>new Date(b.date)-new Date(a.date)):[];
@@ -1536,7 +1790,7 @@ async function init(){
     setInterval(autoUnpaidUmbrella,1000*60*60);
   }catch(e){
     document.getElementById('tbl-recent').innerHTML=
-      `<tr><td colspan="8" style="text-align:center;padding:28px;color:var(--c-danger);font-size:13px">⚠️ 데이터를 불러오지 못했습니다. 새로고침 해주세요.</td></tr>`;
+      `<tr><td colspan="9" style="text-align:center;padding:28px;color:var(--c-danger);font-size:13px">데이터를 불러오지 못했습니다. 새로고침 해주세요.</td></tr>`;
     console.error('init 오류',e);
   }
 }
@@ -1575,8 +1829,8 @@ function renderAfterPay(){updateStats();renderRecent();renderBlacklist();const p
 async function refreshData(){
   const btn=document.getElementById('refresh-btn');
   const mobBtn=document.getElementById('mob-refresh-btn');
-  if(btn){btn.disabled=true;btn.textContent='⏳ 불러오는 중...';}
-  if(mobBtn){mobBtn.disabled=true;mobBtn.textContent='⏳';}
+  if(btn){btn.disabled=true;btn.innerHTML='<span class="spin"></span><span>불러오는 중...</span>';}
+  if(mobBtn){mobBtn.disabled=true;mobBtn.innerHTML='<span class="spin"></span>';}
   try{
     const [rData,iData,nData,sData,mData,lData]=await Promise.all([
       fbGet('/rentals'),fbGet('/itemStatus'),fbGet('/itemNumbers'),
@@ -1596,8 +1850,8 @@ async function refreshData(){
   }catch(e){
     toast('데이터 불러오기 실패. 인터넷 연결을 확인해주세요.','err');
   }finally{
-    if(btn){btn.disabled=false;btn.textContent='🔄 새로고침';}
-    if(mobBtn){mobBtn.disabled=false;mobBtn.textContent='🔄';}
+    if(btn){btn.disabled=false;btn.innerHTML=ICO.refresh+'<span>새로고침</span>';}
+    if(mobBtn){mobBtn.disabled=false;mobBtn.innerHTML=ICO.refresh;}
   }
 }
 
@@ -1636,18 +1890,39 @@ function isLatestRecord(r){
 // /itemLock/<물품키> 값을 조건부 저장(if-match)으로 바꿔서, 같은 물품을 동시에 등록하려는 두 사람 중 한 명만 통과시킴.
 // 브라우저·Firebase가 조건부 저장을 지원하지 않으면 { ok:true, mode:'fallback' } → 기존 '서버 재확인' 방식만 사용
 let _lockMode=''; // 'lock' | 'fallback' (확인용)
-async function claimItem(type,num){
-  const url=`${FB}/itemLock/${fbKey(type,num)}.json`;
-  let etag=null;
+// 물품 잠금 미리 확인 — 번호를 고를 때 잠금 상태(ETag)를 미리 받아 두면 등록 버튼을 누른 뒤 서버 왕복이 1번 줄어듦
+let _lockPre=null; // {key,etag,at}
+async function prefetchLock(type,num){
+  if(!type||!num)return;
+  const key=fbKey(type,num);
   try{
-    const r=await fetch(url,{headers:{'X-Firebase-ETag':'true'}});
-    if(r.ok)etag=r.headers.get('ETag');
-  }catch(e){etag=null;}
+    const r=await fetch(`${FB}/itemLock/${key}.json`,{headers:{'X-Firebase-ETag':'true'}});
+    const etag=r.ok?r.headers.get('ETag'):null;
+    if(etag)_lockPre={key,etag,at:Date.now()};
+  }catch(e){}
+}
+async function claimItem(type,num){
+  const key=fbKey(type,num);
+  const url=`${FB}/itemLock/${key}.json`;
+  const getEtag=async()=>{
+    try{const r=await fetch(url,{headers:{'X-Firebase-ETag':'true'}});return r.ok?r.headers.get('ETag'):null;}catch(e){return null;}
+  };
+  const tryPut=etag=>fetch(url,{method:'PUT',headers:{'Content-Type':'application/json','if-match':etag},
+    body:JSON.stringify(Date.now()+'_'+Math.random().toString(36).slice(2,8))});
+  // 2분 안에 미리 받아 둔 잠금 정보가 있으면 그대로 사용
+  const pre=(_lockPre&&_lockPre.key===key&&Date.now()-_lockPre.at<120000)?_lockPre.etag:null;
+  _lockPre=null;
+  let etag=pre||await getEtag();
   if(!etag){_lockMode='fallback';return {ok:true,mode:'fallback'};}
   let w;
   try{
-    w=await fetch(url,{method:'PUT',headers:{'Content-Type':'application/json','if-match':etag},
-      body:JSON.stringify(Date.now()+'_'+Math.random().toString(36).slice(2,8))});
+    w=await tryPut(etag);
+    // 미리 받아 둔 정보가 그사이 바뀌었으면 최신으로 한 번 더 시도 (원래 방식과 같은 확인)
+    if(w.status===412&&pre){
+      etag=await getEtag();
+      if(!etag){_lockMode='fallback';return {ok:true,mode:'fallback'};}
+      w=await tryPut(etag);
+    }
   }catch(e){_lockMode='fallback';return {ok:true,mode:'fallback'};}
   if(w.status===412)return {ok:false}; // 그사이 다른 사람이 이 물품을 잡음
   if(!w.ok){_lockMode='fallback';return {ok:true,mode:'fallback'};}
@@ -1656,7 +1931,35 @@ async function claimItem(type,num){
 }
 
 // 저장 직전 서버의 최신 데이터로 물품 상태 재확인 (다른 관리자가 동시에 처리한 경우 대비)
-async function serverItemState(type,num){
+// 전체 기록 대신 '이 번호의 기록 + 이 사람의 기록'만 받음 (Firebase 규칙에 .indexOn 필요)
+// 규칙이 아직 없으면 서버가 400을 돌려주고, 그때는 예전처럼 전체 기록을 받음
+let _qMode=null; // 'query' | 'full'
+async function fbQuery(path,field,val){
+  const q=`orderBy=${encodeURIComponent(JSON.stringify(field))}&equalTo=${encodeURIComponent(JSON.stringify(val))}`;
+  const r=await fetch(`${FB}${path}.json?${q}`);
+  if(r.status===400){const e=new Error('noindex');e.noIndex=true;throw e;}
+  if(!r.ok)throw new Error(`HTTP ${r.status}`);
+  return (await r.json())||{};
+}
+async function serverItemState(type,num,phone){
+  const key=fbKey(type,num);
+  if(_qMode!=='full'){
+    try{
+      const ns=String(num);
+      const [a,b,c,st]=await Promise.all([
+        fbQuery('/rentals','itemNum',ns),
+        /^\d+$/.test(ns)?fbQuery('/rentals','itemNum',Number(ns)):Promise.resolve({}), // 예전 기록은 번호가 숫자로 저장된 경우가 있음
+        phone?fbQuery('/rentals','phone',phone):Promise.resolve({}),
+        fbGet(`/itemStatus/${key}`)
+      ]);
+      const sr=Object.values({...a,...b,...c});
+      _qMode='query';
+      return {state:getItemState(type,num,sr,st==null?{}:{[key]:st}),rentals:sr};
+    }catch(e){
+      if(!e.noIndex)throw e;
+      _qMode='full';
+    }
+  }
   const [rData,iData]=await Promise.all([fbGet('/rentals'),fbGet('/itemStatus')]);
   const sr=rData?Object.values(rData):[];
   return {state:getItemState(type,num,sr,iData||{}),rentals:sr};
@@ -1665,12 +1968,12 @@ function isAvailable(type,num){const s=getItemState(type,num);return s==='availa
 
 // ══ STATS ══
 function updateStats(){
+  const invSum=[];
   const renting=rentals.filter(r=>r.status==='renting'||r.status==='unpaid_paid');
   Object.keys(ITEM_NUMBERS).forEach(t=>{
     const rc=renting.filter(r=>r.item===t).length;
     const av=ITEM_NUMBERS[t].filter(n=>isAvailable(t,n)).length;
-    const se=document.getElementById('st-'+t),ae=document.getElementById('av-'+t);
-    if(se)se.textContent=rc;if(ae)ae.textContent=av;
+    invSum.push({t,av,tot:ITEM_NUMBERS[t].length,rc});
   });
   // 물품관리 배지: 대여기록 이상 + 직접 처리한 고장/분실 모두 포함
   const rentalBad=rentals.filter(r=>['unpaid','broken','lost'].includes(r.status)).length;
@@ -1680,25 +1983,46 @@ function updateStats(){
   );
   const directBad=Object.entries(itemStatus).filter(([k,v])=>{const vv=typeof v==='object'?v.v:v;return ['broken','lost'].includes(vv)&&!rentedBrokenLostKeys.has(k);}).length;
   const bad=rentalBad+directBad;
-  document.getElementById('st-unpaid').textContent=bad;
-  document.getElementById('badge-unpaid').textContent=bad;
+  renderInvSum(invSum,bad);
+  const bu=document.getElementById('badge-unpaid');bu.textContent=bad;bu.style.display=bad>0?'inline-flex':'none';
   const mu=document.getElementById('mbadge-unpaid');if(mu){mu.textContent=bad;mu.style.display=bad>0?'block':'none';}
   const blCnt=new Set(rentals.filter(r=>BL_STATUS.includes(r.status)).map(r=>`${r.name}_${r.phone}`)).size;
   const bb=document.getElementById('badge-bl'),mb=document.getElementById('mbadge-bl');
   if(bb){bb.textContent=blCnt;bb.style.display=blCnt>0?'inline-flex':'none';}
   if(mb){mb.textContent=blCnt;mb.style.display=blCnt>0?'block':'none';}
+  updateMoreBadge();
+}
+// 휴대폰 '더보기' 배지 = 대여제한 + 의약품 부족 수
+function updateMoreBadge(){
+  const n=['mbadge-bl','mbadge-med'].reduce((a,id)=>{const e=document.getElementById(id);return a+(e&&e.style.display!=='none'?(+e.textContent||0):0);},0);
+  const m=document.getElementById('mbadge-more');if(m){m.textContent=n;m.style.display=n>0?'block':'none';}
 }
 
+// 대시보드 재고 요약 — 물품별 '대여 가능 / 전체' + 남은 비율 막대, 누르면 물품 현황 해당 탭으로
+function renderInvSum(list,bad){
+  const box=document.getElementById('inv-sum');if(!box)return;
+  box.innerHTML=list.map(({t,av,tot,rc})=>{
+    const pct=tot?Math.round(av/tot*100):0;
+    return `<div class="is-item" onclick="showPage('inventory');switchInvTab('${t}')" title="대여중 ${rc}개">
+      <div class="is-nm">${ITEM_LABELS[t]}</div>
+      <div class="is-nums"><span class="is-big${av===0?' zero':''}">${av}</span><span class="is-of">/ ${tot} 대여 가능</span></div>
+      <div class="is-bar"><i style="width:${pct}%"></i></div></div>`;}).join('')
+   +`<div class="is-item is-alert${bad?'':' ok'}" onclick="showPage('unpaid')">
+      <div class="is-nm">미납 · 고장 · 분실</div>
+      <div class="is-nums"><span class="is-big">${bad}</span><span class="is-of">건</span></div>
+      <div class="is-lnk">${bad?'처리하러 가기 →':'처리할 것 없음'}</div></div>`;
+}
 // ══ TABLE HELPERS ══
 function fmtDate(iso){if(!iso)return '—';const d=new Date(iso);return `${d.getFullYear()}.${p2(d.getMonth()+1)}.${p2(d.getDate())} ${p2(d.getHours())}:${p2(d.getMinutes())}`;}
 function p2(n){return String(n).padStart(2,'0');}
 function daysSince(iso){return Math.floor((Date.now()-new Date(iso))/86400000);}
 
 function actionBtns(r){
-  let b=`<button class="btn btn-ghost btn-sm" onclick="openStatusModal(${r.id})">상태변경</button>`;
+  let b='';
   if(r.status==='renting'||r.status==='unpaid'||r.status==='unpaid_paid')
-    b+=`<button class="btn btn-green btn-sm" onclick="quickReturn(${r.id})">반납</button>`;
-  b+=`<button class="btn btn-danger btn-sm" onclick="deleteRental(${r.id})">삭제</button>`;
+    b+=`<button class="btn btn-ret btn-sm" onclick="quickReturn(${r.id})">반납</button>`;
+  b+=`<button class="btn btn-ghost btn-sm" onclick="openStatusModal(${r.id})">상태변경</button>`;
+  // 삭제는 잘못 누르기 쉬워 목록에서 빼고 '상태변경' 창 안에 둠
   return `<div class="td-actions">${b}</div>`;
 }
 function makeRow(r,cols){return makeRowIdx(r,null,cols);}
@@ -1711,8 +2035,9 @@ function makeRowIdx(r,idx,cols){
     item:`<td>${itemBadge(r.item)}</td>`,num:`<td class="td-mono">${esc(r.itemNum)}</td>`,
     date:`<td class="td-mono" style="font-size:11px">${fmtDate(r.date)}</td>`,
     returnDate:`<td class="td-mono" style="font-size:11px">${fmtDate(r.returnDate)}</td>`,
+    due:(()=>{const d=dueInfo(r);return `<td class="td-mono" style="font-size:11px;white-space:nowrap;color:${d.color};font-weight:${d.bold?700:400}">${d.text}</td>`;})(),
     status:`<td>${sBadgeR(r)}</td>`,actions:`<td>${actionBtns(r)}</td>`,
-    days:`<td style="font-weight:700;color:var(--s-unpaid);font-family:'JetBrains Mono',monospace">${daysSince(r.date)}일</td>`
+    days:`<td style="font-weight:700;color:var(--s-unpaid);font-family:var(--font)">${daysSince(r.date)}일</td>`
   };
   return `<tr>${cols.map(c=>c==='idx'?cells.idx():cells[c]).join('')}</tr>`;
 }
@@ -1725,12 +2050,13 @@ function makeMobileCard(r,cols){
       <span class="m-card-name">${esc(r.name)}</span>
       ${sBadgeR(r)}
     </div>
-    <div class="m-card-row">📞 <b>${esc(r.phone)}</b></div>
-    <div class="m-card-row">🏫 <b>${esc(r.dept||'')}</b></div>
+    <div class="m-card-row"><b>${esc(r.phone)}</b></div>
+    <div class="m-card-row"><b class="m-sub">${esc(r.dept||'')}</b></div>
     <div class="m-card-row">${itemBadge(r.item)} <b>${esc(r.itemNum)}</b></div>
-    <div class="m-card-row">📅 <b>${fmtDate(r.date)}</b></div>
-    ${hasReturnDate&&r.returnDate?`<div class="m-card-row">↩️ <b>${fmtDate(r.returnDate)}</b></div>`:''}
-    ${hasDays?`<div class="m-card-row">⏱ <b style="color:var(--s-unpaid)">${daysSince(r.date)}일 경과</b></div>`:''}
+    <div class="m-card-row"><span class="m-k">대여</span><b>${fmtDate(r.date)}</b></div>
+    ${hasReturnDate&&r.returnDate?`<div class="m-card-row"><span class="m-k">반납</span><b>${fmtDate(r.returnDate)}</b></div>`:''}
+    ${cols.includes('due')?(()=>{const d=dueInfo(r);return `<div class="m-card-row"><span class="m-k">기한</span><b style="color:${d.color}">${d.text}</b></div>`;})():''}
+    ${hasDays?`<div class="m-card-row"><span class="m-k">경과</span><b style="color:var(--s-unpaid)">${daysSince(r.date)}일 경과</b></div>`:''}
     ${hasActions?`<div class="m-card-actions">${actionBtns(r)}</div>`:''}
   </div>`;
 }
@@ -1741,15 +2067,39 @@ function setMobileCards(tbodyId,html,emptyMsg){
   if(!ml){ml=document.createElement('div');ml.className='mobile-card-list';wrap.appendChild(ml);}
   ml.innerHTML=html||`<div style="padding:20px;text-align:center;color:var(--text-muted)">${emptyMsg}</div>`;
 }
-function emptyRow(n,msg='내역이 없습니다'){return `<tr><td colspan="${n}"><div class="empty-state"><div class="ico">📭</div><p>${msg}</p></div></td></tr>`;}
+function emptyRow(n,msg='내역이 없습니다'){return `<tr><td colspan="${n}"><div class="empty-state"><p>${msg}</p></div></td></tr>`;}
 
 // ══ RENDER TABLES ══
+// 대시보드: 지금 물품을 갖고 있는 대여(대여중·미납·연체료 납부 후 미반납)만
+const RECENT_MAX=30;
 function renderRecent(){
-  const list=[...rentals].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,10);
-  const cols=['name','phone','dept','item','num','date','status','actions'];
+  // 순서: 대여중 → 미납(연체료 납부) → 미납 → 장기미납 (장기미납은 처리가 오래 걸려 맨 아래)
+  // 대여중은 기한 안 지난 것(오늘까지가 맨 위) → 기한 지난 것(맨 아래) 순
+  // 장기미납은 지난 날수가 적은 것이 위, 많이 지난 것이 맨 아래
+  const now=Date.now();
+  const grp=r=>r.status==='renting'?(dueDate(r)<now?1:0):r.status==='unpaid_paid'?2:isLongUnpaid(r)?4:3;
+  const ord=(a,b)=>{const g=grp(a);
+    if(g===1||g===4)return dueDate(b)-dueDate(a); // 지난 것들: 덜 지난 것 먼저
+    return dueDate(a)-dueDate(b);};               // 나머지: 기한 가까운 것 먼저
+  const all=rentals.filter(r=>['renting','unpaid','unpaid_paid'].includes(r.status)&&r.date)
+    .sort((a,b)=>grp(a)-grp(b)||ord(a,b));
+  const list=all.slice(0,RECENT_MAX);
+  const cols=['name','phone','dept','item','num','date','due','status','actions'];
   document.getElementById('tbl-recent').innerHTML=
-    list.length?list.map(r=>makeRow(r,cols)).join(''):emptyRow(8);
-  setMobileCards('tbl-recent',list.map(r=>makeMobileCard(r,cols)).join(''),'내역이 없습니다');
+    list.length?list.map(r=>makeRow(r,cols)).join(''):emptyRow(9,'지금 대여중인 물품이 없어요');
+  setMobileCards('tbl-recent',list.map(r=>makeMobileCard(r,cols)).join(''),'지금 대여중인 물품이 없어요');
+  const c=document.getElementById('recent-count');
+  if(c)c.textContent=all.length?`(${all.length}건${all.length>RECENT_MAX?` · 기한 가까운 ${RECENT_MAX}건만 표시`:''})`:'';
+}
+// 반납 기한 표시 — 지남: 빨강 / 오늘: 주황 / 그 외: 회색
+function dueInfo(r){
+  const due=dueDate(r),now=new Date();
+  const day=d=>{const x=new Date(d);x.setHours(0,0,0,0);return x.getTime();};
+  const dd=Math.round((day(due)-day(now))/86400000);
+  const when=`${p2(due.getMonth()+1)}.${p2(due.getDate())} ${p2(due.getHours())}:${p2(due.getMinutes())}`;
+  if(due<now)return {text:`${when} · ${dd===0?'오늘 지남':`${-dd}일 지남`}`,color:'var(--s-unpaid)',bold:true};
+  if(dd===0)return {text:`${when} · 오늘까지`,color:'var(--c-warn-text)',bold:true};
+  return {text:`${when} · ${dd}일 남음`,color:'var(--text-muted)',bold:false};
 }
 const PAGE_SIZE=20;
 let currentPage=1;
@@ -1884,10 +2234,10 @@ async function restoreItemFromUnpaid(key,type,num){
 // ══ INVENTORY ══
 function renderInventory(){
   document.getElementById('inv-tabs').innerHTML=Object.keys(ITEM_NUMBERS).map(t=>
-    `<div class="inv-tab${t===currentInvTab?' active':''}" onclick="switchInvTab('${t}')">${ITEM_ICONS[t]} ${ITEM_LABELS[t]}</div>`
+    `<div class="inv-tab${t===currentInvTab?' active':''}" onclick="switchInvTab('${t}')">${ITEM_LABELS[t]}</div>`
   ).join('');
   const sel=document.getElementById('inv-select');
-  if(sel){sel.innerHTML=Object.keys(ITEM_NUMBERS).map(t=>`<option value="${t}"${t===currentInvTab?' selected':''}>${ITEM_ICONS[t]} ${ITEM_LABELS[t]}</option>`).join('');}
+  if(sel){sel.innerHTML=Object.keys(ITEM_NUMBERS).map(t=>`<option value="${t}"${t===currentInvTab?' selected':''}>${ITEM_LABELS[t]}</option>`).join('');}
   const nums=ITEM_NUMBERS[currentInvTab];
   const stMap={available:'st-available',renting:'st-renting',unpaid:'st-unpaid',broken:'st-broken',lost:'st-lost','unpaid_paid':'st-unpaid-paid','lost_paid':'st-lost-paid'};
   const lbMap={
@@ -1907,7 +2257,7 @@ function renderInventory(){
       .sort((a,b)=>new Date(b.date)-new Date(a.date))[0];
     const renterStr=(rec&&(['renting','unpaid','unpaid_paid'].includes(rec.status)||isOpenLostPaid(rec)))?`<div style="font-size:10px;font-weight:400;color:var(--text);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(rec.name)}</div>`:'';
     const invBadge=(st==='unpaid'&&rec&&isLongUnpaid(rec))
-      ?`<span class="sbadge sb-unpaid" style="font-size:9px;padding:2px 4px;gap:3px">⏰ 장기미납</span>`
+      ?`<span class="sbadge sb-unpaid" style="font-size:9px;padding:2px 4px;gap:3px">장기미납</span>`
       :(lbMap[st]||lbMap.available);
     return `<div class="inv-item ${stMap[st]||'st-available'}" onclick="openInvModal('${currentInvTab}','${esc(escJs(num))}')">
       <div class="inv-num">${esc(num)}</div>${invBadge}${renterStr}
@@ -1930,17 +2280,17 @@ function openInvModal(type,num){
   const isDirectlySet=iStVal2==='broken'||(iStVal2==='lost'&&!hasLostRentalRec);
   const opts=[];
   // 분실비 납부 상태(아직 교체 전)도 새 물품으로 교체 시 대여가능으로 바꿀 수 있게
-  if(isDirectlySet||st==='lost_paid') opts.push({v:'available',l:'대여가능',ico:'✅'});
-  opts.push({v:'unpaid',l:'미납',ico:'⚠️'},{v:'broken',l:'고장',ico:'🔧'},{v:'lost',l:'분실',ico:'❌'});
+  if(isDirectlySet||st==='lost_paid') opts.push({v:'available',l:'대여가능'});
+  opts.push({v:'unpaid',l:'미납'},{v:'broken',l:'고장'},{v:'lost',l:'분실'});
   const hasUnpaidRec=rentals.some(r=>r.item===type&&String(r.itemNum)===String(num)&&['unpaid','unpaid_paid'].includes(r.status));
   const hasLostRec=rentals.some(r=>r.item===type&&String(r.itemNum)===String(num)&&(r.status==='lost'||isOpenLostPaid(r)));
-  if(hasUnpaidRec) opts.push({v:'unpaid_paid',l:'연체료 납부',ico:'🟠'});
-  if(hasUnpaidRec&&!hasLostRec) opts.push({v:'lost_paid',l:'분실비 납부',ico:'💜'});
-  if(hasLostRec) opts.push({v:'lost_paid',l:'분실비 납부',ico:'💜'});
+  if(hasUnpaidRec) opts.push({v:'unpaid_paid',l:'연체료 납부'});
+  if(hasUnpaidRec&&!hasLostRec) opts.push({v:'lost_paid',l:'분실비 납부'});
+  if(hasLostRec) opts.push({v:'lost_paid',l:'분실비 납부'});
+  const _stc=getStClr();
+  const _cc=v=>v==='available'?_stc.returned:v==='unpaid_paid'?cssVar('--s-unpaid-paid'):v==='lost_paid'?cssVar('--s-lost-paid'):_stc[v];
   document.getElementById('inv-cond-opts').innerHTML=opts.map(o=>
-    `<div class="cond-opt${cur===o.v?' sel-'+o.v:''}" data-v="${o.v}" onclick="pickCond('${o.v}')">
-      <div class="cico">${o.ico}</div>${o.l}
-    </div>`).join('');
+    `<div class="cond-opt${cur===o.v?' sel-'+o.v:''}" data-v="${o.v}" onclick="pickCond('${o.v}')"><i class="s5-dot" style="background:${_cc(o.v)}"></i>${o.l}</div>`).join('');
   // 상태별 버튼 표시
   const returnBtn=document.getElementById('inv-return-btn');
   const unpaidReturnBtn=document.getElementById('inv-unpaid-return-btn');
@@ -2088,7 +2438,7 @@ function checkRestriction(){
   // 이름+전화번호 모두 입력된 경우에만 확인 (이름만으로 검색 시 동명이인 오탐 방지)
   if(!name||!phone){w.style.display='none';return;}
   const bl=rentals.find(r=>r.name===name&&r.phone===phone&&BL_STATUS.includes(r.status));
-  if(bl){w.textContent=`⛔ ${bl.name}님은 "${sInfo(bl.status).l}" 상태로 대여가 제한됩니다.`;w.style.display='block';}
+  if(bl){w.textContent=`${bl.name}님은 "${sInfo(bl.status).l}" 상태로 대여가 제한됩니다.`;w.style.display='block';}
   else{w.style.display='none';}
   autoFillDept();
 }
@@ -2128,7 +2478,7 @@ function showSuggest(field){
   _acField=field;_acList=list;_acIdx=-1;
   if(!list.length){box.style.display='none';return;}
   box.innerHTML=list.map((p,i)=>`<div class="ac-item" data-i="${i}" onpointerdown="event.preventDefault();pickSuggest(${i})">
-    <div class="ac-name">${esc(p.name)}${p.bl?`<span class="ac-bl">⛔ ${sInfo(p.bl).l}</span>`:''}</div>
+    <div class="ac-name">${esc(p.name)}${p.bl?`<span class="ac-bl">${sInfo(p.bl).l}</span>`:''}</div>
     <div class="ac-sub">${esc(maskPhone(p.phone))} · ${esc(p.dept||'학부 없음')} · 대여 ${p.count}회</div>
   </div>`).join('');
   box.style.display='block';
@@ -2194,10 +2544,10 @@ async function submitRental(){
   if(name&&phone&&dept&&selItemType&&!itemNum){toast('물품 번호를 선택해주세요','err');document.getElementById('f-item-num')?.focus();return;}
   if(!name||!phone||!dept||!selItemType||!itemNum){toast('모든 필수 항목을 입력해주세요','err');return;}
   const bl=rentals.find(r=>r.name===name&&r.phone===phone&&BL_STATUS.includes(r.status));
-  if(bl){toast(`⛔ ${name}님은 "${sInfo(bl.status).l}" 상태로 대여가 제한됩니다.`,'err');return;}
+  if(bl){toast(`${name}님은 "${sInfo(bl.status).l}" 상태로 대여가 제한됩니다.`,'err');return;}
   if(!isAvailable(selItemType,itemNum)){
     const curState=getItemState(selItemType,itemNum);
-    toast(`⛔ ${ITEM_LABELS[selItemType]} ${itemNum}은(는) 현재 "${sInfo(curState).l}" 상태로 대여할 수 없습니다.`,'err');return;
+    toast(`${ITEM_LABELS[selItemType]} ${itemNum}은(는) 현재 "${sInfo(curState).l}" 상태로 대여할 수 없습니다.`,'err');return;
   }
   if(!isOnline()) return;
   const btn=document.getElementById('rental-submit-btn');
@@ -2206,25 +2556,25 @@ async function submitRental(){
   try{
     const cl=await claimItem(selItemType,itemNum);
     if(!cl.ok){
-      toast(`⛔ ${ITEM_LABELS[selItemType]} ${itemNum}은(는) 방금 다른 곳에서 처리 중입니다. 새로고침 후 다시 시도해주세요.`,'err');
-      if(btn){btn.disabled=false;btn.textContent='✅ 등록';}
+      toast(`${ITEM_LABELS[selItemType]} ${itemNum}은(는) 방금 다른 곳에서 처리 중입니다. 새로고침 후 다시 시도해주세요.`,'err');
+      if(btn){btn.disabled=false;btn.textContent='등록';}
       return;
     }
-    const sv=await serverItemState(selItemType,itemNum);
+    const sv=await serverItemState(selItemType,itemNum,phone);
     if(sv.state!=='available'){
-      toast(`⛔ ${ITEM_LABELS[selItemType]} ${itemNum}은(는) 방금 다른 곳에서 "${sInfo(sv.state).l}" 처리되었습니다. 새로고침 후 다시 시도해주세요.`,'err');
-      if(btn){btn.disabled=false;btn.textContent='✅ 등록';}
+      toast(`${ITEM_LABELS[selItemType]} ${itemNum}은(는) 방금 다른 곳에서 "${sInfo(sv.state).l}" 처리되었습니다. 새로고침 후 다시 시도해주세요.`,'err');
+      if(btn){btn.disabled=false;btn.textContent='등록';}
       return;
     }
     const sbl=sv.rentals.find(r=>r.name===name&&r.phone===phone&&BL_STATUS.includes(r.status));
     if(sbl){
-      toast(`⛔ ${name}님은 "${sInfo(sbl.status).l}" 상태로 대여가 제한됩니다.`,'err');
-      if(btn){btn.disabled=false;btn.textContent='✅ 등록';}
+      toast(`${name}님은 "${sInfo(sbl.status).l}" 상태로 대여가 제한됩니다.`,'err');
+      if(btn){btn.disabled=false;btn.textContent='등록';}
       return;
     }
   }catch(e){
     toast('서버 확인 실패 — 인터넷 연결을 확인 후 다시 시도해주세요','err');
-    if(btn){btn.disabled=false;btn.textContent='✅ 등록';}
+    if(btn){btn.disabled=false;btn.textContent='등록';}
     return;
   }
   if(btn)btn.textContent='저장 중...';
@@ -2242,7 +2592,7 @@ async function submitRental(){
     updateHistoryBtns();
     toast('저장에 실패했습니다. 인터넷 연결을 확인 후 다시 시도해주세요.','err');
   }finally{
-    if(btn){btn.disabled=false;btn.textContent='✅ 등록';}
+    if(btn){btn.disabled=false;btn.textContent='등록';}
   }
 }
 
@@ -2250,12 +2600,19 @@ async function submitRental(){
 function openStatusModal(id){
   editId=id;const r=rentals.find(x=>x.id===id);if(!r)return;
   document.getElementById('status-modal-sub').textContent=`${r.dept||''} | ${ITEM_LABELS[r.item]} ${r.itemNum}`;
-  document.getElementById('status-info-box').innerHTML=`<strong>${esc(r.name)}</strong> · <span class="td-mono">${esc(r.phone)}</span>`;
+  const _d=dueInfo(r);
+  document.getElementById('status-info-box').innerHTML=`<div><strong>${esc(r.name)}</strong><span class="si-m"> · ${esc(r.phone)}</span></div>
+    <div class="si-item">${itemBadge(r.item)} <b>${esc(r.itemNum)}</b><span class="si-m"> · ${esc(r.dept||'')}</span></div>
+    <div class="si-dates">대여 ${fmtDate(r.date).slice(5)} · 기한 <span style="color:${_d.color};font-weight:${_d.bold?600:400}">${_d.text}</span></div>`;
   selStatus=r.status;
-  document.getElementById('s5-opts').innerHTML=S5.map(s=>
-    `<div class="s5-opt${r.status===s.v?' sel-'+s.v:''}" data-v="${s.v}" onclick="pickStatus('${s.v}')">
-      <div class="s5ico">${s.ico}</div>${s.l}
-    </div>`).join('');
+  // 상태를 의미별로 묶음: 진행 / 문제 / 납부 (창 안에서는 긴 이름을 짧게)
+  const SHORT={unpaid_paid:'연체료 납부',lost_paid:'분실비 납부'};
+  const GROUPS=[['진행',['renting','returned']],['문제',['unpaid','broken','lost']],['납부',['unpaid_paid','lost_paid']]];
+  const stc=getStClr();
+  document.getElementById('s5-opts').innerHTML=GROUPS.map(([g,vs])=>`<div class="s5-row"><span class="s5-gk">${g}</span><div class="s5-ops">`+
+    vs.map(v=>{const s=sInfo(v);const c=v==='unpaid_paid'?cssVar('--s-unpaid-paid'):v==='lost_paid'?cssVar('--s-lost-paid'):stc[v];
+      return `<div class="s5-opt${r.status===v?' sel-'+v:''}" data-v="${v}" onclick="pickStatus('${v}')"><i class="s5-dot" style="background:${c}"></i>${SHORT[v]||s.l}</div>`;}).join('')+
+    `</div></div>`).join('');
   document.getElementById('f-status-note').value=r.note||'';
   document.getElementById('return-date-wrap').style.display=r.status==='returned'?'block':'none';
   // 반납일이 없으면 칸을 비움 (이전에 연 기록의 값이 남지 않도록)
@@ -2362,7 +2719,7 @@ async function quickReturn(id){
   delete itemStatus[key];
   try{
     await fbCommit([opDel(`/itemStatus/${key}`),opPut(`/rentals/${r.id}`,r)]);
-    renderAfterStatus();toast(`${r.name}님 ${ITEM_LABELS[r.item]} 반납 완료!`,'ok');
+    renderAfterStatus();toast(`${r.name}님 · ${ITEM_LABELS[r.item]} ${r.itemNum} 반납 완료!`,'ok');
   }catch(e){
     r.status=prevStatus;r.returnDate=prevReturnDate;
     if(prevWasBlacklisted===undefined)delete r.wasBlacklisted;else r.wasBlacklisted=prevWasBlacklisted;
@@ -2385,7 +2742,7 @@ async function quickUnpaidReturnFromInv(){
   if(!isOnline()) return;
   const days=daysSince(r.date);
   const label=isLongUnpaid(r)?'장기미납':'미납';
-  if(!confirm(`${r.name}님의 ${label} 물품을 연체료 납부 처리 후 반납하시겠습니까?\n\n물품: ${ITEM_LABELS[r.item]} ${r.itemNum}\n경과일: ${days}일\n\n✅ 연체료 납부 완료 처리\n✅ 대여제한 자동 해제\n✅ 반납 완료 처리`)) return;
+  if(!confirm(`${r.name}님의 ${label} 물품을 연체료 납부 처리 후 반납하시겠습니까?\n\n물품: ${ITEM_LABELS[r.item]} ${r.itemNum}\n경과일: ${days}일\n\n· 연체료 납부 완료 처리\n· 대여제한 자동 해제\n· 반납 완료 처리`)) return;
   closeModal('modal-inv');
   await quickReturn(id);
 }
@@ -2458,9 +2815,9 @@ async function saveEditRental(){
   if(keyChanged&&['renting','unpaid','unpaid_paid'].includes(r.status)){
     try{
       const cl=await claimItem(editSelItemType,itemNum);
-      if(!cl.ok){toast(`⛔ ${ITEM_LABELS[editSelItemType]} ${itemNum}은(는) 방금 다른 곳에서 처리 중입니다. 새로고침 후 다시 시도해주세요.`,'err');return;}
+      if(!cl.ok){toast(`${ITEM_LABELS[editSelItemType]} ${itemNum}은(는) 방금 다른 곳에서 처리 중입니다. 새로고침 후 다시 시도해주세요.`,'err');return;}
       const sv=await serverItemState(editSelItemType,itemNum);
-      if(sv.state!=='available'){toast(`⛔ ${ITEM_LABELS[editSelItemType]} ${itemNum}은(는) 현재 "${sInfo(sv.state).l}" 상태입니다. 새로고침 후 다시 시도해주세요.`,'err');return;}
+      if(sv.state!=='available'){toast(`${ITEM_LABELS[editSelItemType]} ${itemNum}은(는) 현재 "${sInfo(sv.state).l}" 상태입니다. 새로고침 후 다시 시도해주세요.`,'err');return;}
     }catch(e){toast('서버 확인 실패 — 인터넷 연결을 확인 후 다시 시도해주세요','err');return;}
   }
   _opLock=true;_beginSaving();
@@ -2503,6 +2860,11 @@ function openRentalFromInv(){
   for(let i=0;i<sel.options.length;i++){
     if(String(sel.options[i].value)===String(invNum)){sel.selectedIndex=i;break;}
   }
+}
+async function deleteFromStatusModal(){
+  const id=editId;
+  closeModal('modal-status');
+  await deleteRental(id);
 }
 async function deleteRental(id){
   if(!confirm('이 내역을 삭제하시겠습니까?\n\n※ 삭제된 내역은 통계에 반영되지 않습니다.'))return;
@@ -2563,32 +2925,32 @@ function renderBlacklist(){
   const ss=document.getElementById('bl-sms')?.value||'';
   if(ss==='none')persons=persons.filter(p=>!_blSmsInfo(p).lastSent);
   const grid=document.getElementById('bl-grid');
-  if(!persons.length){grid.innerHTML=`<div class="empty-state"><div class="ico">🎉</div><p>대여제한 대상자가 없습니다</p></div>`;return;}
+  if(!persons.length){grid.innerHTML=`<div class="empty-state"><p>대여제한 대상자가 없습니다</p></div>`;return;}
   grid.innerHTML=persons.map(p=>{
     const key=smsKey(p.name,p.phone);
     const {logs,currentLogs,lastSent}=_blSmsInfo(p);
 
     const tags=p.records.map(r=>{
       const isLong=isLongUnpaid(r);
-      const label=isLong?'⏰ 장기미납':sInfo(r.status).l;
+      const label=isLong?'장기미납':sInfo(r.status).l;
       const extra='';
-      return `<span class="sbadge ${sInfo(r.status).cl}" style="font-size:10px;${extra}">${label} · ${ITEM_LABELS[r.item]||r.item} ${esc(r.itemNum)}</span>`;
+      return `<span class="sbadge ${sInfo(r.status).cl}">${label} · ${ITEM_LABELS[r.item]||r.item} ${esc(r.itemNum)}</span>`;
     }).join('');
 
     const hasU=p.records.some(r=>r.status==='unpaid');
     const hasL=p.records.some(r=>r.status==='lost');
     const payBtns=[
-      hasU?`<button class="btn btn-orange btn-sm" onclick="blPay('${escJs(p.name)}','${escJs(p.phone)}','unpaid')">연체료 납부</button>`:'',
-      hasU?`<button class="btn btn-green btn-sm" onclick="blReturn('${escJs(p.name)}','${escJs(p.phone)}','unpaid')">납부+반납</button>`:'',
-      (hasU&&!hasL)?`<button class="btn btn-purple btn-sm" onclick="blPayAsLost('${escJs(p.name)}','${escJs(p.phone)}')">분실비 납부</button>`:'',
-      hasL?`<button class="btn btn-purple btn-sm" onclick="blPay('${escJs(p.name)}','${escJs(p.phone)}','lost')">분실비 납부</button>`:'',
+      hasU?`<button class="btn btn-ghost btn-sm" onclick="blPay('${escJs(p.name)}','${escJs(p.phone)}','unpaid')">연체료 납부</button>`:'',
+      hasU?`<button class="btn btn-ghost btn-sm" onclick="blReturn('${escJs(p.name)}','${escJs(p.phone)}','unpaid')">납부+반납</button>`:'',
+      (hasU&&!hasL)?`<button class="btn btn-ghost btn-sm" onclick="blPayAsLost('${escJs(p.name)}','${escJs(p.phone)}')">분실비 납부</button>`:'',
+      hasL?`<button class="btn btn-ghost btn-sm" onclick="blPay('${escJs(p.name)}','${escJs(p.phone)}','lost')">분실비 납부</button>`:'',
       hasL?`<button class="btn btn-ghost btn-sm" onclick="blReturn('${escJs(p.name)}','${escJs(p.phone)}','lost')">분실해제</button>`:''
     ].filter(Boolean).join('');
 
     // 문자 발송 상태 (현재 BL 에피소드 기준)
     const smsBadge=lastSent
-      ?`<span class="sms-badge sms-sent">✉️ 발송완료</span><span class="sms-last-time">${fmtDate(lastSent.sentAt)}</span>${currentLogs.length>1?`<span style="font-size:10px;color:var(--text-muted)">총 ${currentLogs.length}회</span>`:''}`
-      :`<span class="sms-badge sms-none">✉️ 미발송</span>`;
+      ?`<b>발송완료</b> · ${fmtDate(lastSent.sentAt)}${currentLogs.length>1?` · 총 ${currentLogs.length}회`:''}`
+      :`<span class="bl-sms-none">미발송</span>`;
 
     // 발송 이력 (최근 3건, 펼치기)
     const logHtml=logs.slice(0,5).map(l=>`
@@ -2597,35 +2959,27 @@ function renderBlacklist(){
           <span class="sli-time">${fmtDate(l.sentAt)}</span>
           ${l.note?`<span class="sli-note">· ${esc(l.note)}</span>`:''}
         </div>
-        ${l.reply?`<div style="font-size:10px;color:var(--accent);padding-left:2px">📝 ${esc(l.reply)}</div>`:''}
+        ${l.reply?`<div style="font-size:10px;color:var(--accent);padding-left:2px">메모 · ${esc(l.reply)}</div>`:''}
       </div>`).join('');
-    const logSection=logs.length?`
-      <div style="margin-top:6px">
-        <button class="btn btn-ghost btn-sm" style="font-size:10px;padding:3px 8px" onclick="toggleSmsLog('smslog-${key}')">
-          이력 ${logs.length}건 보기/숨기기
-        </button>
-        <div class="sms-log-wrap" id="smslog-${key}" style="display:none;margin-top:6px">${logHtml}</div>
-      </div>`:'';
+    const logToggle=logs.length?` · <button class="bl-link" onclick="toggleSmsLog('smslog-${key}')">이력 ${logs.length}건 보기</button>`:'';
+    const logSection=logs.length?`<div class="sms-log-wrap" id="smslog-${key}" style="display:none;margin-top:8px">${logHtml}</div>`:'';
 
     return `<div class="bl-card">
-      <div class="bl-card-top">
-        <div class="bl-avatar">${esc(p.name.charAt(0))}</div>
+      <div class="bl-head">
         <div class="bl-info">
           <div class="bl-name">${esc(p.name)}</div>
           <div class="bl-meta">${esc(p.phone)} · ${esc(p.dept)}</div>
-          <div class="bl-tags">${tags}</div>
         </div>
-        <div class="bl-actions">
-          ${payBtns}
-          <button class="btn btn-ghost btn-sm" onclick="goRentals('${escJs(p.name)}')">내역 보기</button>
-        </div>
+        <button class="btn btn-ghost btn-sm" onclick="goRentals('${escJs(p.name)}')">내역 보기</button>
       </div>
-      <div class="bl-sms-section">
-        <div class="bl-sms-top">
-          ${smsBadge}
-          <button class="btn btn-primary btn-sm" style="margin-left:auto" onclick="openSmsModal('${escJs(p.name)}','${escJs(p.phone)}')">✉️ 문자 발송</button>
-        </div>
-        ${logSection}
+      <div class="bl-rows">
+        <div class="bl-row"><span class="bl-k">사유</span><div class="bl-tags">${tags}</div></div>
+        <div class="bl-row"><span class="bl-k">문자</span><span class="bl-sms-line">${smsBadge}${logToggle}</span></div>
+      </div>
+      ${logSection}
+      <div class="bl-foot">
+        <div class="bl-actions">${payBtns}</div>
+        <button class="btn btn-primary btn-sm" onclick="openSmsModal('${escJs(p.name)}','${escJs(p.phone)}')">문자 발송</button>
       </div>
     </div>`;
   }).join('');
@@ -2675,12 +3029,12 @@ function renderSmsModalLog(){
         <!-- 메모 -->
         ${l.reply
           ?`<div style="display:flex;align-items:center;gap:6px;background:var(--surface);border-radius:5px;padding:5px 8px;border:1px solid var(--border)">
-              <span style="font-size:10px;color:var(--accent);font-weight:700;flex-shrink:0">📝 메모</span>
+              <span style="font-size:10px;color:var(--accent);font-weight:700;flex-shrink:0">메모</span>
               <span id="sms-reply-view-${i}" style="font-size:11px;color:var(--text);flex:1">${esc(l.reply)}</span>
               <input id="sms-reply-input-${i}" class="fi" style="display:none;flex:1;padding:3px 7px;font-size:11px" value="${esc(l.reply)}"
                 onkeydown="if(event.key==='Enter')saveSmsReply(${i});if(event.key==='Escape'){event.preventDefault();cancelSmsReply(${i})}">
               <button id="sms-reply-edit-${i}" onclick="startSmsReplyEdit(${i})"
-                style="background:none;border:none;cursor:pointer;font-size:11px;color:var(--text-muted);padding:1px 3px;flex-shrink:0">✏️</button>
+                style="background:none;border:none;cursor:pointer;font-size:11px;color:var(--text-muted);padding:1px 3px;flex-shrink:0;display:inline-flex" aria-label="메모 수정">${ICO.edit}</button>
               <button id="sms-reply-save-${i}" onclick="saveSmsReply(${i})"
                 style="display:none;background:var(--accent);color:white;border:none;border-radius:4px;font-size:10px;padding:2px 7px;cursor:pointer;flex-shrink:0">저장</button>
             </div>`
@@ -2688,7 +3042,7 @@ function renderSmsModalLog(){
               <input id="sms-reply-input-${i}" class="fi" placeholder="메모 추가..." style="flex:1;padding:4px 8px;font-size:11px"
                 onkeydown="if(event.key==='Enter')saveSmsReply(${i})">
               <button onclick="saveSmsReply(${i})"
-                style="background:var(--accent);color:white;border:none;border-radius:5px;font-size:11px;padding:4px 9px;cursor:pointer;white-space:nowrap;font-family:'Noto Sans KR',sans-serif;font-weight:600">추가</button>
+                style="background:var(--accent);color:white;border:none;border-radius:5px;font-size:11px;padding:4px 9px;cursor:pointer;white-space:nowrap;font-family:var(--font);font-weight:600">추가</button>
             </div>`
         }
       </div>`).join('');
@@ -2773,7 +3127,7 @@ async function confirmSmsSent(){
   if(btn){btn.disabled=true;btn.textContent='저장 중...';}
   try{
     await fbPut(`/smsLog/${key}`,logs);
-    toast(`✉️ ${_smsName}님 문자 발송 기록 완료!`,'ok');
+    toast(`${_smsName}님 문자 발송 기록 완료!`,'ok');
   }catch(e){
     smsLog[key]=prevLogs;
     document.getElementById('sms-note-input').value=note;
@@ -2781,7 +3135,7 @@ async function confirmSmsSent(){
     renderBlacklist();
     toast('저장 실패 — 네트워크를 확인해주세요','err');
   }finally{
-    if(btn){btn.disabled=false;btn.textContent='✉️ 발송 기록 저장';}
+    if(btn){btn.disabled=false;btn.textContent='발송 기록 저장';}
   }
 }
 async function blPay(name,phone,status){
@@ -2945,52 +3299,41 @@ function renderBlHistory(){
   persons.sort((a,b)=>latestResolved(b)-latestResolved(a));
   const grid=document.getElementById('bl-history-grid');
   if(!persons.length){
-    grid.innerHTML=`<div class="empty-state"><div class="ico">📋</div><p>해제된 대여제한 이력이 없습니다</p></div>`;
+    grid.innerHTML=`<div class="empty-state"><p>해제된 대여제한 이력이 없습니다</p></div>`;
     return;
   }
   grid.innerHTML=persons.map(p=>{
-    const rows=p.records.map(r=>{
-      const reasonLabel=r.note?`<span style="color:var(--text-muted);font-size:10px"> · ${esc(r.note)}</span>`:'';
-      return `<tr>
-        <td>${itemBadge(r.item)}</td>
-        <td class="td-mono">${esc(r.itemNum)}</td>
-        <td>${fmtDate(r.date)}</td>
-        <td>${r.resolvedAt?fmtDate(r.resolvedAt):'—'}</td>
-        <td>${reasonLabel}</td>
-      </tr>`;
-    }).join('');
-    const cards=p.records.map(r=>`<div class="blh-card">
-        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">${itemBadge(r.item)}<b class="td-mono" style="font-size:12px;color:var(--text)">${esc(r.itemNum)}</b></div>
-        <div class="blh-dates"><span>대여 ${fmtDate(r.date)}</span><span>해제 ${r.resolvedAt?fmtDate(r.resolvedAt):'—'}</span></div>
-        ${r.note?`<div class="blh-note">📝 ${esc(r.note)}</div>`:''}
-      </div>`).join('');
+    // 가장 최근 해제 기록만 보이고, 나머지는 '더보기'로 펼침
+    const recs=[...p.records].sort((a,b)=>new Date(b.resolvedAt||b.date)-new Date(a.resolvedAt||a.date));
+    const one=r=>`<div class="blh-item">
+        <div class="blh-what">${itemBadge(r.item)} <b>${esc(r.itemNum)}</b></div>
+        <div class="blh-when">대여 ${fmtDate(r.date)} · 해제 ${r.resolvedAt?fmtDate(r.resolvedAt):'—'}</div>
+        ${r.note?`<div class="blh-when">메모 · ${esc(r.note)}</div>`:''}
+      </div>`;
+    const hk='blh-more-'+smsKey(p.name,p.phone).replace(/[^\w가-힣]/g,'_');
+    // 더보기 버튼은 '상태' 줄 오른쪽에 둬서, 접힌 상태에서는 카드 높이가 모두 같게
+    const items=one(recs[0])+(recs.length>1?`<div class="blh-more" id="${hk}" style="display:none">${recs.slice(1).map(one).join('')}</div>`:'');
+    const more=recs.length>1?`<span class="blh-sep">·</span><button class="bl-link blh-toggle" onclick="toggleBlhMore('${hk}',this,${recs.length-1})">이전 기록 ${recs.length-1}건 더보기</button>`:'';
     return `<div class="bl-card">
-      <div class="bl-card-top">
-        <div class="bl-avatar" style="background:var(--bl-avatar-bg2);color:var(--bl-avatar-cl2)">${esc(p.name.charAt(0))}</div>
+      <div class="bl-head">
         <div class="bl-info">
           <div class="bl-name">${esc(p.name)}</div>
           <div class="bl-meta">${esc(p.phone)} · ${esc(p.dept)}</div>
-          <div class="bl-tags" style="margin-top:5px"><span class="sbadge sb-returned" style="font-size:10px">✅ 해제완료</span></div>
         </div>
-        <div class="bl-actions">
-          <button class="btn btn-ghost btn-sm" onclick="goRentals('${escJs(p.name)}')">내역 보기</button>
-        </div>
+        <button class="btn btn-ghost btn-sm" onclick="goRentals('${escJs(p.name)}')">내역 보기</button>
       </div>
-      <div class="blh-cards">${cards}</div>
-      <div class="blh-table" style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);overflow-x:auto">
-        <table style="width:100%;font-size:12px;border-collapse:collapse">
-          <thead><tr style="color:var(--text-muted);font-size:11px">
-            <th style="text-align:left;padding:4px 6px">물품</th>
-            <th style="text-align:left;padding:4px 6px">번호</th>
-            <th style="text-align:left;padding:4px 6px">대여일</th>
-            <th style="text-align:left;padding:4px 6px">해제일</th>
-            <th style="text-align:left;padding:4px 6px">메모</th>
-          </tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
+      <div class="bl-rows">
+        <div class="bl-row"><span class="bl-k">상태</span><span class="sbadge sb-returned">해제완료</span>${more}</div>
+        <div class="bl-row"><span class="bl-k">기록</span><div class="blh-list">${items}</div></div>
       </div>
     </div>`;
   }).join('');
+}
+function toggleBlhMore(id,btn,n){
+  const el=document.getElementById(id);if(!el)return;
+  const open=el.style.display==='none';
+  el.style.display=open?'flex':'none';
+  btn.textContent=open?'접기':`이전 기록 ${n}건 더보기`;
 }
 function goInvRentals(){
   closeModal('modal-inv');
@@ -3016,7 +3359,7 @@ function openManageModal(){
 
 function renderManageTabs(){
   document.getElementById('manage-tabs').innerHTML=Object.keys(ITEM_NUMBERS).map(t=>
-    `<div class="inv-tab${t===manageTab?' active':''}" onclick="switchManageTab('${t}')" style="font-size:12px">${ITEM_ICONS[t]} ${ITEM_LABELS[t]}</div>`
+    `<div class="inv-tab${t===manageTab?' active':''}" onclick="switchManageTab('${t}')" style="font-size:12px">${ITEM_LABELS[t]}</div>`
   ).join('');
 }
 
@@ -3039,7 +3382,7 @@ function toggleDragMode(){
   const banner=document.getElementById('drag-mode-banner');
   if(_dragMode){
     _dragSnap=captureNow(`${ITEM_LABELS[manageTab]} 순서 변경`);
-    btn.textContent='✅ 순서 변경 완료';
+    btn.textContent='순서 변경 완료';
     btn.style.background='var(--accent)';btn.style.color='white';btn.style.borderColor='var(--accent)';
     if(banner) banner.style.display='block';
   }else{
@@ -3094,8 +3437,8 @@ function renderManageList(){
     // 잠긴 번호: 마우스를 올리거나(PC) 누르면(휴대폰) 잠금 이유와 푸는 방법을 토스트로 안내
     const lockEv=locked?`onmouseenter="showLockToast('${esc(escJs(key))}')" onclick="showLockToast('${esc(escJs(key))}',true)"`:'';
     const statusIcon=locked
-      ?`<span ${lockEv} style="font-size:10px;opacity:.5;cursor:help">🔒</span>`
-      :hasHistory?'<span title="대여 기록 있음" style="font-size:10px;opacity:.5">📋</span>':'';
+      ?`<span ${lockEv} style="opacity:.55;cursor:help;display:inline-flex">${ICO.lock}</span>`
+      :hasHistory?`<span title="대여 기록 있음" style="opacity:.45;display:inline-flex">${ICO.clock}</span>`:'';
     const delBtn=locked
       ?`<span ${lockEv} style="width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;opacity:.3;font-size:11px;cursor:not-allowed">✕</span>`
       :`<button class="del-btn" onclick="deleteItemNum('${esc(escJs(key))}')" title="삭제">✕</button>`;
@@ -3123,7 +3466,7 @@ function showLockToast(numStr,force){
   else{why=`분실비는 납부됐지만 아직 새 물품으로 교체하지 않았어요`;how='새 물품을 들여온 뒤 물품 현황에서 이 번호를 "대여가능"으로 저장하면';}
   // 이전 안내 토스트는 지우고 새로 표시 (토스트가 쌓이지 않게)
   if(_lockToastEl&&_lockToastEl.isConnected)_lockToastEl.remove();
-  toast(`🔒 ${label} 삭제 불가 — ${why}. ${how} 잠금이 풀려요.`,'inf');
+  toast(`${label} 삭제 불가 — ${why}. ${how} 잠금이 풀려요.`,'inf');
   _lockToastEl=document.getElementById('toasts').lastElementChild;
   _lockToastKey=numStr;_lockToastAt=Date.now();
 }
@@ -3303,11 +3646,13 @@ function showPage(id){
     document.getElementById('s-status').value='active';
   }
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-item,.mnav-item').forEach(n=>n.classList.remove('active'));
+  document.querySelectorAll('.nav-item,.mnav-item,.ms-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
   const L={dashboard:'대시보드',rentals:'대여 현황',inventory:'물품 현황',unpaid:'물품 관리',blacklist:'대여제한시스템',stats:'통계',medicine:'의약품 관리'};
   [...document.querySelectorAll('.nav-item')].find(n=>n.textContent.includes(L[id]||''))?.classList.add('active');
   const mn=document.getElementById('mnav-'+id);if(mn)mn.classList.add('active');
+  // 하단 메뉴에 없는 페이지(대여제한·통계·의약품)는 '더보기'에 표시
+  if(['blacklist','stats','medicine'].includes(id))document.getElementById('mnav-more')?.classList.add('active');
   if(id==='rentals')renderRentals();
   if(id==='inventory')renderInventory();
   if(id==='unpaid'){renderUnpaid();switchUnpaidTab(1);}
@@ -3338,7 +3683,7 @@ function closeModal(id){
 function toast(msg,type='inf'){
   const c=document.getElementById('toasts');
   const el=document.createElement('div');el.className=`toast ${type}`;
-  el.innerHTML=`<span>${type==='ok'?'✅':type==='err'?'❌':'ℹ️'}</span> ${esc(msg)}`;
+  el.innerHTML=`<span class="t-ic">${type==='ok'?ICO.check:type==='err'?ICO.x:ICO.info}</span><span>${esc(msg)}</span>`;
   c.appendChild(el);setTimeout(()=>el.remove(),3500);
 }
 // 저장 중 표시 — 0.25초 이상 걸리는 저장에만 표시(빠른 저장은 깜빡임 방지)
@@ -3356,11 +3701,17 @@ function _endSaving(){
   if(el)el.style.display='none';
 }
 function tick(){const e=document.getElementById('clock-time');if(e){const n=new Date();e.textContent=`${p2(n.getHours())}:${p2(n.getMinutes())}:${p2(n.getSeconds())}`; }}
+// 대여 등록·편집 창의 물품 버튼에 아이콘 네모 넣기
+document.querySelectorAll('.item-type-btn').forEach(b=>{const t=b.dataset.t;if(ITEM_ICO[t]&&!b.querySelector('.ib-sq'))b.insertAdjacentHTML('afterbegin',`<span class="ib-sq ibs-${t}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ITEM_ICO[t]}</svg></span>`);});
 ['modal-rental','modal-status','modal-edit','modal-inv','modal-manage','modal-sms','modal-med-manage','modal-med','modal-notice'].forEach(id=>{
   document.getElementById(id).addEventListener('click',e=>{if(e.target.id===id)closeModal(id);});
 });
 // ══ STATS ══
+if(window.Chart){Chart.defaults.font.family="'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,system-ui,'Apple SD Gothic Neo','Malgun Gothic',sans-serif";}
 function cssVar(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim();}
+// 통계 화면 전용 색 (채도를 낮춘 차분한 모던 톤)
+const STAT_ITEM_CLR={umbrella:'#2e9a6e',charger:'#c7841a',calculator:'#5458c8',multitap:'#c64d7d',heatpack:'#2a8fb5'};
+const STAT_ST_CLR={renting:'#5458c8',returned:'#2e9a6e',unpaid:'#d1495b',broken:'#e07a8a',lost:'#8b5fc0',unpaid_paid:'#c7841a',lost_paid:'#b3a0dc'};
 function getItemClr(){return{umbrella:cssVar('--c-umbrella'),charger:cssVar('--c-charger'),calculator:cssVar('--c-calculator'),multitap:cssVar('--c-multitap'),heatpack:cssVar('--c-heatpack')};}
 function getStClr(){return{renting:cssVar('--s-renting'),returned:cssVar('--s-returned'),unpaid:cssVar('--s-unpaid'),broken:cssVar('--s-broken'),lost:cssVar('--s-lost'),unpaid_paid:cssVar('--s-unpaid-paid'),lost_paid:cssVar('--s-lost-paid')};}
 const ST_LBL={renting:'대여중',returned:'반납완료',unpaid:'미납',broken:'고장',lost:'분실',unpaid_paid:'미납 (연체료 납부)',lost_paid:'분실 (분실비 납부)'};
@@ -3406,24 +3757,23 @@ function renderTurnover(list){
     const avgStr = avgHr===null ? '—' : avgHr<24 ? `${avgHr}시간` : `${Math.floor(avgHr/24)}일 ${avgHr%24}시간`;
 
     // 반납률 바 색상
-    const barColor = returnRate>=80?'#16a34a':returnRate>=50?'#f59e0b':'#dc2626';
+    const barColor = 'var(--accent)';
 
-    return `<div class="tv-card" data-ico="${ITEM_ICONS[t]}">
-      <div class="tv-icon">${ITEM_ICONS[t]}</div>
-      <div class="tv-name">${ITEM_LABELS[t]}</div>
+    return `<div class="tv-card">
+      <div class="tv-name">${itemBadge(t)}</div>
 
-      <div style="font-size:22px;font-weight:900;letter-spacing:-.04em;color:var(--c-${t});margin:4px 0 1px">${total}</div>
-      <div style="font-size:9px;color:var(--text-muted);margin-bottom:8px">누적 대여</div>
+      <div style="font-size:20px;font-weight:700;color:var(--text);margin:8px 0 1px">${total}</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">누적 대여</div>
 
       <div style="width:100%;height:4px;background:var(--surface2);border-radius:10px;overflow:hidden;margin-bottom:6px">
         <div style="height:100%;width:${returnRate}%;background:${barColor};border-radius:10px;transition:width .6s"></div>
       </div>
 
-      <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text-muted)">
-        <span>반납률 <b style="color:${barColor};font-family:'JetBrains Mono',monospace">${returnRate}%</b></span>
-        <span>미납 <b style="color:${unpaid>0?'var(--s-unpaid)':'var(--text-muted)'};font-family:'JetBrains Mono',monospace">${unpaidRate}%</b></span>
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted)">
+        <span>반납률 <b style="color:var(--text)">${returnRate}%</b></span>
+        <span>미납 <b style="color:${unpaid>0?'var(--s-unpaid)':'var(--text-muted)'};font-family:var(--font)">${unpaidRate}%</b></span>
       </div>
-      <div style="margin-top:6px;font-size:9px;color:var(--text-muted)">평균 <b style="color:var(--text)">${avgStr}</b></div>
+      <div style="margin-top:6px;font-size:12px;color:var(--text-muted)">평균 <b style="color:var(--text)">${avgStr}</b></div>
     </div>`;
   }).join('');
 }
@@ -3432,37 +3782,23 @@ function renderTurnover(list){
 function renderDonuts(){
   const wrap=document.getElementById('st-donuts');
   if(!wrap)return;
-  const types=Object.keys(ITEM_NUMBERS);
-  wrap.innerHTML=types.map(t=>`
-    <div class="donut-row">
-      <div class="donut-mini-wrap"><canvas id="dnt-${t}"></canvas></div>
-      <div class="donut-info">
-        <div class="donut-name">${ITEM_ICONS[t]} ${ITEM_LABELS[t]}</div>
-        <div class="donut-meta" id="dnt-meta-${t}"></div>
-      </div>
-    </div>`).join('');
-
-  types.forEach(t=>{
+  const stClr=STAT_ST_CLR;
+  wrap.innerHTML=Object.keys(ITEM_NUMBERS).map(t=>{
     const nums=ITEM_NUMBERS[t];
-    const counts={available:0,renting:0,unpaid:0,broken:0,lost:0};
-    nums.forEach(n=>{const s=getItemState(t,n);counts[s]=(counts[s]||0)+1;});
-    const labels=Object.keys(counts).filter(k=>counts[k]>0);
-    const data=labels.map(k=>counts[k]);
-    const stClr=getStClr();
-    const colors=labels.map(k=>k==='available'?stClr.returned:stClr[k]);
-    const ctx=document.getElementById('dnt-'+t)?.getContext('2d');
-    if(!ctx)return;
-    _charts['dnt-'+t]=new Chart(ctx,{
-      type:'doughnut',
-      data:{labels:labels.map(k=>k==='available'?'가능':ST_LBL[k]),datasets:[{data,backgroundColor:colors,borderWidth:2,borderColor:cssVar('--surface'),hoverOffset:3}]},
-      options:{responsive:true,maintainAspectRatio:false,cutout:'65%',
-        plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.label}: ${c.raw}개`}}}
-      }
-    });
-    const meta=document.getElementById('dnt-meta-'+t);
-    if(meta) meta.innerHTML=labels.map((k,i)=>`
-      <span class="dm-chip"><span class="dm-dot" style="background:${colors[i]||''}"></span>${k==='available'?'가능':ST_LBL[k]} ${data[i]}</span>`).join('');
-  });
+    const counts={available:0,renting:0,unpaid:0,unpaid_paid:0,broken:0,lost:0,lost_paid:0};
+    nums.forEach(n=>{const st=getItemState(t,n);counts[st]=(counts[st]||0)+1;});
+    const keys=Object.keys(counts).filter(k=>counts[k]>0);
+    const tot=nums.length||1;
+    const clr=k=>k==='available'?stClr.returned:(stClr[k]||cssVar('--s-lost'));
+    const lbl=k=>k==='available'?'가능':ST_LBL[k];
+    const bar=keys.map(k=>`<i style="flex:${counts[k]};background:${clr(k)}" title="${lbl(k)} ${counts[k]}개"></i>`).join('');
+    const meta=keys.map(k=>`<span class="dm-chip"><span class="dm-dot" style="background:${clr(k)}"></span>${lbl(k)} ${counts[k]}</span>`).join('');
+    return `<div class="sbar-row">
+      <div class="sbar-top"><span class="donut-name">${itemBadge(t)}</span><span class="sbar-tot">${nums.length}개</span></div>
+      <div class="sbar">${bar||'<i style="flex:1;background:var(--border)"></i>'}</div>
+      <div class="donut-meta">${meta}</div>
+    </div>`;
+  }).join('');
 }
 
 // ── ③ 학부별 바 ────────────────────────────────────────────────
@@ -3497,8 +3833,8 @@ function renderHourChart(list){
         label:'대여 건수',
         data:hours,
         // 운영 시간(14:00~18:00) 막대를 진하게
-        backgroundColor:hours.map((_,i)=>(i>=14&&i<18)?cssVar('--s-returned')+'cc':cssVar('--s-returned')+'40'),
-        borderColor:hours.map((_,i)=>(i>=14&&i<18)?cssVar('--s-returned'):cssVar('--s-returned')+'66'),
+        backgroundColor:hours.map((_,i)=>(i>=14&&i<18)?'#2e9a6e':'#cfe6da'),
+        borderColor:hours.map((_,i)=>(i>=14&&i<18)?'#2e9a6e':'#cfe6da'),
         borderWidth:1,borderRadius:3
       }]
     },
@@ -3518,13 +3854,13 @@ function _dailyChartConfig(list,big){
   const days=_period==='all'?30:parseInt(_period);
   const dateArr=[];
   for(let i=days-1;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);dateArr.push(_localDay(d));}
-  const clr=getItemClr(),muted=cssVar('--text-muted'),grid=cssVar('--border');
+  const clr=STAT_ITEM_CLR,muted=cssVar('--text-muted'),grid=cssVar('--border');
   return {days,config:{
     type:'line',
     data:{
       labels:dateArr.map(d=>{const[,m,dd]=d.split('-');return `${m}/${dd}`;}),
-      datasets:Object.keys(ITEM_NUMBERS).map(t=>({
-        label:`${ITEM_ICONS[t]} ${ITEM_LABELS[t]}`,
+      datasets:Object.keys(ITEM_NUMBERS).filter(t=>!_dailyItems||_dailyItems.has(t)).map(t=>({
+        label:`${ITEM_LABELS[t]}`,
         data:dateArr.map(d=>list.filter(r=>r.item===t&&r.date&&_localDay(new Date(r.date))===d).length),
         borderColor:clr[t],backgroundColor:clr[t]+(big?'28':'30'),
         borderWidth:big?2.5:2,pointRadius:big?3:2.5,pointHoverRadius:big?6:5,
@@ -3534,7 +3870,7 @@ function _dailyChartConfig(list,big){
     options:{
       responsive:true,maintainAspectRatio:false,
       plugins:{
-        legend:{position:'bottom',labels:{color:muted,font:{size:big?12:11},padding:big?16:12,boxWidth:big?12:10,boxHeight:big?12:10}},
+        legend:{display:false},
         ...(big?{tooltip:{mode:'index',intersect:false}}:{})
       },
       scales:{
@@ -3545,8 +3881,27 @@ function _dailyChartConfig(list,big){
     }
   }};
 }
+// 일별 추이 물품 선택 (전체 / 물품 하나)
+let _dailyItems=null; // null = 전체, 아니면 고른 물품들(Set) — 여러 개 골라 비교 가능
+function _dailyChips(){
+  const clr=STAT_ITEM_CLR;
+  return `<button class="inv-tab${!_dailyItems?' active':''}" onclick="setDailyItem('all')">전체</button>`+
+    Object.keys(ITEM_NUMBERS).map(t=>`<button class="inv-tab${_dailyItems&&_dailyItems.has(t)?' active':''}" onclick="setDailyItem('${t}')"><span class="dc-dot" style="background:${clr[t]}"></span>${ITEM_LABELS[t]}</button>`).join('');
+}
+function setDailyItem(t){
+  if(t==='all')_dailyItems=null;
+  else{
+    if(!_dailyItems)_dailyItems=new Set();
+    if(_dailyItems.has(t))_dailyItems.delete(t);else _dailyItems.add(t);
+    // 다 끄거나 다 켜면 '전체'로
+    if(!_dailyItems.size||_dailyItems.size===Object.keys(ITEM_NUMBERS).length)_dailyItems=null;
+  }
+  renderDailyChart(_filtered());
+  if(document.getElementById('modal-chart-detail').classList.contains('open'))renderDailyDetailChart();
+}
 function renderDailyChart(list){
   _charts['daily']?.destroy();
+  const ch=document.getElementById('st-daily-chips');if(ch)ch.innerHTML=_dailyChips();
   const ctx=document.getElementById('chart-daily')?.getContext('2d');
   if(!ctx)return;
   const {days,config}=_dailyChartConfig(list,false);
@@ -3572,6 +3927,7 @@ function renderDailyDetailChart(){
   if(!ctx)return;
   const {days,config}=_dailyChartConfig(_filtered(),true);
   document.getElementById('chart-detail-range').textContent=`(최근 ${days}일)`;
+  const ch=document.getElementById('detail-daily-chips');if(ch)ch.innerHTML=_dailyChips();
   _charts['daily-detail']=new Chart(ctx,config);
 }
 
@@ -3647,7 +4003,7 @@ async function saveNotice(){
   }catch(e){
     toast('저장 실패 — 네트워크를 확인해주세요','err');
   }finally{
-    if(btn){btn.disabled=false;btn.textContent='💾 저장';}
+    if(btn){btn.disabled=false;btn.textContent='저장';}
   }
 }
 
@@ -3675,8 +4031,8 @@ function checkPw(){
 function togglePwVis(){
   const input=document.getElementById('pw-input');
   const btn=document.getElementById('pw-toggle-btn');
-  if(input.type==='password'){input.type='text';btn.textContent='🙈';}
-  else{input.type='password';btn.textContent='👁️';}
+  if(input.type==='password'){input.type='text';btn.innerHTML=ICO.eyeoff;}
+  else{input.type='password';btn.innerHTML=ICO.eye;}
 }
 
 // 이미 인증된 세션이면 바로 진입
@@ -3785,25 +4141,23 @@ function buildMedFilters(){
 // 의약품 페이지가 열려 있을 때만 사용 통계 다시 그리기
 function refreshMedStatsIfVisible(){if(_activePage()==='medicine')renderMedStats();}
 
+// 재고 현황: 작은 칸 (윗줄 이름·수량, 아랫줄 종류). '부족한 것만 보기'를 켜면 부족 품목만
+let _medLowOnly=false;
+function toggleMedLowOnly(){_medLowOnly=!_medLowOnly;renderMedicine();}
 function renderMedicine(){
   const cat=document.getElementById('med-cat-filter').value;
-  const list=cat?medItems.filter(m=>m.cat===cat):medItems;
   const low=MED_LOW_THRESHOLD;
+  let list=cat?medItems.filter(m=>m.cat===cat):medItems;
+  if(_medLowOnly)list=list.filter(m=>m.qty<=(low[m.cat]||2));
   document.getElementById('med-grid').innerHTML=list.length?list.map(m=>{
     const thr=low[m.cat]||2;
     const st=m.qty===0?'empty':m.qty<=thr?'low':'';
     const unit=medUnit(m);
-    return `<div class="med-card ${st}" onclick="openMedModal('${m.id}')">
-      <div class="med-card-top">
-        <div>
-          <div class="med-card-name">${esc(m.name)}</div>
-          <div class="med-cat-badge" style="margin-top:3px;display:inline-flex;align-items:center;gap:3px">${esc(m.cat)}<span class="med-status-dot ${st}" style="display:inline-block"></span></div>
-        </div>
-      </div>
-      <div class="med-qty ${st}">${m.qty}</div>
-      <div class="med-unit">${unit} 남음</div>
+    return `<div class="med-card ${st}" onclick="openMedModal('${m.id}')" title="${esc(m.name)} · ${esc(m.cat)} · ${m.qty}${esc(unit)} 남음">
+      <div class="mc-top"><span class="mc-nm">${esc(m.name)}</span><span class="mc-q ${st}">${m.qty}<small>${esc(unit)}</small></span></div>
+      <div class="mc-cat">${esc(m.cat)}</div>
     </div>`;
-  }).join(''):`<div style="padding:30px;text-align:center;color:var(--text-muted);grid-column:1/-1">해당 카테고리 없음</div>`;
+  }).join(''):`<div style="padding:30px;text-align:center;color:var(--text-muted);grid-column:1/-1">${_medLowOnly?'부족한 품목이 없어요':'해당 카테고리 없음'}</div>`;
   updateMedBadge();
 }
 
@@ -3816,14 +4170,18 @@ function updateMedBadge(){
   const mb=document.getElementById('mbadge-med');
   if(b){b.textContent=cnt;b.style.display=cnt>0?'inline-flex':'none';}
   if(mb){mb.textContent=cnt;mb.style.display=cnt>0?'block':'none';}
-  const unit=medUnit;
-  const tagsHtml=lowItems.map(m=>`<span class="med-banner-tag">${esc(m.name)} ${m.qty}${unit(m)} 남음</span>`).join('');
-  // 의약품 페이지 배너 (id: med-page-banner)
+  updateMoreBadge();
+
+  // 의약품 페이지 재고 부족 줄 (한 줄 요약 + '부족한 것만 보기')
   const pb=document.getElementById('med-page-banner');
-  const pbi=document.getElementById('med-page-banner-items');
   if(pb){
-    if(cnt>0){pb.style.display='flex';if(pbi)pbi.innerHTML=tagsHtml;}
-    else pb.style.display='none';
+    if(cnt>0||_medLowOnly){
+      const e=lowItems.filter(m=>m.qty===0).length;
+      pb.style.display='flex';
+      pb.innerHTML=`<span class="mb-ic">${ICO.alert}</span>
+        <span class="mb-txt"><b>재고 부족 ${cnt}개</b> · <span class="mb-e">없음 ${e}</span> · <span class="mb-l">거의 없음 ${cnt-e}</span><span class="mb-names">${esc(lowItems.map(m=>m.name).join(', '))}</span></span>
+        <button class="mb-btn${_medLowOnly?' on':''}" onclick="toggleMedLowOnly()">${_medLowOnly?'전체 보기':'부족한 것만 보기'}</button>`;
+    }else pb.style.display='none';
   }
 }
 
@@ -3832,9 +4190,20 @@ function renderMedLog(){
   const list=fid?medLog.filter(l=>l.medId===fid):medLog;
   const tb=document.getElementById('tbl-med-log');
   if(!list.length){
-    tb.innerHTML=`<tr><td colspan="6"><div class="empty-state"><div class="ico">📋</div><p>이력 없음</p></div></td></tr>`;
+    tb.innerHTML=`<tr><td colspan="6"><div class="empty-state"><p>이력 없음</p></div></td></tr>`;
+    setMobileCards('tbl-med-log','','이력 없음');
     return;
   }
+  // 휴대폰: 표 대신 카드 (표는 휴대폰에서 숨겨지므로 카드가 없으면 이력이 비어 보였음)
+  setMobileCards('tbl-med-log',list.slice(0,100).map(l=>{
+    const sign=l.delta>=0?'+':'';const cls=l.delta>=0?'plus':'minus';const realIdx=medLog.indexOf(l);
+    return `<div class="m-card">
+      <div class="m-card-top"><span class="m-card-name">${esc(l.name)}</span><span class="med-log-change ${cls}" style="font-size:15px">${sign}${l.delta}</span></div>
+      <div class="m-card-row"><span class="m-k">일시</span><b>${fmtDate(l.at)}</b></div>
+      <div class="m-card-row"><span class="m-k">사유</span><b>${esc(l.reason)}</b><span style="color:var(--text-muted);margin-left:8px">남은 수량 <b style="color:var(--text)">${l.after}</b></span></div>
+      ${l.memo&&l.memo.trim()?`<div class="m-card-row"><span class="m-k">메모</span><span>${esc(l.memo)}</span></div>`:''}
+      <div class="m-card-actions"><button class="btn btn-danger btn-sm" onclick="deleteMedLog(${realIdx})">삭제</button></div>
+    </div>`;}).join(''),'이력 없음');
   tb.innerHTML=list.slice(0,100).map((l,i)=>{
     const sign=l.delta>=0?'+':'';
     const cls=l.delta>=0?'plus':'minus';
@@ -3843,7 +4212,7 @@ function renderMedLog(){
     const memoRow=hasMemo
       ?`<tr id="memo-row-${realIdx}" style="display:none;background:var(--surface2)">
           <td colspan="6" style="padding:6px 14px 8px 32px;font-size:11px;color:var(--text-muted)">
-            💬 ${esc(l.memo)}
+            메모 · ${esc(l.memo)}
           </td>
         </tr>`
       :'';
@@ -3851,7 +4220,7 @@ function renderMedLog(){
       <td class="td-mono" style="font-size:10px;white-space:nowrap">${fmtDate(l.at)}</td>
       <td class="td-name" style="font-size:11px">${esc(l.name)}</td>
       <td class="med-log-change ${cls}">${sign}${l.delta}</td>
-      <td class="td-sub" style="font-size:11px">${esc(l.reason)}${hasMemo?` <span style="font-size:9px;color:var(--accent);font-weight:700">💬</span>`:''}</td>
+      <td class="td-sub" style="font-size:11px">${esc(l.reason)}${hasMemo?` <span style="color:var(--accent);display:inline-flex;vertical-align:middle">${ICO.note}</span>`:''}</td>
       <td class="td-mono" style="font-weight:700">${l.after}</td>
       <td><button class="btn btn-danger btn-sm" style="padding:2px 6px;font-size:10px" onclick="event.stopPropagation();deleteMedLog(${realIdx})">✕</button></td>
     </tr>${memoRow}`;
@@ -3885,7 +4254,7 @@ function renderMedStats(){
   usageLogs.forEach(l=>{useMap[l.name]=(useMap[l.name]||0)+Math.abs(l.delta);});
   const sorted=Object.entries(useMap).sort((a,b)=>b[1]-a[1]).slice(0,8);
   const maxVal=sorted[0]?sorted[0][1]:1;
-  const barColors=['#2d5016','#4a7c2a','#6aad3a','#8fcf56','#b5e07a','#d4eda0','#e8f5c4','#f4fce3'];
+  const barColors=Array(8).fill('#4aa982'); // 통계 화면과 같은 차분한 초록 한 가지
   document.getElementById('med-stat-bars').innerHTML=sorted.length
     ? sorted.map(([name,cnt],i)=>`
         <div style="display:flex;align-items:center;gap:7px">
@@ -3893,7 +4262,7 @@ function renderMedStats(){
           <div style="flex:1;height:10px;background:var(--surface2);border-radius:20px;overflow:hidden">
             <div style="height:100%;width:${Math.round(cnt/maxVal*100)}%;background:${barColors[i]||barColors[7]};border-radius:20px;transition:width .6s cubic-bezier(.34,1.56,.64,1)"></div>
           </div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:var(--accent);min-width:22px;text-align:right">${cnt}</div>
+          <div style="font-family:var(--font);font-size:10px;font-weight:700;color:var(--text);min-width:22px;text-align:right">${cnt}</div>
         </div>`)
         .join('')
     : '<div style="font-size:12px;color:var(--text-muted);padding:8px 0">사용 이력 없음</div>';
@@ -3903,7 +4272,7 @@ function renderMedStats(){
   medLog.filter(l=>period==='all'||(now-new Date(l.at).getTime())<=ms)
     .forEach(l=>{reasonMap[l.reason]=(reasonMap[l.reason]||0)+1;});
   const reasons=Object.entries(reasonMap).sort((a,b)=>b[1]-a[1]);
-  const donutColors=[cssVar('--s-returned'),cssVar('--c-umbrella'),cssVar('--c-warn'),cssVar('--s-unpaid'),cssVar('--s-lost'),cssVar('--s-renting')];
+  const donutColors=['#2e9a6e','#c7841a','#5458c8','#c64d7d','#2a8fb5','#8b5fc0'];
   const dCtx=document.getElementById('med-stat-donut')?.getContext('2d');
   if(dCtx&&reasons.length){
     _medStatCharts.donut=new Chart(dCtx,{
@@ -3930,7 +4299,7 @@ function renderMedStats(){
         <div style="display:flex;align-items:center;gap:5px;font-size:11px">
           <span style="width:8px;height:8px;border-radius:50%;background:${donutColors[i]||'#ccc'};flex-shrink:0"></span>
           <span style="color:var(--text-muted)">${r}</span>
-          <span style="font-family:'JetBrains Mono',monospace;font-weight:700;margin-left:auto">${cnt}</span>
+          <span style="font-family:var(--font);font-weight:700;margin-left:auto">${cnt}</span>
         </div>`).join('')
     : '<div style="font-size:11px;color:var(--text-muted)">데이터 없음</div>';
 
@@ -3950,7 +4319,7 @@ function renderMedStats(){
         labels:dateArr.map(d=>{const[,m,dd]=d.split('-');return `${m}/${dd}`;}),
         datasets:[{
           data:lineData,
-          borderColor:cssVar('--s-returned'),backgroundColor:cssVar('--s-returned')+'20',
+          borderColor:'#2e9a6e',backgroundColor:'#2e9a6e20',
           borderWidth:2,pointRadius:2,pointHoverRadius:4,fill:true,tension:.4
         }]
       },
@@ -4137,7 +4506,7 @@ async function saveMedAdj(){
     undoStack.pop();updateHistoryBtns();
     toast('저장 실패 — 네트워크를 확인해주세요','err');
   }finally{
-    if(btn){btn.disabled=false;btn.textContent='💾 저장';}
+    if(btn){btn.disabled=false;btn.textContent='저장';}
   }
 }
 
@@ -4162,16 +4531,16 @@ function renderMedManageList(){
     ? list.map(m=>{
         const delBtn=`<button class="btn btn-danger btn-sm" onclick="deleteMedItem('${m.id}')">삭제</button>`;
         return `<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border);border-radius:7px;background:var(--surface);font-size:12px;">
-          <span id="med-cat-view-${m.id}" style="background:var(--surface2);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:600;color:var(--text-muted);white-space:nowrap;flex-shrink:0">${esc(m.cat)}</span>
+          <span id="med-cat-view-${m.id}" style="font-size:11px;color:var(--text-muted);white-space:nowrap;flex-shrink:0">${esc(m.cat)}</span>
           <input id="med-cat-edit-${m.id}" class="fi" list="med-cat-datalist" title="종류" style="display:none;width:90px;flex-shrink:0;padding:4px 8px;font-size:12px" value="${esc(m.cat)}"
             onkeydown="if(event.key==='Enter')saveMedName('${m.id}');if(event.key==='Escape'){event.preventDefault();cancelMedName('${m.id}')}">
           <span id="med-name-view-${m.id}" style="font-weight:600;flex:1">${esc(m.name)}</span>
           <input id="med-name-edit-${m.id}" class="fi" title="품명" style="display:none;flex:1;min-width:0;padding:4px 8px;font-size:12px" value="${esc(m.name)}"
             onkeydown="if(event.key==='Enter')saveMedName('${m.id}');if(event.key==='Escape'){event.preventDefault();cancelMedName('${m.id}')}">
-          <span id="med-qty-view-${m.id}" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);flex-shrink:0">${m.qty}${esc(medUnit(m))}</span>
+          <span id="med-qty-view-${m.id}" style="font-family:var(--font);font-size:11px;color:var(--text-muted);flex-shrink:0">${m.qty}${esc(medUnit(m))}</span>
           <input id="med-unit-edit-${m.id}" class="fi" title="단위" style="display:none;width:52px;flex-shrink:0;padding:4px 6px;font-size:12px;text-align:center" value="${esc(medUnit(m))}"
             onkeydown="if(event.key==='Enter')saveMedName('${m.id}');if(event.key==='Escape'){event.preventDefault();cancelMedName('${m.id}')}">
-          <button class="btn btn-ghost btn-sm" onclick="startMedNameEdit('${m.id}')" id="med-edit-btn-${m.id}" title="이름·종류·단위 수정">✏️</button>
+          <button class="btn btn-ghost btn-sm" onclick="startMedNameEdit('${m.id}')" id="med-edit-btn-${m.id}" title="이름·종류·단위 수정" aria-label="이름·종류·단위 수정">${ICO.edit}</button>
           <button class="btn btn-primary btn-sm" onclick="saveMedName('${m.id}')" id="med-save-btn-${m.id}" style="display:none">저장</button>
           ${delBtn}
         </div>`;
@@ -4189,7 +4558,7 @@ function toggleMedOrderMode(){
   const banner=document.getElementById('med-order-banner');
   if(_medOrderMode){
     _medOrderSnap=captureNow('의약품 표시 순서 변경');
-    btn.textContent='✅ 순서 변경 완료';
+    btn.textContent='순서 변경 완료';
     btn.style.background='var(--accent)';btn.style.color='white';btn.style.borderColor='var(--accent)';
     if(banner)banner.style.display='block';
   }else{
@@ -4233,8 +4602,8 @@ function _renderMedOrderList(){
     <div class="med-order-row" data-mi="${i}" draggable="true" ondragstart="_medDragIdx=${i};this.style.opacity='.35';event.dataTransfer.effectAllowed='move'" ondragend="this.style.opacity='';_medDragEnd()"
       style="display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--accent);border-radius:7px;background:var(--drag-mode-bg);font-size:12px;cursor:grab">
       <span style="opacity:.5">⠿</span>
-      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);width:18px">${i+1}</span>
-      <span style="background:var(--surface2);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:600;color:var(--text-muted);white-space:nowrap;flex-shrink:0">${esc(m.cat)}</span>
+      <span style="font-family:var(--font);font-size:10px;color:var(--text-muted);width:18px">${i+1}</span>
+      <span style="font-size:11px;color:var(--text-muted);white-space:nowrap;flex-shrink:0">${esc(m.cat)}</span>
       <span style="font-weight:600;flex:1">${esc(m.name)}</span>
       <button style="${arrow}" onclick="moveMed(${i},-1)" ${i===0?'disabled':''} title="위로">▲</button>
       <button style="${arrow}" onclick="moveMed(${i},1)" ${i===medItems.length-1?'disabled':''} title="아래로">▼</button>
@@ -4374,7 +4743,7 @@ async function submitMedAdd(){
     refreshMedStatsIfVisible();
     ['med-add-cat','med-add-name'].forEach(i=>document.getElementById(i).value='');
     document.getElementById('med-add-qty').value='0';
-    toast(`💊 ${name} 품목 추가 완료!`,'ok');
+    toast(`${name} 품목 추가 완료!`,'ok');
   }catch(e){
     prevOrders.forEach(([m,o])=>{if(o===undefined)delete m.order;else m.order=o;});
     medItems=medItems.filter(x=>x.id!==id);
@@ -4447,7 +4816,7 @@ init();
     <b style="font-size:13px;display:block;margin-bottom:2px;">홈 화면에 추가</b>
     <span style="font-size:11px;color:var(--text-muted);">앱처럼 빠르게 실행할 수 있어요</span>
   </div>
-  <button id="pwa-install-btn" style="background:var(--accent);color:white;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:'Noto Sans KR',sans-serif;">설치</button>
+  <button id="pwa-install-btn" style="background:var(--accent);color:white;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:var(--font);">설치</button>
   <button onclick="document.getElementById('pwa-banner').style.display='none';localStorage.setItem('pwa-dismissed','1')" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer;padding:4px;">✕</button>
 </div>
 <script>
