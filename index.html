@@ -557,6 +557,12 @@ button,input,select,textarea{font-family:var(--font)}
 .is-alert .is-nm,.is-alert .is-lnk{color:#b42318}
 .is-alert .is-big{color:#c42020}
 .is-lnk{font-size:12px;margin-top:8px;font-weight:600}
+/* 대시보드 오늘 요약 띠 */
+.today-b{display:flex;align-items:center;gap:18px;flex-wrap:wrap;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 16px;margin-bottom:10px;font-size:13px;color:var(--text-muted)}
+.today-b .tb-h{font-weight:700;font-size:12px;background:var(--accent-pale);color:var(--accent);padding:3px 8px;border-radius:5px}
+.today-b b{font-size:13px;color:var(--text);margin-left:4px;font-weight:500}
+.today-b .dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:1px}
+@media(max-width:768px){.today-b{gap:12px;padding:9px 12px}}
 .is-alert.ok{background:var(--surface)}.is-alert.ok .is-big{color:var(--text)}.is-alert.ok .is-nm,.is-alert.ok .is-lnk{color:var(--text-muted)}
 /* 표 */
 table{font-size:13px}
@@ -828,11 +834,12 @@ thead th:last-child,tbody td:last-child{padding-right:20px}
     <div><div class="page-title">대시보드</div><div class="page-sub">전체 대여 현황 요약</div></div>
     <button class="btn btn-primary" onclick="openRentalModal()"><svg class="ic" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5v14"/></svg>대여 등록</button>
   </div>
+  <div class="today-b" id="today-sum"></div>
   <div class="inv-sum" id="inv-sum"></div>
   <div class="section">
-    <div class="section-header"><div class="section-title">대여중 · 미납 <span id="recent-count" style="font-weight:400;color:var(--text-muted);font-size:12px"></span></div><button class="btn btn-ghost btn-sm" onclick="showPage('rentals')">전체 보기</button></div>
+    <div class="section-header"><div class="section-title">최근 대여 <span id="recent-count" style="font-weight:400;color:var(--text-muted);font-size:12px"></span></div><button class="btn btn-ghost btn-sm" onclick="showPage('rentals')">전체 보기</button></div>
     <div class="tbl-wrap"><table>
-      <thead><tr><th>이름</th><th>연락처</th><th>학부</th><th>물품</th><th>번호</th><th>대여일시</th><th>반납 기한</th><th>상태</th><th>처리</th></tr></thead>
+      <thead><tr><th>이름</th><th>연락처</th><th>학부</th><th>물품</th><th>번호</th><th>대여일시</th><th>기한 · 반납</th><th>상태</th><th>처리</th></tr></thead>
       <tbody id="tbl-recent"></tbody>
     </table></div>
   </div>
@@ -1177,6 +1184,7 @@ thead th:last-child,tbody td:last-child{padding-right:20px}
       </div>
       <div class="fg full"><label>물품 번호 *</label><select class="fi" id="e-item-num"></select></div>
       <div class="fg full"><label>대여 일시</label><input class="fi" type="datetime-local" id="e-date"></div>
+      <div class="fg full"><label>반납 일시</label><div style="display:flex;gap:6px"><input class="fi" type="datetime-local" id="e-return-date" style="flex:1;min-width:0"><button type="button" class="btn btn-ghost btn-sm" style="flex-shrink:0" onclick="document.getElementById('e-return-date').value=''">비우기</button></div></div>
       <div class="fg full"><label>메모</label><input class="fi" id="e-note" placeholder="특이사항"></div>
     </div>
   </div>
@@ -1649,7 +1657,7 @@ function setHistoryLoading(v){
 }
 
 function sInfo(v){return S5.find(s=>s.v===v)||{v,l:v,cl:'sb-renting'};}
-function sBadge(v){const s=sInfo(v);return `<span class="sbadge ${s.cl}">${s.l}</span>`;}
+function sBadge(v){const s=sInfo(v);return `<span class="sbadge ${s.cl}">${esc(s.l)}</span>`;}
 // 반납 기한 — 약속우산: 대여 7일째 18:00 / 그 외: 대여 당일 18:00 (18시 이후 대여면 다음 날 18:00)
 // (학생 페이지 public.html의 반납 기한·자동 미납 기준과 동일)
 function dueDate(r){
@@ -1676,6 +1684,7 @@ const ITEM_ICO={
   heatpack:'<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>'
 };
 function itemBadge(t){
+  if(!Object.hasOwn(ITEM_LABELS,t))return `<span class="item-badge">${esc(t)}</span>`;
   const ic=ITEM_ICO[t]?`<span class="ib-sq ibs-${t}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ITEM_ICO[t]}</svg></span>`:'';
   return `<span class="item-badge ib-${t}">${ic}${ITEM_LABELS[t]||t}</span>`;
 }
@@ -1857,15 +1866,30 @@ async function refreshData(){
 
 // ══ 물품 실질 상태 계산 ══
 // 우선순위: itemStatus(고장/분실) > 대여기록 상태 > available
-function getItemState(type,num,rList=rentals,sMap=itemStatus){
+// 한 번의 화면 갱신 동안만 사용하는 최신 대여 색인 (동일 시각은 기존 배열 순서 유지).
+function rentalItemKey(type,num){return JSON.stringify([type,String(num)]);}
+function buildLatestRentalIndex(records=rentals){
+  const latest=new Map();
+  const times=new Map();
+  for(const record of records){
+    const key=rentalItemKey(record.item,record.itemNum);
+    const time=new Date(record.date).getTime();
+    if(Number.isFinite(time)&&time>(times.get(key)??-Infinity)){
+      latest.set(key,record);
+      times.set(key,time);
+    }
+  }
+  return latest;
+}
+function getItemState(type,num,rList=rentals,sMap=itemStatus,latestIndex=null){
   const key=fbKey(type,num);
   const iSt=sMap[key];
-  const iStVal=typeof iSt==='object'?iSt.v:iSt; // 객체(메모 포함) or 문자열 모두 처리
+  const iStVal=iSt&&typeof iSt==='object'?iSt.v:iSt; // 객체(메모 포함) or 문자열 모두 처리
   if(iStVal==='broken') return 'broken';
   // 가장 최근 대여 기록 (배열 생성·정렬 없이 1회 순회로 최신 1건만 탐색 — 성능)
   const ns=String(num);
-  let last=null,lastT=-Infinity;
-  for(const r of rList){
+  let last=latestIndex?.get(rentalItemKey(type,num))||null,lastT=-Infinity;
+  if(!latestIndex)for(const r of rList){
     if(r.item===type&&String(r.itemNum)===ns){
       const t=new Date(r.date).getTime();
       if(t>lastT){lastT=t;last=r;}
@@ -1964,15 +1988,16 @@ async function serverItemState(type,num,phone){
   const sr=rData?Object.values(rData):[];
   return {state:getItemState(type,num,sr,iData||{}),rentals:sr};
 }
-function isAvailable(type,num){const s=getItemState(type,num);return s==='available';}
+function isAvailable(type,num,latestIndex=null){return getItemState(type,num,rentals,itemStatus,latestIndex)==='available';}
 
 // ══ STATS ══
 function updateStats(){
+  const latestIndex=buildLatestRentalIndex();
   const invSum=[];
   const renting=rentals.filter(r=>r.status==='renting'||r.status==='unpaid_paid');
   Object.keys(ITEM_NUMBERS).forEach(t=>{
     const rc=renting.filter(r=>r.item===t).length;
-    const av=ITEM_NUMBERS[t].filter(n=>isAvailable(t,n)).length;
+    const av=ITEM_NUMBERS[t].filter(n=>isAvailable(t,n,latestIndex)).length;
     invSum.push({t,av,tot:ITEM_NUMBERS[t].length,rc});
   });
   // 물품관리 배지: 대여기록 이상 + 직접 처리한 고장/분실 모두 포함
@@ -1981,9 +2006,10 @@ function updateStats(){
   const rentedBrokenLostKeys=new Set(
     rentals.filter(r=>['broken','lost'].includes(r.status)).map(r=>fbKey(r.item,r.itemNum))
   );
-  const directBad=Object.entries(itemStatus).filter(([k,v])=>{const vv=typeof v==='object'?v.v:v;return ['broken','lost'].includes(vv)&&!rentedBrokenLostKeys.has(k);}).length;
+  const directBad=Object.entries(itemStatus).filter(([k,v])=>{const vv=v&&typeof v==='object'?v.v:v;return ['broken','lost'].includes(vv)&&!rentedBrokenLostKeys.has(k);}).length;
   const bad=rentalBad+directBad;
   renderInvSum(invSum,bad);
+  renderTodaySum(renting.length);
   const bu=document.getElementById('badge-unpaid');bu.textContent=bad;bu.style.display=bad>0?'inline-flex':'none';
   const mu=document.getElementById('mbadge-unpaid');if(mu){mu.textContent=bad;mu.style.display=bad>0?'block':'none';}
   const blCnt=new Set(rentals.filter(r=>BL_STATUS.includes(r.status)).map(r=>`${r.name}_${r.phone}`)).size;
@@ -1999,6 +2025,18 @@ function updateMoreBadge(){
 }
 
 // 대시보드 재고 요약 — 물품별 '대여 가능 / 전체' + 남은 비율 막대, 누르면 물품 현황 해당 탭으로
+// 대시보드 오늘 요약 — 오늘 대여 / 오늘 반납 / 지금 대여 중
+function renderTodaySum(rentingCnt){
+  const box=document.getElementById('today-sum');if(!box)return;
+  const now=new Date(),today=_localDay(now);
+  const isToday=iso=>iso&&_localDay(new Date(iso))===today;
+  const outCnt=rentals.filter(r=>isToday(r.date)).length;
+  const inCnt=rentals.filter(r=>isToday(r.returnDate)).length;
+  box.innerHTML=`<span class="tb-h">오늘 ${now.getMonth()+1}/${now.getDate()}</span>
+    <span><i class="dot" style="background:var(--s-renting)"></i>대여<b>${outCnt}</b></span>
+    <span><i class="dot" style="background:var(--s-returned)"></i>반납<b>${inCnt}</b></span>
+    <span><i class="dot" style="background:var(--accent)"></i>지금 대여 중<b>${rentingCnt}</b></span>`;
+}
 function renderInvSum(list,bad){
   const box=document.getElementById('inv-sum');if(!box)return;
   box.innerHTML=list.map(({t,av,tot,rc})=>{
@@ -2035,7 +2073,7 @@ function makeRowIdx(r,idx,cols){
     item:`<td>${itemBadge(r.item)}</td>`,num:`<td class="td-mono">${esc(r.itemNum)}</td>`,
     date:`<td class="td-mono" style="font-size:11px">${fmtDate(r.date)}</td>`,
     returnDate:`<td class="td-mono" style="font-size:11px">${fmtDate(r.returnDate)}</td>`,
-    due:(()=>{const d=dueInfo(r);return `<td class="td-mono" style="font-size:11px;white-space:nowrap;color:${d.color};font-weight:${d.bold?700:400}">${d.text}</td>`;})(),
+    due:(()=>{const d=dueCell(r);return `<td class="td-mono" style="font-size:11px;white-space:nowrap;color:${d.color};font-weight:${d.bold?700:400}">${d.text}</td>`;})(),
     status:`<td>${sBadgeR(r)}</td>`,actions:`<td>${actionBtns(r)}</td>`,
     days:`<td style="font-weight:700;color:var(--s-unpaid);font-family:var(--font)">${daysSince(r.date)}일</td>`
   };
@@ -2055,7 +2093,7 @@ function makeMobileCard(r,cols){
     <div class="m-card-row">${itemBadge(r.item)} <b>${esc(r.itemNum)}</b></div>
     <div class="m-card-row"><span class="m-k">대여</span><b>${fmtDate(r.date)}</b></div>
     ${hasReturnDate&&r.returnDate?`<div class="m-card-row"><span class="m-k">반납</span><b>${fmtDate(r.returnDate)}</b></div>`:''}
-    ${cols.includes('due')?(()=>{const d=dueInfo(r);return `<div class="m-card-row"><span class="m-k">기한</span><b style="color:${d.color}">${d.text}</b></div>`;})():''}
+    ${cols.includes('due')?(()=>{const d=dueCell(r);return `<div class="m-card-row"><span class="m-k">${d.k}</span><b style="color:${d.color}">${d.short||d.text}</b></div>`;})():''}
     ${hasDays?`<div class="m-card-row"><span class="m-k">경과</span><b style="color:var(--s-unpaid)">${daysSince(r.date)}일 경과</b></div>`:''}
     ${hasActions?`<div class="m-card-actions">${actionBtns(r)}</div>`:''}
   </div>`;
@@ -2070,26 +2108,25 @@ function setMobileCards(tbodyId,html,emptyMsg){
 function emptyRow(n,msg='내역이 없습니다'){return `<tr><td colspan="${n}"><div class="empty-state"><p>${msg}</p></div></td></tr>`;}
 
 // ══ RENDER TABLES ══
-// 대시보드: 지금 물품을 갖고 있는 대여(대여중·미납·연체료 납부 후 미반납)만
+// 대시보드: 전체 상태, 대여일 최신순 (전체 기록은 대여현황에서)
 const RECENT_MAX=30;
 function renderRecent(){
-  // 순서: 대여중 → 미납(연체료 납부) → 미납 → 장기미납 (장기미납은 처리가 오래 걸려 맨 아래)
-  // 대여중은 기한 안 지난 것(오늘까지가 맨 위) → 기한 지난 것(맨 아래) 순
-  // 장기미납은 지난 날수가 적은 것이 위, 많이 지난 것이 맨 아래
-  const now=Date.now();
-  const grp=r=>r.status==='renting'?(dueDate(r)<now?1:0):r.status==='unpaid_paid'?2:isLongUnpaid(r)?4:3;
-  const ord=(a,b)=>{const g=grp(a);
-    if(g===1||g===4)return dueDate(b)-dueDate(a); // 지난 것들: 덜 지난 것 먼저
-    return dueDate(a)-dueDate(b);};               // 나머지: 기한 가까운 것 먼저
-  const all=rentals.filter(r=>['renting','unpaid','unpaid_paid'].includes(r.status)&&r.date)
-    .sort((a,b)=>grp(a)-grp(b)||ord(a,b));
+  const all=rentals.filter(r=>r.date).sort((a,b)=>new Date(b.date)-new Date(a.date));
   const list=all.slice(0,RECENT_MAX);
   const cols=['name','phone','dept','item','num','date','due','status','actions'];
   document.getElementById('tbl-recent').innerHTML=
-    list.length?list.map(r=>makeRow(r,cols)).join(''):emptyRow(9,'지금 대여중인 물품이 없어요');
-  setMobileCards('tbl-recent',list.map(r=>makeMobileCard(r,cols)).join(''),'지금 대여중인 물품이 없어요');
+    list.length?list.map(r=>makeRow(r,cols)).join(''):emptyRow(9,'대여 기록이 없어요');
+  setMobileCards('tbl-recent',list.map(r=>makeMobileCard(r,cols)).join(''),'대여 기록이 없어요');
   const c=document.getElementById('recent-count');
-  if(c)c.textContent=all.length?`(${all.length}건${all.length>RECENT_MAX?` · 기한 가까운 ${RECENT_MAX}건만 표시`:''})`:'';
+  if(c)c.textContent=all.length>RECENT_MAX?`(최근 ${RECENT_MAX}건)`:'';
+}
+// 대시보드 '기한 · 반납' 칸: 물품을 갖고 있으면 반납 기한, 아니면 반납한 시각
+function dueCell(r){
+  if(['renting','unpaid','unpaid_paid'].includes(r.status))return {k:'기한',...dueInfo(r)};
+  if(r.returnDate){const d=new Date(r.returnDate);
+    const s=`${p2(d.getMonth()+1)}.${p2(d.getDate())} ${p2(d.getHours())}:${p2(d.getMinutes())}`;
+    return {k:'반납',text:`반납 ${s}`,short:s,color:'var(--text-muted)',bold:false};}
+  return {k:'반납',text:'—',color:'var(--text-muted)',bold:false};
 }
 // 반납 기한 표시 — 지남: 빨강 / 오늘: 주황 / 그 외: 회색
 function dueInfo(r){
@@ -2176,7 +2213,7 @@ function renderUnpaid(){
     rentals.filter(r=>['broken','lost'].includes(r.status)).map(r=>fbKey(r.item,r.itemNum))
   );
   const directItems=Object.entries(itemStatus)
-    .filter(([key,val])=>{const v=typeof val==='object'?val.v:val;return ['broken','lost'].includes(v);})
+    .filter(([key,val])=>{const v=val&&typeof val==='object'?val.v:val;return ['broken','lost'].includes(v);})
     .filter(([key])=>!rentedBrokenLost.has(key))
     .map(([key,val])=>{
       // key 형식: "umbrella_A-1" (특수문자를 _로 치환했을 수 있음)
@@ -2199,7 +2236,7 @@ function renderUnpaid(){
   tb2.innerHTML=directItems.map(({key,type,num,val})=>`<tr>
     <td>${itemBadge(type)}</td>
     <td class="td-mono">${esc(num)}</td>
-    <td>${sBadge(typeof val==='object'?val.v:val)}</td>
+    <td>${sBadge(val&&typeof val==='object'?val.v:val)}</td>
     <td><div class="td-actions">
       <button class="btn btn-green btn-sm" onclick="restoreItemFromUnpaid('${esc(escJs(key))}','${esc(escJs(type))}','${esc(escJs(num))}')">복구</button>
     </div></td>
@@ -2207,7 +2244,7 @@ function renderUnpaid(){
   // 모바일 카드 렌더링
   setMobileCards('tbl-item-cond',directItems.map(({key,type,num,val})=>`
       <div class="m-card">
-        <div class="m-card-top">${itemBadge(type)}<span class="td-mono" style="font-weight:700">${esc(num)}</span>${sBadge(typeof val==='object'?val.v:val)}</div>
+        <div class="m-card-top">${itemBadge(type)}<span class="td-mono" style="font-weight:700">${esc(num)}</span>${sBadge(val&&typeof val==='object'?val.v:val)}</div>
         <div class="m-card-actions"><button class="btn btn-green btn-sm" onclick="restoreItemFromUnpaid('${esc(escJs(key))}','${esc(escJs(type))}','${esc(escJs(num))}')">복구</button></div>
       </div>`).join(''),'물품 자체 이상 없음');
   // 기본 섹션1 활성화 (초기 렌더시, 탭2가 활성화된 경우 강제 전환 방지)
@@ -2251,10 +2288,10 @@ function renderInventory(){
   };
   const grid=document.getElementById('inv-grid');
   grid.style.gridTemplateColumns='';
+  const latestIndex=buildLatestRentalIndex();
   grid.innerHTML=nums.map(num=>{
-    const st=getItemState(currentInvTab,num);
-    const rec=rentals.filter(r=>r.item===currentInvTab&&String(r.itemNum)===String(num))
-      .sort((a,b)=>new Date(b.date)-new Date(a.date))[0];
+    const st=getItemState(currentInvTab,num,rentals,itemStatus,latestIndex);
+    const rec=latestIndex.get(rentalItemKey(currentInvTab,num));
     const renterStr=(rec&&(['renting','unpaid','unpaid_paid'].includes(rec.status)||isOpenLostPaid(rec)))?`<div style="font-size:10px;font-weight:400;color:var(--text);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(rec.name)}</div>`:'';
     const invBadge=(st==='unpaid'&&rec&&isLongUnpaid(rec))
       ?`<span class="sbadge sb-unpaid" style="font-size:9px;padding:2px 4px;gap:3px">장기미납</span>`
@@ -2272,10 +2309,10 @@ function openInvModal(type,num){
   document.getElementById('inv-modal-title').textContent=`${ITEM_LABELS[type]} ${num}`;
   document.getElementById('inv-modal-sub').textContent=`현재: ${sInfo(st==='available'?'returned':st).l}`;
   const iSt=itemStatus[fbKey(type,num)];
-  document.getElementById('f-inv-note').value=(typeof iSt==='object'?iSt.note:'') || '';
+  document.getElementById('f-inv-note').value=(iSt&&typeof iSt==='object'?iSt.note:'') || '';
   const cur=st==='available'?'available':st;
   // 대여가능 옵션: 물품현황에서 직접 고장/분실 설정한 경우에만 표시
-  const iStVal2=typeof iSt==='object'?iSt.v:iSt;
+  const iStVal2=iSt&&typeof iSt==='object'?iSt.v:iSt;
   const hasLostRentalRec=rentals.some(r=>r.item===type&&String(r.itemNum)===String(num)&&r.status==='lost');
   const isDirectlySet=iStVal2==='broken'||(iStVal2==='lost'&&!hasLostRentalRec);
   const opts=[];
@@ -2522,7 +2559,8 @@ function selectItemType(t){
   selItemType=t;
   document.querySelectorAll('.item-type-btn').forEach(b=>b.className='item-type-btn'+(b.dataset.t===t?' sel-'+t:''));
   const busy=new Set(rentals.filter(r=>r.item===t&&r.status==='renting').map(r=>String(r.itemNum)));
-  const nums=ITEM_NUMBERS[t].filter(n=>isAvailable(t,n));
+  const latestIndex=buildLatestRentalIndex();
+  const nums=ITEM_NUMBERS[t].filter(n=>isAvailable(t,n,latestIndex));
   const sel=document.getElementById('f-item-num');
   sel.innerHTML=nums.length
     ?'<option value="" selected>-- 번호 선택 --</option>'+nums.map(n=>{const u=busy.has(String(n));return `<option value="${esc(n)}"${u?' disabled':''}>${esc(n)}${u?' (대여중)':''}</option>`;}).join('')
@@ -2587,7 +2625,7 @@ async function submitRental(){
     closeModal('modal-rental');renderAfterRental();
     toast(`${name}님 ${ITEM_LABELS[selItemType]} ${itemNum} 대여 등록!`,'ok');
   }catch(e){
-    rentals.shift();
+    rentals=rentals.filter(entry=>entry.id!==id);
     undoStack.pop();
     updateHistoryBtns();
     toast('저장에 실패했습니다. 인터넷 연결을 확인 후 다시 시도해주세요.','err');
@@ -2707,6 +2745,7 @@ async function quickReturn(id){
   const prevReturnDate=r.returnDate;
   const prevWasBlacklisted=r.wasBlacklisted;
   const prevResolvedAt=r.resolvedAt;
+  const latest=isLatestRecord(r);
   const key=fbKey(r.item,r.itemNum);
   const prevItemStatusVal=itemStatus[key];
   saveSnapshot(`${r.name} ${ITEM_LABELS[r.item]} 반납`);
@@ -2716,9 +2755,9 @@ async function quickReturn(id){
     r.wasBlacklisted=true;
     r.resolvedAt=new Date().toISOString();
   }
-  delete itemStatus[key];
+  if(latest)delete itemStatus[key];
   try{
-    await fbCommit([opDel(`/itemStatus/${key}`),opPut(`/rentals/${r.id}`,r)]);
+    await fbCommit([opPut(`/rentals/${r.id}`,r),...(latest?[opDel(`/itemStatus/${key}`)]:[])]);
     renderAfterStatus();toast(`${r.name}님 · ${ITEM_LABELS[r.item]} ${r.itemNum} 반납 완료!`,'ok');
   }catch(e){
     r.status=prevStatus;r.returnDate=prevReturnDate;
@@ -2771,6 +2810,11 @@ function openEditModal(id){
     const local=new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16);
     document.getElementById('e-date').value=local;
   } else { document.getElementById('e-date').value=''; }
+  // 반납 일시 (없으면 빈칸)
+  if(r.returnDate){
+    const d=new Date(r.returnDate);
+    document.getElementById('e-return-date').value=new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16);
+  } else { document.getElementById('e-return-date').value=''; }
   openModal('modal-edit');
 }
 function _fillEditItemNums(type, selectedNum){
@@ -2778,10 +2822,11 @@ function _fillEditItemNums(type, selectedNum){
   const nums=ITEM_NUMBERS[type]||[];
   const sel=document.getElementById('e-item-num');
   // 현재 편집 중인 번호는 항상 포함, 나머지는 available 상태만 표시
-  const visible=nums.filter(n=>String(n)===selectedNum||getItemState(type,n)==='available');
+  const latestIndex=buildLatestRentalIndex();
+  const visible=nums.filter(n=>String(n)===selectedNum||isAvailable(type,n,latestIndex));
   sel.innerHTML=visible.length
-    ? visible.map(n=>`<option value="${n}"${String(n)===selectedNum?' selected':''}>${n}</option>`).join('')
-    : `<option disabled>${selectedNum||'—'} (현재 번호)</option>`;
+    ? visible.map(n=>`<option value="${esc(n)}"${String(n)===selectedNum?' selected':''}>${esc(n)}</option>`).join('')
+    : `<option disabled>${esc(selectedNum||'—')} (현재 번호)</option>`;
 }
 function editSelectItemType(t){
   editSelItemType=t;
@@ -2799,11 +2844,14 @@ async function saveEditRental(){
   const itemNum=document.getElementById('e-item-num').value;
   const dateVal=document.getElementById('e-date').value;
   const note=document.getElementById('e-note').value.trim();
+  const rdVal=document.getElementById('e-return-date').value;
   if(!name||!phone||!dept||!editSelItemType||!itemNum){toast('필수 항목을 모두 입력해주세요','err');return;}
-  if(dateVal){
-    const nd=new Date(dateVal).getTime();
-    if(nd>Date.now()+5*60000){toast('대여 일시는 미래로 설정할 수 없습니다','err');return;}
-    if(r.returnDate&&nd>new Date(r.returnDate).getTime()){toast('대여 일시가 반납 일시보다 늦을 수 없습니다','err');return;}
+  const nd=dateVal?new Date(dateVal).getTime():(r.date?new Date(r.date).getTime():null);
+  if(dateVal&&nd>Date.now()+5*60000){toast('대여 일시는 미래로 설정할 수 없습니다','err');return;}
+  if(rdVal){
+    const rt=new Date(rdVal).getTime();
+    if(rt>Date.now()+5*60000){toast('반납 일시는 미래로 설정할 수 없습니다','err');return;}
+    if(nd!=null&&nd>rt){toast('대여 일시가 반납 일시보다 늦을 수 없습니다','err');return;}
   }
   if(!isOnline()) return;
   const prev={...r};
@@ -2825,6 +2873,7 @@ async function saveEditRental(){
   r.name=name; r.phone=phone; r.dept=dept;
   r.item=editSelItemType; r.itemNum=itemNum;
   if(dateVal) r.date=new Date(dateVal).toISOString();
+  r.returnDate=rdVal?new Date(rdVal).toISOString():null;
   r.note=note||'';
   // 물품 번호/종류가 바뀌면 itemStatus도 이동
   if(keyChanged){
@@ -2934,17 +2983,17 @@ function renderBlacklist(){
       const isLong=isLongUnpaid(r);
       const label=isLong?'장기미납':sInfo(r.status).l;
       const extra='';
-      return `<span class="sbadge ${sInfo(r.status).cl}">${label} · ${ITEM_LABELS[r.item]||r.item} ${esc(r.itemNum)}</span>`;
+      return `<span class="sbadge ${sInfo(r.status).cl}">${label} · ${esc(ITEM_LABELS[r.item]||r.item)} ${esc(r.itemNum)}</span>`;
     }).join('');
 
     const hasU=p.records.some(r=>r.status==='unpaid');
     const hasL=p.records.some(r=>r.status==='lost');
     const payBtns=[
-      hasU?`<button class="btn btn-ghost btn-sm" onclick="blPay('${escJs(p.name)}','${escJs(p.phone)}','unpaid')">연체료 납부</button>`:'',
-      hasU?`<button class="btn btn-ghost btn-sm" onclick="blReturn('${escJs(p.name)}','${escJs(p.phone)}','unpaid')">납부+반납</button>`:'',
-      (hasU&&!hasL)?`<button class="btn btn-ghost btn-sm" onclick="blPayAsLost('${escJs(p.name)}','${escJs(p.phone)}')">분실비 납부</button>`:'',
-      hasL?`<button class="btn btn-ghost btn-sm" onclick="blPay('${escJs(p.name)}','${escJs(p.phone)}','lost')">분실비 납부</button>`:'',
-      hasL?`<button class="btn btn-ghost btn-sm" onclick="blReturn('${escJs(p.name)}','${escJs(p.phone)}','lost')">분실해제</button>`:''
+      hasU?`<button class="btn btn-ghost btn-sm" onclick="blPay('${esc(escJs(p.name))}','${esc(escJs(p.phone))}','unpaid')">연체료 납부</button>`:'',
+      hasU?`<button class="btn btn-ghost btn-sm" onclick="blReturn('${esc(escJs(p.name))}','${esc(escJs(p.phone))}','unpaid')">납부+반납</button>`:'',
+      (hasU&&!hasL)?`<button class="btn btn-ghost btn-sm" onclick="blPayAsLost('${esc(escJs(p.name))}','${esc(escJs(p.phone))}')">분실비 납부</button>`:'',
+      hasL?`<button class="btn btn-ghost btn-sm" onclick="blPay('${esc(escJs(p.name))}','${esc(escJs(p.phone))}','lost')">분실비 납부</button>`:'',
+      hasL?`<button class="btn btn-ghost btn-sm" onclick="blReturn('${esc(escJs(p.name))}','${esc(escJs(p.phone))}','lost')">분실해제</button>`:''
     ].filter(Boolean).join('');
 
     // 문자 발송 상태 (현재 BL 에피소드 기준)
@@ -2961,8 +3010,8 @@ function renderBlacklist(){
         </div>
         ${l.reply?`<div style="font-size:10px;color:var(--accent);padding-left:2px">메모 · ${esc(l.reply)}</div>`:''}
       </div>`).join('');
-    const logToggle=logs.length?` · <button class="bl-link" onclick="toggleSmsLog('smslog-${key}')">이력 ${logs.length}건 보기</button>`:'';
-    const logSection=logs.length?`<div class="sms-log-wrap" id="smslog-${key}" style="display:none;margin-top:8px">${logHtml}</div>`:'';
+    const logToggle=logs.length?` · <button class="bl-link" onclick="toggleSmsLog('smslog-${esc(escJs(key))}')">이력 ${logs.length}건 보기</button>`:'';
+    const logSection=logs.length?`<div class="sms-log-wrap" id="smslog-${esc(key)}" style="display:none;margin-top:8px">${logHtml}</div>`:'';
 
     return `<div class="bl-card">
       <div class="bl-head">
@@ -2970,7 +3019,7 @@ function renderBlacklist(){
           <div class="bl-name">${esc(p.name)}</div>
           <div class="bl-meta">${esc(p.phone)} · ${esc(p.dept)}</div>
         </div>
-        <button class="btn btn-ghost btn-sm" onclick="goRentals('${escJs(p.name)}')">내역 보기</button>
+        <button class="btn btn-ghost btn-sm" onclick="goRentals('${esc(escJs(p.name))}')">내역 보기</button>
       </div>
       <div class="bl-rows">
         <div class="bl-row"><span class="bl-k">사유</span><div class="bl-tags">${tags}</div></div>
@@ -2979,7 +3028,7 @@ function renderBlacklist(){
       ${logSection}
       <div class="bl-foot">
         <div class="bl-actions">${payBtns}</div>
-        <button class="btn btn-primary btn-sm" onclick="openSmsModal('${escJs(p.name)}','${escJs(p.phone)}')">문자 발송</button>
+        <button class="btn btn-primary btn-sm" onclick="openSmsModal('${esc(escJs(p.name))}','${esc(escJs(p.phone))}')">문자 발송</button>
       </div>
     </div>`;
   }).join('');
@@ -3178,6 +3227,7 @@ async function blReturn(name,phone,status){
   if(!isOnline()) return;
   const label=status==='unpaid'?'미납':'분실';
   const targets=rentals.filter(r=>r.name===name&&r.phone===phone&&r.status===status);
+  const latestTargets=targets.filter(isLatestRecord);
   const items=targets.map(r=>`${ITEM_LABELS[r.item]} ${r.itemNum}`).join(', ');
   if(!confirm(`${name}님의 ${label} 물품을 반납 처리하시겠습니까?\n\n대상 물품: ${items}\n\n반납 완료 후 대여제한이 자동 해제됩니다.`)) return;
   const prevStates=targets.map(r=>{
@@ -3191,12 +3241,12 @@ async function blReturn(name,phone,status){
     r.wasBlacklisted=true;r.resolvedAt=resolvedAt;
     r.status='returned';r.returnDate=resolvedAt;
     const k=fbKey(r.item,r.itemNum);
-    delete itemStatus[k];
+    if(latestTargets.includes(r))delete itemStatus[k];
   }
   try{
     const writes=[
       ...targets.map(r=>opPut(`/rentals/${r.id}`,r)),
-      ...targets.map(r=>opDel(`/itemStatus/${fbKey(r.item,r.itemNum)}`))
+      ...latestTargets.map(r=>opDel(`/itemStatus/${fbKey(r.item,r.itemNum)}`))
     ];
     await fbCommit(writes);
     renderAfterPay();
@@ -3320,7 +3370,7 @@ function renderBlHistory(){
           <div class="bl-name">${esc(p.name)}</div>
           <div class="bl-meta">${esc(p.phone)} · ${esc(p.dept)}</div>
         </div>
-        <button class="btn btn-ghost btn-sm" onclick="goRentals('${escJs(p.name)}')">내역 보기</button>
+        <button class="btn btn-ghost btn-sm" onclick="goRentals('${esc(escJs(p.name))}')">내역 보기</button>
       </div>
       <div class="bl-rows">
         <div class="bl-row"><span class="bl-k">상태</span><span class="sbadge sb-returned">해제완료</span>${more}</div>
@@ -3851,7 +3901,7 @@ function renderHourChart(list){
 
 // ── ⑤ 일별 추이 라인 (작은 그래프 / 자세히 보기 공용) ──────────────
 function _dailyChartConfig(list,big){
-  const days=_period==='all'?30:parseInt(_period);
+  const days=_period==='all'?60:parseInt(_period); // 전체 = 최근 60일 (학기 흐름 한눈에)
   const dateArr=[];
   for(let i=days-1;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);dateArr.push(_localDay(d));}
   const clr=STAT_ITEM_CLR,muted=cssVar('--text-muted'),grid=cssVar('--border');
@@ -3863,7 +3913,7 @@ function _dailyChartConfig(list,big){
         label:`${ITEM_LABELS[t]}`,
         data:dateArr.map(d=>list.filter(r=>r.item===t&&r.date&&_localDay(new Date(r.date))===d).length),
         borderColor:clr[t],backgroundColor:clr[t]+(big?'28':'30'),
-        borderWidth:big?2.5:2,pointRadius:big?3:2.5,pointHoverRadius:big?6:5,
+        borderWidth:big?2.5:2,pointRadius:big?3:(days>30?1.5:2.5),pointHoverRadius:big?6:5,
         fill:false,tension:.4
       }))
     },
@@ -3933,6 +3983,7 @@ function renderDailyDetailChart(){
 
 // ── 전체 렌더 진입점 ──────────────────────────────────────────
 function renderStats(){
+  if(typeof Chart!=='function'){toast('통계 차트를 불러오지 못했습니다. 연결을 확인해주세요','err');return;}
   _destroyAll();
   const list=_filtered();
   renderTurnover(list);
@@ -4118,7 +4169,7 @@ async function initMedicine(){
   buildMedFilters();
   renderMedicine();
   renderMedLog();
-  renderMedStats();
+  refreshMedStatsIfVisible();
   updateMedBadge();
 }
 
@@ -4153,7 +4204,7 @@ function renderMedicine(){
     const thr=low[m.cat]||2;
     const st=m.qty===0?'empty':m.qty<=thr?'low':'';
     const unit=medUnit(m);
-    return `<div class="med-card ${st}" onclick="openMedModal('${m.id}')" title="${esc(m.name)} · ${esc(m.cat)} · ${m.qty}${esc(unit)} 남음">
+    return `<div class="med-card ${st}" onclick="openMedModal('${esc(escJs(m.id))}')" title="${esc(m.name)} · ${esc(m.cat)} · ${m.qty}${esc(unit)} 남음">
       <div class="mc-top"><span class="mc-nm">${esc(m.name)}</span><span class="mc-q ${st}">${m.qty}<small>${esc(unit)}</small></span></div>
       <div class="mc-cat">${esc(m.cat)}</div>
     </div>`;
@@ -4242,6 +4293,7 @@ function _destroyMedCharts(){
 }
 
 function renderMedStats(){
+  if(typeof Chart!=='function')return;
   _destroyMedCharts();
   const period=document.getElementById('med-stat-period')?.value||'30';
   // 기간 필터: 차감(사용) 이력만
@@ -4298,7 +4350,7 @@ function renderMedStats(){
     ? reasons.map(([r,cnt],i)=>`
         <div style="display:flex;align-items:center;gap:5px;font-size:11px">
           <span style="width:8px;height:8px;border-radius:50%;background:${donutColors[i]||'#ccc'};flex-shrink:0"></span>
-          <span style="color:var(--text-muted)">${r}</span>
+          <span style="color:var(--text-muted)">${esc(r)}</span>
           <span style="font-family:var(--font);font-weight:700;margin-left:auto">${cnt}</span>
         </div>`).join('')
     : '<div style="font-size:11px;color:var(--text-muted)">데이터 없음</div>';
@@ -4465,11 +4517,22 @@ function updateMedPreview(m,delta){
   prev.innerHTML=`${m.qty} <span style="opacity:.5;font-size:11px">현재</span> → <strong style="font-size:15px">${after}</strong> <span style="font-size:11px">(${sign}${delta})</span>`;
 }
 
+function parseQuantity(value){
+  const text=String(value??'').trim();
+  if(!/^\d+$/.test(text))return null;
+  const quantity=Number(text);
+  return Number.isSafeInteger(quantity)?quantity:null;
+}
+let _medSaving=false;
 async function saveMedAdj(){
+  if(_medSaving)return;
   const m=medItems.find(x=>x.id===_medId);if(!m)return;
   if(!isOnline()) return;
   const reason=document.getElementById('med-reason').value;
-  const rawVal=parseInt(document.getElementById('med-direct-qty').value||'0')||0;
+  const rawVal=parseQuantity(document.getElementById('med-direct-qty').value);
+  if(rawVal===null){toast('수량은 0 이상의 정수로 입력해주세요','err');return;}
+  if(!Number.isSafeInteger(m.qty)||m.qty<0){toast('저장된 재고 수량을 확인해주세요','err');return;}
+  if(!['수량 정정','구비 추가','기타+',...MED_MINUS].includes(reason)){toast('유효한 사유를 선택해주세요','err');return;}
   let delta;
   if(reason==='수량 정정'){
     delta=rawVal-m.qty;
@@ -4480,9 +4543,11 @@ async function saveMedAdj(){
   }
   // 재고보다 많이 차감하면 0에서 멈추므로, 이력에는 실제로 바뀐 양만 기록
   const newQty=Math.max(0,m.qty+delta);
+  if(!Number.isSafeInteger(newQty)){toast('수량이 너무 큽니다','err');return;}
   delta=newQty-m.qty;
   if(delta===0){toast('변경량이 0입니다. 수량을 입력해주세요','err');return;}
   saveSnapshot(`의약품 재고 조정: ${m.name}`);
+  _medSaving=true;
   const prevQty=m.qty;
   const memo=document.getElementById('med-memo').value.trim();
   m.qty=newQty;
@@ -4501,11 +4566,12 @@ async function saveMedAdj(){
     toast(`${m.name} ${delta>=0?'+'+delta:delta} → ${m.qty}${medUnit(m)}`,'ok');
   }catch(e){
     m.qty=prevQty;
-    medLog.shift();
+    medLog=medLog.filter(entry=>entry.logId!==logId);
     renderMedicine();
     undoStack.pop();updateHistoryBtns();
     toast('저장 실패 — 네트워크를 확인해주세요','err');
   }finally{
+    _medSaving=false;
     if(btn){btn.disabled=false;btn.textContent='저장';}
   }
 }
@@ -4529,19 +4595,19 @@ function renderMedManageList(){
   document.getElementById('med-manage-count').textContent=`(${list.length}개)`;
   document.getElementById('med-manage-list').innerHTML=list.length
     ? list.map(m=>{
-        const delBtn=`<button class="btn btn-danger btn-sm" onclick="deleteMedItem('${m.id}')">삭제</button>`;
+        const delBtn=`<button class="btn btn-danger btn-sm" onclick="deleteMedItem('${esc(escJs(m.id))}')">삭제</button>`;
         return `<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border);border-radius:7px;background:var(--surface);font-size:12px;">
-          <span id="med-cat-view-${m.id}" style="font-size:11px;color:var(--text-muted);white-space:nowrap;flex-shrink:0">${esc(m.cat)}</span>
-          <input id="med-cat-edit-${m.id}" class="fi" list="med-cat-datalist" title="종류" style="display:none;width:90px;flex-shrink:0;padding:4px 8px;font-size:12px" value="${esc(m.cat)}"
-            onkeydown="if(event.key==='Enter')saveMedName('${m.id}');if(event.key==='Escape'){event.preventDefault();cancelMedName('${m.id}')}">
-          <span id="med-name-view-${m.id}" style="font-weight:600;flex:1">${esc(m.name)}</span>
-          <input id="med-name-edit-${m.id}" class="fi" title="품명" style="display:none;flex:1;min-width:0;padding:4px 8px;font-size:12px" value="${esc(m.name)}"
-            onkeydown="if(event.key==='Enter')saveMedName('${m.id}');if(event.key==='Escape'){event.preventDefault();cancelMedName('${m.id}')}">
-          <span id="med-qty-view-${m.id}" style="font-family:var(--font);font-size:11px;color:var(--text-muted);flex-shrink:0">${m.qty}${esc(medUnit(m))}</span>
-          <input id="med-unit-edit-${m.id}" class="fi" title="단위" style="display:none;width:52px;flex-shrink:0;padding:4px 6px;font-size:12px;text-align:center" value="${esc(medUnit(m))}"
-            onkeydown="if(event.key==='Enter')saveMedName('${m.id}');if(event.key==='Escape'){event.preventDefault();cancelMedName('${m.id}')}">
-          <button class="btn btn-ghost btn-sm" onclick="startMedNameEdit('${m.id}')" id="med-edit-btn-${m.id}" title="이름·종류·단위 수정" aria-label="이름·종류·단위 수정">${ICO.edit}</button>
-          <button class="btn btn-primary btn-sm" onclick="saveMedName('${m.id}')" id="med-save-btn-${m.id}" style="display:none">저장</button>
+          <span id="med-cat-view-${esc(m.id)}" style="font-size:11px;color:var(--text-muted);white-space:nowrap;flex-shrink:0">${esc(m.cat)}</span>
+          <input id="med-cat-edit-${esc(m.id)}" class="fi" list="med-cat-datalist" title="종류" style="display:none;width:90px;flex-shrink:0;padding:4px 8px;font-size:12px" value="${esc(m.cat)}"
+            onkeydown="if(event.key==='Enter')saveMedName('${esc(escJs(m.id))}');if(event.key==='Escape'){event.preventDefault();cancelMedName('${esc(escJs(m.id))}')}">
+          <span id="med-name-view-${esc(m.id)}" style="font-weight:600;flex:1">${esc(m.name)}</span>
+          <input id="med-name-edit-${esc(m.id)}" class="fi" title="품명" style="display:none;flex:1;min-width:0;padding:4px 8px;font-size:12px" value="${esc(m.name)}"
+            onkeydown="if(event.key==='Enter')saveMedName('${esc(escJs(m.id))}');if(event.key==='Escape'){event.preventDefault();cancelMedName('${esc(escJs(m.id))}')}">
+          <span id="med-qty-view-${esc(m.id)}" style="font-family:var(--font);font-size:11px;color:var(--text-muted);flex-shrink:0">${m.qty}${esc(medUnit(m))}</span>
+          <input id="med-unit-edit-${esc(m.id)}" class="fi" title="단위" style="display:none;width:52px;flex-shrink:0;padding:4px 6px;font-size:12px;text-align:center" value="${esc(medUnit(m))}"
+            onkeydown="if(event.key==='Enter')saveMedName('${esc(escJs(m.id))}');if(event.key==='Escape'){event.preventDefault();cancelMedName('${esc(escJs(m.id))}')}">
+          <button class="btn btn-ghost btn-sm" onclick="startMedNameEdit('${esc(escJs(m.id))}')" id="med-edit-btn-${esc(m.id)}" title="이름·종류·단위 수정" aria-label="이름·종류·단위 수정">${ICO.edit}</button>
+          <button class="btn btn-primary btn-sm" onclick="saveMedName('${esc(escJs(m.id))}')" id="med-save-btn-${esc(m.id)}" style="display:none">저장</button>
           ${delBtn}
         </div>`;
       }).join('')
@@ -4709,7 +4775,8 @@ async function submitMedAdd(){
   if(_medOrderMode) toggleMedOrderMode(); // 순서 변경 중이면 먼저 순서를 저장 (되돌리기가 꼬이지 않도록)
   const cat=document.getElementById('med-add-cat').value.trim();
   const name=document.getElementById('med-add-name').value.trim();
-  const qty=Math.max(0,parseInt(document.getElementById('med-add-qty').value)||0);
+  const qty=parseQuantity(document.getElementById('med-add-qty').value);
+  if(qty===null){toast('수량은 0 이상의 정수로 입력해주세요','err');return;}
   const unit=document.getElementById('med-add-unit').value.trim()||'정';
   if(!cat||!name){toast('종류와 품명은 필수입니다','err');return;}
   if(medItems.some(m=>m.name===name&&m.cat===cat)){toast('이미 동일한 품목이 있습니다','err');return;}
