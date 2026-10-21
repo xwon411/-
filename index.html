@@ -3723,6 +3723,10 @@ function exportCSV(){
 // ══ UTILS ══
 
 function showPage(id){
+  // 대여 제한에서 다른 페이지로 가면 '신규 미납만 보기' 해제 → 돌아오면 전체 목록
+  if(id!=='blacklist'&&_blNewOnly){_blNewOnly=false;renderBlacklist();}
+  // 해제 이력 탭에 있다가 나가면 '현재 등재' 탭으로 되돌림
+  if(id!=='blacklist'&&_blTab!=='active')switchBlTab('active');
   // 대여 현황에서 다른 페이지로 이동 시 필터 초기화
   if(id!=='rentals'&&_rentalsFiltered){
     _invNumFilter='';
