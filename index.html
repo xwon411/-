@@ -563,6 +563,12 @@ button,input,select,textarea{font-family:var(--font)}
 .today-b b{font-size:13px;color:var(--text);margin-left:4px;font-weight:500}
 .today-b .dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:1px}
 @media(max-width:768px){.today-b{gap:12px;padding:9px 12px}}
+/* 신규 미납 알약 (대시보드 요약 띠 / 대여 제한 제목 옆) */
+.pt-nu{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#b42318;background:#fff1ef;border:1px solid #f6d5d0;border-radius:20px;padding:3px 10px;cursor:pointer;font-family:var(--font);white-space:nowrap}
+.pt-nu i{width:6px;height:6px;border-radius:50%;background:#dc2626;display:inline-block}
+.pt-nu.on{background:#c42020;color:#fff;border-color:#c42020}.pt-nu.on i{background:#fff}
+.today-b #today-nu{margin-left:auto}
+.title-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .is-alert.ok{background:var(--surface)}.is-alert.ok .is-big{color:var(--text)}.is-alert.ok .is-nm,.is-alert.ok .is-lnk{color:var(--text-muted)}
 /* 표 */
 table{font-size:13px}
@@ -941,7 +947,7 @@ thead th:last-child,tbody td:last-child{padding-right:20px}
 
 <!-- BLACKLIST -->
 <div class="page" id="page-blacklist">
-  <div class="page-header"><div><div class="page-title">대여 제한 시스템</div><div class="page-sub">미납·분실 대상자 — 납부 시 자동 해제</div></div></div>
+  <div class="page-header"><div><div class="title-row"><div class="page-title">대여 제한 시스템</div><button class="pt-nu" id="bl-new-pill" style="display:none" onclick="toggleBlNewOnly()"></button></div><div class="page-sub">미납·분실 대상자 — 납부 시 자동 해제</div></div></div>
   <!-- 탭 -->
   <div style="display:flex;gap:0;margin-bottom:14px;border-bottom:2px solid var(--border);">
     <button id="bl-tab-active" onclick="switchBlTab('active')" style="padding:8px 18px;font-size:13px;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:2px solid var(--accent);color:var(--accent);margin-bottom:-2px;font-family:var(--font);">현재 등재</button>
@@ -2012,7 +2018,7 @@ function updateStats(){
   renderTodaySum(renting.length);
   const bu=document.getElementById('badge-unpaid');bu.textContent=bad;bu.style.display=bad>0?'inline-flex':'none';
   const mu=document.getElementById('mbadge-unpaid');if(mu){mu.textContent=bad;mu.style.display=bad>0?'block':'none';}
-  const blCnt=new Set(rentals.filter(r=>BL_STATUS.includes(r.status)).map(r=>`${r.name}_${r.phone}`)).size;
+  const blCnt=rentals.filter(r=>BL_STATUS.includes(r.status)).length; // 대여 제한 카드 수(물품 건수)와 같게
   const bb=document.getElementById('badge-bl'),mb=document.getElementById('mbadge-bl');
   if(bb){bb.textContent=blCnt;bb.style.display=blCnt>0?'inline-flex':'none';}
   if(mb){mb.textContent=blCnt;mb.style.display=blCnt>0?'block':'none';}
@@ -2035,8 +2041,39 @@ function renderTodaySum(rentingCnt){
   box.innerHTML=`<span class="tb-h">오늘 ${now.getMonth()+1}/${now.getDate()}</span>
     <span><i class="dot" style="background:var(--s-renting)"></i>대여<b>${outCnt}</b></span>
     <span><i class="dot" style="background:var(--s-returned)"></i>반납<b>${inCnt}</b></span>
-    <span><i class="dot" style="background:var(--accent)"></i>지금 대여 중<b>${rentingCnt}</b></span>`;
+    <span><i class="dot" style="background:var(--accent)"></i>지금 대여 중<b>${rentingCnt}</b></span>
+    <span id="today-nu"></span>`;
+  _renderNuPills();
 }
+// 신규 미납 — 약속우산 미납 건마다, 그 건에 대한 문자 기록이 없는 것 (대여 제한 카드의 문자 상태와 같은 기준)
+//  · 새 기록(ids 있음): 그 건의 id가 들어 있어야 보낸 걸로 침
+//  · 예전 기록(ids 없음): 그 건을 빌린 뒤에 보냈으면 보낸 걸로 침
+// 문자 기록 저장 / 납부 / 반납으로 미납이 풀리면 빠짐. 안 보내면 다음 날에도 계속 남음
+// 문자 기록이 이 대여 건을 다룬 것인지 (빌린 뒤에 보냈고, ids가 있으면 이 건 id 포함)
+function _smsCovers(l,r){
+  if(new Date(l.sentAt).getTime()<new Date(r.date).getTime())return false;
+  if(!l.ids)return true; // 예전 기록(물품 정보 없음)
+  return (Array.isArray(l.ids)?l.ids:Object.values(l.ids)).map(String).includes(String(r.id));
+}
+// 이 대여 건의 문자 정보 — logs: 이 건 관련 기록(최신순)
+function _recSmsInfo(r){
+  const logs=getSmsLogs(smsKey(r.name,r.phone)).sort((a,b)=>new Date(b.sentAt)-new Date(a.sentAt)).filter(l=>_smsCovers(l,r));
+  return {logs,lastSent:logs[0]||null};
+}
+function newUnpaidRecs(){
+  return rentals.filter(r=>r.item==='umbrella'&&r.status==='unpaid'&&r.date&&!_recSmsInfo(r).lastSent);
+}
+let _blNewOnly=false; // 대여 제한: 신규 미납만 보기
+function _renderNuPills(){
+  const n=newUnpaidRecs().length;
+  if(!n)_blNewOnly=false;
+  const d=document.getElementById('today-nu');
+  if(d)d.innerHTML=n?`<button class="pt-nu" onclick="goNewUnpaid()"><i></i>신규 미납 ${n}</button>`:'';
+  const b=document.getElementById('bl-new-pill');
+  if(b){b.style.display=n?'':'none';b.innerHTML=`<i></i>신규 미납 ${n}`;b.classList.toggle('on',_blNewOnly);}
+}
+function goNewUnpaid(){_blNewOnly=true;showPage('blacklist');switchBlTab('active');renderBlacklist();}
+function toggleBlNewOnly(){_blNewOnly=!_blNewOnly;if(_blTab!=='active')switchBlTab('active');renderBlacklist();}
 function renderInvSum(list,bad){
   const box=document.getElementById('inv-sum');if(!box)return;
   box.innerHTML=list.map(({t,av,tot,rc})=>{
@@ -2956,52 +2993,43 @@ function _blSmsInfo(p){
 function renderBlacklist(){
   const q=(document.getElementById('bl-search')?.value||'').toLowerCase();
   const sf=document.getElementById('bl-filter')?.value||'';
-  const map={};
-  rentals.filter(r=>BL_STATUS.includes(r.status)).forEach(r=>{
-    const k=smsKey(r.name,r.phone);
-    if(!map[k])map[k]={name:r.name,phone:r.phone,dept:r.dept||'',records:[]};
-    map[k].records.push(r);
-  });
-  let persons=Object.values(map);
-  if(q)persons=persons.filter(p=>p.name.toLowerCase().includes(q)||p.phone.includes(q)||p.dept.toLowerCase().includes(q));
+  // 카드 = 대여 건 하나 (같은 사람이라도 물품이 다르면 카드가 따로)
+  let recs=rentals.filter(r=>BL_STATUS.includes(r.status));
+  if(q)recs=recs.filter(r=>(r.name||'').toLowerCase().includes(q)||(r.phone||'').includes(q)||(r.dept||'').toLowerCase().includes(q));
   // 사유 필터 (장기미납 = 반납 기한 지나고 7일 이상 미납)
-  const matchReason=r=>!sf||(sf==='long'?isLongUnpaid(r):r.status===sf);
-  if(sf)persons=persons.filter(p=>p.records.some(matchReason));
+  if(sf)recs=recs.filter(r=>sf==='long'?isLongUnpaid(r):r.status===sf);
   // 대여 요일 필터 (빌린 날의 요일 기준)
   const sd=document.getElementById('bl-day')?.value||'';
-  if(sd!=='')persons=persons.filter(p=>p.records.some(r=>r.date&&new Date(r.date).getDay()===parseInt(sd)&&matchReason(r)));
-  // 문자 미발송만 (현재 등재 기간 기준)
+  if(sd!=='')recs=recs.filter(r=>r.date&&new Date(r.date).getDay()===parseInt(sd));
+  // 문자 미발송만 (이 건 기준)
   const ss=document.getElementById('bl-sms')?.value||'';
-  if(ss==='none')persons=persons.filter(p=>!_blSmsInfo(p).lastSent);
+  if(ss==='none')recs=recs.filter(r=>!_recSmsInfo(r).lastSent);
+  // 신규 미납만 (제목 옆 알약)
+  _renderNuPills();
+  if(_blNewOnly){const nu=new Set(newUnpaidRecs().map(r=>String(r.id)));recs=recs.filter(r=>nu.has(String(r.id)));}
   const grid=document.getElementById('bl-grid');
-  if(!persons.length){grid.innerHTML=`<div class="empty-state"><p>대여제한 대상자가 없습니다</p></div>`;return;}
-  grid.innerHTML=persons.map(p=>{
-    const key=smsKey(p.name,p.phone);
-    const {logs,currentLogs,lastSent}=_blSmsInfo(p);
+  if(!recs.length){grid.innerHTML=`<div class="empty-state"><p>대여제한 대상자가 없습니다</p></div>`;return;}
+  grid.innerHTML=recs.map(r=>{
+    const rid=String(r.id);
+    const N=esc(escJs(r.name)),P=esc(escJs(r.phone)),I=esc(escJs(rid));
+    const {logs,lastSent}=_recSmsInfo(r);
+    const label=isLongUnpaid(r)?'장기미납':sInfo(r.status).l;
+    const tag=`<span class="sbadge ${sInfo(r.status).cl}">${label} · ${esc(ITEM_LABELS[r.item]||r.item)} ${esc(r.itemNum)}</span>`;
 
-    const tags=p.records.map(r=>{
-      const isLong=isLongUnpaid(r);
-      const label=isLong?'장기미납':sInfo(r.status).l;
-      const extra='';
-      return `<span class="sbadge ${sInfo(r.status).cl}">${label} · ${esc(ITEM_LABELS[r.item]||r.item)} ${esc(r.itemNum)}</span>`;
-    }).join('');
-
-    const hasU=p.records.some(r=>r.status==='unpaid');
-    const hasL=p.records.some(r=>r.status==='lost');
+    const isU=r.status==='unpaid',isL=r.status==='lost';
     const payBtns=[
-      hasU?`<button class="btn btn-ghost btn-sm" onclick="blPay('${esc(escJs(p.name))}','${esc(escJs(p.phone))}','unpaid')">연체료 납부</button>`:'',
-      hasU?`<button class="btn btn-ghost btn-sm" onclick="blReturn('${esc(escJs(p.name))}','${esc(escJs(p.phone))}','unpaid')">납부+반납</button>`:'',
-      (hasU&&!hasL)?`<button class="btn btn-ghost btn-sm" onclick="blPayAsLost('${esc(escJs(p.name))}','${esc(escJs(p.phone))}')">분실비 납부</button>`:'',
-      hasL?`<button class="btn btn-ghost btn-sm" onclick="blPay('${esc(escJs(p.name))}','${esc(escJs(p.phone))}','lost')">분실비 납부</button>`:'',
-      hasL?`<button class="btn btn-ghost btn-sm" onclick="blReturn('${esc(escJs(p.name))}','${esc(escJs(p.phone))}','lost')">분실해제</button>`:''
+      isU?`<button class="btn btn-ghost btn-sm" onclick="blPay('${N}','${P}','unpaid','${I}')">연체료 납부</button>`:'',
+      isU?`<button class="btn btn-ghost btn-sm" onclick="blReturn('${N}','${P}','unpaid','${I}')">납부+반납</button>`:'',
+      isU?`<button class="btn btn-ghost btn-sm" onclick="blPayAsLost('${N}','${P}','${I}')">분실비 납부</button>`:'',
+      isL?`<button class="btn btn-ghost btn-sm" onclick="blPay('${N}','${P}','lost','${I}')">분실비 납부</button>`:'',
+      isL?`<button class="btn btn-ghost btn-sm" onclick="blReturn('${N}','${P}','lost','${I}')">분실해제</button>`:''
     ].filter(Boolean).join('');
 
-    // 문자 발송 상태 (현재 BL 에피소드 기준)
+    // 문자 발송 상태 (이 건 기준)
     const smsBadge=lastSent
-      ?`<b>발송완료</b> · ${fmtDate(lastSent.sentAt)}${currentLogs.length>1?` · 총 ${currentLogs.length}회`:''}`
+      ?`<b>발송완료</b> · ${fmtDate(lastSent.sentAt)}${logs.length>1?` · 총 ${logs.length}회`:''}`
       :`<span class="bl-sms-none">미발송</span>`;
 
-    // 발송 이력 (최근 3건, 펼치기)
     const logHtml=logs.slice(0,5).map(l=>`
       <div class="sms-log-item" style="flex-direction:column;gap:3px;align-items:stretch">
         <div style="display:flex;align-items:center;gap:6px">
@@ -3010,25 +3038,25 @@ function renderBlacklist(){
         </div>
         ${l.reply?`<div style="font-size:10px;color:var(--accent);padding-left:2px">메모 · ${esc(l.reply)}</div>`:''}
       </div>`).join('');
-    const logToggle=logs.length?` · <button class="bl-link" onclick="toggleSmsLog('smslog-${esc(escJs(key))}')">이력 ${logs.length}건 보기</button>`:'';
-    const logSection=logs.length?`<div class="sms-log-wrap" id="smslog-${esc(key)}" style="display:none;margin-top:8px">${logHtml}</div>`:'';
+    const logToggle=logs.length?` · <button class="bl-link" onclick="toggleSmsLog('smslog-${I}')">이력 ${logs.length}건 보기</button>`:'';
+    const logSection=logs.length?`<div class="sms-log-wrap" id="smslog-${esc(rid)}" style="display:none;margin-top:8px">${logHtml}</div>`:'';
 
     return `<div class="bl-card">
       <div class="bl-head">
         <div class="bl-info">
-          <div class="bl-name">${esc(p.name)}</div>
-          <div class="bl-meta">${esc(p.phone)} · ${esc(p.dept)}</div>
+          <div class="bl-name">${esc(r.name)}</div>
+          <div class="bl-meta">${esc(r.phone)} · ${esc(r.dept||'')}</div>
         </div>
-        <button class="btn btn-ghost btn-sm" onclick="goRentals('${esc(escJs(p.name))}')">내역 보기</button>
+        <button class="btn btn-ghost btn-sm" onclick="goRentals('${N}')">내역 보기</button>
       </div>
       <div class="bl-rows">
-        <div class="bl-row"><span class="bl-k">사유</span><div class="bl-tags">${tags}</div></div>
+        <div class="bl-row"><span class="bl-k">사유</span><div class="bl-tags">${tag}</div></div>
         <div class="bl-row"><span class="bl-k">문자</span><span class="bl-sms-line">${smsBadge}${logToggle}</span></div>
       </div>
       ${logSection}
       <div class="bl-foot">
         <div class="bl-actions">${payBtns}</div>
-        <button class="btn btn-primary btn-sm" onclick="openSmsModal('${esc(escJs(p.name))}','${esc(escJs(p.phone))}')">문자 발송</button>
+        <button class="btn btn-primary btn-sm" onclick="openSmsModal('${N}','${P}','${I}')">문자 발송</button>
       </div>
     </div>`;
   }).join('');
@@ -3040,11 +3068,12 @@ function toggleSmsLog(id){
 }
 
 // 문자 발송 모달 열기
-let _smsName='',_smsPhone='';
-function openSmsModal(name,phone){
-  _smsName=name; _smsPhone=phone;
+let _smsName='',_smsPhone='',_smsRid=''; // _smsRid: 어떤 대여 건에 대한 문자인지
+function openSmsModal(name,phone,rid){
+  _smsName=name; _smsPhone=phone; _smsRid=rid?String(rid):'';
   document.getElementById('sms-modal-sub').textContent=`${phone}`;
-  document.getElementById('sms-modal-info').innerHTML=`<strong>${esc(name)}</strong>님에게 문자 발송 후 아래 기록을 저장하세요.`;
+  const _sr=_smsRid&&rentals.find(r=>String(r.id)===_smsRid);
+  document.getElementById('sms-modal-info').innerHTML=`<strong>${esc(name)}</strong>님${_sr?` (${esc(ITEM_LABELS[_sr.item]||_sr.item)} ${esc(_sr.itemNum)})`:''}에게 문자 발송 후 아래 기록을 저장하세요.`;
   document.getElementById('sms-note-input').value='';
   renderSmsModalLog();
   openModal('modal-sms');
@@ -3064,9 +3093,12 @@ function renderSmsModalLog(){
   const logs=getSmsLogs(key).sort((a,b)=>new Date(b.sentAt)-new Date(a.sentAt));
   const sec=document.getElementById('sms-log-section');
   const items=document.getElementById('sms-log-items');
-  if(logs.length){
+  // 카드에서 열었으면 그 건 관련 기록만 (i는 전체 목록 기준 번호라 삭제·메모 기능 그대로 동작)
+  const _sr=_smsRid&&rentals.find(r=>String(r.id)===_smsRid);
+  const shown=logs.map((l,i)=>({l,i})).filter(({l})=>!_sr||_smsCovers(l,_sr));
+  if(shown.length){
     sec.style.display='block';
-    items.innerHTML=logs.map((l,i)=>`
+    items.innerHTML=shown.map(({l,i})=>`
       <div class="sms-log-item" style="flex-direction:column;gap:5px;align-items:stretch">
         <div style="display:flex;align-items:center;gap:6px">
           <span class="sli-time">${fmtDate(l.sentAt)}</span>
@@ -3166,7 +3198,9 @@ async function confirmSmsSent(){
   const key=smsKey(_smsName,_smsPhone);
   const prevLogs=getSmsLogs(key).slice();
   const logs=getSmsLogs(key);
-  const entry={sentAt:new Date().toISOString(),note};
+  // 이 문자가 어떤 건에 대한 것인지 — 카드의 대여 건 id만 저장 (같은 사람의 다른 카드엔 반영 안 됨)
+  const ids=_smsRid?[_smsRid]:rentals.filter(r=>BL_STATUS.includes(r.status)&&smsKey(r.name,r.phone)===key).map(r=>String(r.id));
+  const entry={sentAt:new Date().toISOString(),note,ids};
   logs.unshift(entry);
   smsLog[key]=logs;
   document.getElementById('sms-note-input').value='';
@@ -3187,12 +3221,13 @@ async function confirmSmsSent(){
     if(btn){btn.disabled=false;btn.textContent='발송 기록 저장';}
   }
 }
-async function blPay(name,phone,status){
+async function blPay(name,phone,status,rid){
   if(_opLock)return;
   if(!isOnline()) return;
   const label=status==='unpaid'?'연체료':'분실비';
   const newStatus=status==='unpaid'?'unpaid_paid':'lost_paid';
-  const targets=rentals.filter(r=>r.name===name&&r.phone===phone&&r.status===status);
+  const targets=rentals.filter(r=>r.name===name&&r.phone===phone&&r.status===status&&(!rid||String(r.id)===String(rid))); // rid: 카드의 그 건만
+  if(!targets.length) return;
   const items=targets.map(r=>`${ITEM_LABELS[r.item]} ${r.itemNum}`).join(', ');
   if(!confirm(`${name}님의 ${label} 납부를 처리하시겠습니까?\n\n대상 물품: ${items}\n\n납부 확인 후 대여제한이 자동 해제됩니다.`)) return;
   const prevStates=targets.map(r=>{
@@ -3222,11 +3257,12 @@ async function blPay(name,phone,status){
     toast('저장에 실패했습니다. 다시 시도해주세요.','err');
   }finally{_opLock=false;_endSaving();}
 }
-async function blReturn(name,phone,status){
+async function blReturn(name,phone,status,rid){
   if(_opLock)return;
   if(!isOnline()) return;
   const label=status==='unpaid'?'미납':'분실';
-  const targets=rentals.filter(r=>r.name===name&&r.phone===phone&&r.status===status);
+  const targets=rentals.filter(r=>r.name===name&&r.phone===phone&&r.status===status&&(!rid||String(r.id)===String(rid))); // rid: 카드의 그 건만
+  if(!targets.length) return;
   const latestTargets=targets.filter(isLatestRecord);
   const items=targets.map(r=>`${ITEM_LABELS[r.item]} ${r.itemNum}`).join(', ');
   if(!confirm(`${name}님의 ${label} 물품을 반납 처리하시겠습니까?\n\n대상 물품: ${items}\n\n반납 완료 후 대여제한이 자동 해제됩니다.`)) return;
@@ -3263,10 +3299,10 @@ async function blReturn(name,phone,status){
   }finally{_opLock=false;_endSaving();}
 }
 // 미납 → 분실비 납부 한 번에 처리 (미납으로 등록됐으나 실제 분실+납부한 경우)
-async function blPayAsLost(name,phone){
+async function blPayAsLost(name,phone,rid){
   if(_opLock)return;
   if(!isOnline()) return;
-  const targets=rentals.filter(r=>r.name===name&&r.phone===phone&&r.status==='unpaid');
+  const targets=rentals.filter(r=>r.name===name&&r.phone===phone&&r.status==='unpaid'&&(!rid||String(r.id)===String(rid))); // rid: 카드의 그 건만
   if(!targets.length) return;
   const items=targets.map(r=>`${ITEM_LABELS[r.item]} ${r.itemNum}`).join(', ');
   if(!confirm(`${name}님의 미납을 분실로 변경하고 분실비 납부 처리하시겠습니까?\n\n대상 물품: ${items}\n\n물품은 분실 처리(영구 대여불가)되며, 대여제한이 자동 해제됩니다.`)) return;
