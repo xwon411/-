@@ -243,6 +243,7 @@ function getItemState(type, num){
   if(last.status === 'unpaid_paid') return 'renting';               // 연체료 납부 후 아직 반납 전 → 대여중
   if(last.status === 'lost_paid' && !last.replacedAt) return 'lost'; // 분실비 납부, 아직 교체 전
   if(last.status === 'lost_paid') return iStVal==='lost' ? 'lost' : 'available'; // 새 물품으로 교체됨
+  if(last.status === 'broken_paid') return 'available'; // 고장비 납부 후 수리·교체됨
   if(iStVal==='lost') return 'lost';
   if(last.status === 'returned') return 'available';
   return last.status;
@@ -393,8 +394,8 @@ function searchMyRental() {
   }
 
   resultWrap.innerHTML = found.map(r => {
-    const stMap = { renting:'renting', unpaid:'unpaid', returned:'returned', broken:'unpaid', lost:'unpaid', unpaid_paid:'renting', lost_paid:'returned' };
-    const stLbl = { renting:'대여중', unpaid:'미납', returned:'반납완료', broken:'고장', lost:'분실', unpaid_paid:'미납 (연체료 납부)', lost_paid:'분실 (분실비 납부)' };
+    const stMap = { renting:'renting', unpaid:'unpaid', returned:'returned', broken:'unpaid', lost:'unpaid', unpaid_paid:'renting', lost_paid:'returned', broken_paid:'returned' };
+    const stLbl = { renting:'대여중', unpaid:'미납', returned:'반납완료', broken:'고장', lost:'분실', unpaid_paid:'미납 (연체료 납부)', lost_paid:'분실 (분실비 납부)', broken_paid:'고장 (고장비 납부)' };
     const stCls = stMap[r.status] || 'renting';
     const due   = getDueInfo(r);
 
@@ -403,6 +404,8 @@ function searchMyRental() {
       ddHtml = `<div class="rrc-dday done">반납 완료</div>`;
     } else if (r.status === 'lost_paid') {
       ddHtml = `<div class="rrc-dday done">분실비 납부 완료</div>`;
+    } else if (r.status === 'broken_paid') {
+      ddHtml = `<div class="rrc-dday done">고장비 납부 완료</div>`;
     } else if (due) {
       ddHtml = `<div class="rrc-dday ${due.cls}">
         <div class="dd-big">${due.big}</div>
