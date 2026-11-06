@@ -1819,28 +1819,47 @@ async function init(){
 }
 
 // 약속우산 대여 후 7일째 오후 6시 기준 자동 미납 처리
+let _autoBusy=false;
 async function autoUnpaidUmbrella(){
-  const now=Date.now();
-  const targets=rentals.filter(r=>{
-    if(r.item!=='umbrella'||r.status!=='renting') return false;
-    return now>=dueDate(r).getTime(); // 대여 7일째 오후 6시
-  });
-  if(!targets.length) return;
-  saveSnapshot(`약속우산 자동 미납 처리 (${targets.length}건)`);
-  const prevStates=targets.map(r=>({r,status:r.status,note:r.note}));
-  for(const r of targets){
-    r.status='unpaid';
-    r.note=(r.note?r.note+' / ':'')+'7일 경과 자동 미납 처리';
-  }
+  if(_autoBusy)return;
+  _autoBusy=true;
   try{
-    await fbCommit(targets.map(r=>opPut(`/rentals/${r.id}`,r)));
-    toast('약속우산 7일 경과 — 자동 미납 처리되었습니다','inf');
-    renderAll();
-  }catch(e){
-    prevStates.forEach(({r,status:s,note:n})=>{r.status=s;r.note=n;});
-    undoStack.pop();updateHistoryBtns();
-    toast('자동 미납 처리 실패 — 네트워크를 확인해주세요','err');
-  }
+    const now=Date.now();
+    const cands=rentals.filter(r=>{
+      if(r.item!=='umbrella'||r.status!=='renting') return false;
+      return now>=dueDate(r).getTime(); // 대여 7일째 오후 6시
+    });
+    if(!cands.length) return;
+    // 이 화면이 오래 켜져 있었으면 그 사이 다른 기기에서 반납했을 수 있음 → 서버에서 다시 확인
+    let server;
+    try{server=await Promise.all(cands.map(r=>fbGet(`/rentals/${r.id}`)));}catch(e){return;}
+    const targets=[];let synced=false;
+    cands.forEach((r,i)=>{
+      const sv=server[i];
+      if(!sv){rentals=rentals.filter(x=>x.id!==r.id);synced=true;return;} // 서버에서 삭제된 기록
+      if(sv.status!=='renting'){ // 이미 반납 등으로 바뀜 → 이 화면의 기록만 최신으로 맞추고 건너뜀
+        Object.keys(r).forEach(k=>{if(!(k in sv))delete r[k];});Object.assign(r,sv);synced=true;return;
+      }
+      targets.push({r,sv});
+    });
+    if(!targets.length){if(synced)renderAll();return;}
+    saveSnapshot(`약속우산 자동 미납 처리 (${targets.length}건)`);
+    const prevStates=targets.map(({r})=>({r,status:r.status,note:r.note}));
+    for(const {r,sv} of targets){
+      r.status='unpaid';
+      r.note=(sv.note?sv.note+' / ':'')+'7일 경과 자동 미납 처리';
+    }
+    try{
+      // 기록 전체가 아니라 상태·메모만 저장 (다른 항목을 옛날 값으로 덮어쓰지 않도록)
+      await fbCommit(targets.flatMap(({r})=>[opPut(`/rentals/${r.id}/status`,'unpaid'),opPut(`/rentals/${r.id}/note`,r.note)]));
+      toast('약속우산 7일 경과 — 자동 미납 처리되었습니다','inf');
+      renderAll();
+    }catch(e){
+      prevStates.forEach(({r,status:s,note:n})=>{r.status=s;r.note=n;});
+      undoStack.pop();updateHistoryBtns();
+      toast('자동 미납 처리 실패 — 네트워크를 확인해주세요','err');
+    }
+  }finally{_autoBusy=false;}
 }
 function renderAll(){updateStats();renderRecent();renderRentals();renderInventory();renderUnpaid();renderBlacklist();}
 function _activePage(){const p=document.querySelector('.page.active');return p?p.id.replace('page-',''):''}
@@ -1849,34 +1868,58 @@ function renderAfterStatus(){updateStats();renderRecent();const pg=_activePage()
 function renderAfterInvCond(){updateStats();renderInventory();const pg=_activePage();if(pg==='unpaid')renderUnpaid();if(pg==='rentals')renderRentals();}
 function renderAfterEdit(){updateStats();renderRecent();const pg=_activePage();if(pg==='rentals')renderRentals();if(pg==='inventory')renderInventory();}
 function renderAfterPay(){updateStats();renderRecent();renderBlacklist();const pg=_activePage();if(pg==='rentals')renderRentals();if(pg==='unpaid')renderUnpaid();}
+// 서버에서 최신 데이터 다시 불러오기 (새로고침 버튼 / 자동 새로고침 공용)
+let _lastLoadAt=Date.now(),_lastUserActAt=0,_refreshBusy=false;
+['pointerdown','keydown','input'].forEach(ev=>document.addEventListener(ev,()=>{_lastUserActAt=Date.now();},true));
+async function _loadLatest(){
+  const [rData,iData,nData,sData,mData,lData]=await Promise.all([
+    fbGet('/rentals'),fbGet('/itemStatus'),fbGet('/itemNumbers'),
+    fbGet('/smsLog'),fbGet('/medicine'),fbGet('/medLog')
+  ]);
+  rentals=rData?Object.values(rData).sort((a,b)=>new Date(b.date)-new Date(a.date)):[];
+  itemStatus=iData||{};
+  smsLog=sData||{};
+  if(nData){Object.keys(ITEM_NUMBERS).forEach(t=>{if(nData[t])ITEM_NUMBERS[t]=nData[t];});}
+  medItems=mData?Object.values(mData):[];sortMedItems();
+  medLog=lData?Object.values(lData).sort((a,b)=>new Date(b.at)-new Date(a.at)):[];
+  // 새로고침 후 undoStack 초기화 — 구버전 스냅샷이 최신 데이터에 덮어쓰이는 것 방지
+  undoStack=[];redoStack=[];updateHistoryBtns();
+  renderAll();
+  buildMedFilters();renderMedicine();renderMedLog();renderMedStats();updateMedBadge();
+  _lastLoadAt=Date.now();
+}
 async function refreshData(){
   const btn=document.getElementById('refresh-btn');
   const mobBtn=document.getElementById('mob-refresh-btn');
   if(btn){btn.disabled=true;btn.innerHTML='<span class="spin"></span><span>불러오는 중...</span>';}
   if(mobBtn){mobBtn.disabled=true;mobBtn.innerHTML='<span class="spin"></span>';}
+  _refreshBusy=true;
   try{
-    const [rData,iData,nData,sData,mData,lData]=await Promise.all([
-      fbGet('/rentals'),fbGet('/itemStatus'),fbGet('/itemNumbers'),
-      fbGet('/smsLog'),fbGet('/medicine'),fbGet('/medLog')
-    ]);
-    rentals=rData?Object.values(rData).sort((a,b)=>new Date(b.date)-new Date(a.date)):[];
-    itemStatus=iData||{};
-    smsLog=sData||{};
-    if(nData){Object.keys(ITEM_NUMBERS).forEach(t=>{if(nData[t])ITEM_NUMBERS[t]=nData[t];});}
-    medItems=mData?Object.values(mData):[];sortMedItems();
-    medLog=lData?Object.values(lData).sort((a,b)=>new Date(b.at)-new Date(a.at)):[];
-    // 새로고침 후 undoStack 초기화 — 구버전 스냅샷이 최신 데이터에 덮어쓰이는 것 방지
-    undoStack=[];redoStack=[];updateHistoryBtns();
-    renderAll();
-    buildMedFilters();renderMedicine();renderMedLog();renderMedStats();updateMedBadge();
+    await _loadLatest();
     toast('최신 데이터를 불러왔습니다','ok');
   }catch(e){
     toast('데이터 불러오기 실패. 인터넷 연결을 확인해주세요.','err');
   }finally{
+    _refreshBusy=false;
     if(btn){btn.disabled=false;btn.innerHTML=ICO.refresh+'<span>새로고침</span>';}
     if(mobBtn){mobBtn.disabled=false;mobBtn.innerHTML=ICO.refresh;}
   }
 }
+// 자동 새로고침 — 창이 열려 있거나 입력·저장 중이면 건너뜀 (작업 중인 내용 보호)
+async function silentRefresh(){
+  if(_refreshBusy||_opLock||_historyBusy||!navigator.onLine)return;
+  if(document.querySelector('.modal-overlay.open'))return;
+  if(Date.now()-_lastUserActAt<60*1000)return; // 1분 안에 조작했으면 다음 기회에
+  _refreshBusy=true;
+  try{await _loadLatest();}catch(e){}finally{_refreshBusy=false;}
+}
+// 다른 탭·앱에 갔다가 돌아왔을 때 (1분 이상 지났으면), 그리고 켜둔 동안 5분마다
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'&&Date.now()-_lastLoadAt>60*1000)silentRefresh();
+});
+setInterval(()=>{
+  if(document.visibilityState==='visible'&&Date.now()-_lastLoadAt>5*60*1000)silentRefresh();
+},60*1000);
 
 // ══ 물품 실질 상태 계산 ══
 // 우선순위: itemStatus(고장/분실) > 대여기록 상태 > available
