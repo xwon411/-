@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>농생대 분실물 보관함</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+/* 물품 대여 현황(public.html)과 같은 토큰·구조. 600px 단일 열, 흰 카드 목록 */
+:root{
+  --font:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,system-ui,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  --bg:#f6f5f2;--surface:#fff;--surface2:#f6f5f2;--border:#e6e4de;
+  --accent:#2d5016;--accent-pale:#e8f0e0;
+  --text:#1b1d1a;--text-muted:#6b6f68;
+  --ok:#16a34a;--few:#c2410c;--none:#dc2626;--renting:#2563eb;
+  --track:#ecebe6;--hover:#fafaf8;--divider:#f0efe9;
+  color-scheme:light;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);display:flex;flex-direction:column;font-feature-settings:'tnum';letter-spacing:-.005em;font-size:14px}
+button,input{font-family:var(--font)}
+.ic{display:block;flex-shrink:0}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* 헤더 */
+header{background:var(--surface);border-bottom:1px solid var(--border)}
+.hd-in{max-width:960px;margin:0 auto;padding-block:22px 16px}
+.hd-tag{font-size:12px;font-weight:700;color:var(--accent);margin-bottom:4px}
+.hd-title{font-size:22px;font-weight:700;letter-spacing:-.02em}
+.hd-sub{font-size:13px;color:var(--text-muted);margin-top:2px}
+
+/* 업데이트 줄 */
+.update-bar{max-width:960px;margin:0 auto;width:100%;padding-block:12px 0;display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-muted);flex-wrap:wrap}
+.upd-dot{width:7px;height:7px;border-radius:50%;background:var(--ok);flex-shrink:0}
+.upd-dot.sample{background:#d4a017}
+.upd-label{white-space:nowrap}
+.upd-time{color:var(--text);font-weight:500}
+.upd-btn{margin-left:auto;display:inline-flex;align-items:center;gap:5px;padding:6px 11px;border-radius:7px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap}
+.upd-btn:hover{background:var(--hover)}
+
+/* 메인 */
+main{flex:1;padding-block:12px 40px;max-width:960px;margin:0 auto;width:100%}
+.sec-row{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:22px 2px 10px}
+.sec-title{font-size:13px;font-weight:600;color:var(--text-muted)}
+.sec-title b{color:var(--accent);margin-left:4px}
+.sec-asof{font-size:12px;color:var(--text-muted);white-space:nowrap}
+
+/* 물품 찾기 */
+.search-section{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:12px}
+.search-title{font-size:15px;font-weight:700;margin-bottom:3px}
+.search-sub{font-size:12.5px;color:var(--text-muted);margin-bottom:12px;line-height:1.55}
+.search-input{width:100%;padding:11px 13px;border:1px solid var(--border);border-radius:8px;font-size:15px;outline:none;background:var(--surface2);-webkit-appearance:none;transition:border-color .12s;color:var(--text)}
+.search-input:focus{border-color:var(--accent);background:var(--surface)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:6px 11px;border-radius:7px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-weight:600;cursor:pointer}
+.chip:hover{background:var(--hover)}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.chip .n{font-weight:500;opacity:.7}
+.chip:focus-visible,.upd-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* 분실물 카드 */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.item-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.thumb{position:relative;aspect-ratio:1/1;max-width:100%;background:var(--surface2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.thumb svg{width:44px;height:44px}
+.thumb .lock-txt{font-size:12px;font-weight:600}
+.tag-no{position:absolute;left:8px;top:8px;font-size:11px;font-weight:700;color:var(--text);background:var(--surface);border:1px solid var(--border);padding:2px 7px;border-radius:6px}
+.photo-note{position:absolute;right:8px;bottom:8px;font-size:11px;font-weight:600;color:#fff;background:rgba(27,29,26,.55);padding:2px 7px;border-radius:5px}
+.ic-body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:8px;flex:1}
+.ic-name{font-size:15px;font-weight:700;letter-spacing:-.01em;overflow-wrap:anywhere}
+.meta{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:12.5px}
+.meta dt{color:var(--text-muted)}
+.meta dd{min-width:0;overflow-wrap:anywhere}
+.ic-badge{margin-top:auto;display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;white-space:nowrap}
+.ic-badge::before{content:'';width:7px;height:7px;border-radius:50%;background:currentColor}
+.ic-badge.avail{color:var(--ok)}.ic-badge.few{color:var(--few)}
+@media(max-width:520px){.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.ic-body{padding:10px 11px 12px}.meta{grid-template-columns:1fr;gap:0}.meta dt{font-size:11px}}
+
+.empty{text-align:center;padding:18px 0 8px;color:var(--text-muted);font-size:13px}
+
+/* 안내 */
+.notice{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:18px;font-size:13px;line-height:1.75;color:var(--text-muted)}
+.notice b{color:var(--text);font-weight:600}
+.notice-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px}
+
+footer{text-align:center;padding-block:16px;font-size:12px;color:var(--text-muted);border-top:1px solid var(--border)}
+
+/* 물품 아이콘 색 (물품대여 페이지와 같은 팔레트) */
+.ibs-umbrella{background:#e6f4f1;color:#0f766e}.ibs-charger{background:#fbf3e0;color:#a16207}.ibs-calculator{background:#eef1f5;color:#475569}.ibs-multitap{background:#eef5e4;color:#4d7c0f}.ibs-heatpack{background:#fdeee6;color:#c2410c}
+
+@media(max-width:380px){
+  .hd-title{font-size:19px}
+  .search-section,.notice{padding:14px}
+}
+</style>
+</head>
+<body>
+
+<header class="gut"><div class="hd-in">
+  <div class="hd-tag">SNU CALS</div>
+  <div class="hd-title">분실물 보관 현황</div>
+  <div class="hd-sub">농업생명과학대학 학생회</div>
+</div></header>
+
+<div class="gut">
+  <div class="update-bar">
+    <div class="upd-dot" id="upd-dot"></div>
+    <span class="upd-label" id="upd-label">업데이트</span>
+    <span class="upd-time" id="upd-time"></span>
+    <button class="upd-btn" id="upd-btn" type="button"><svg class="ic" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>새로고침</button>
+  </div>
+</div>
+
+<main class="gut">
+  <div class="sec-row"><div class="sec-title">보관 중인 물품<b id="sec-count">0</b></div><div class="sec-asof" id="sec-asof"></div></div>
+  <div class="chips" id="chips" role="group" aria-label="분류"></div>
+  <div class="grid" id="list"></div>
+  <div class="empty" id="empty" hidden>현재 보관 중인 물품이 없어요.</div>
+
+  <div class="notice">
+    <div class="notice-title">분실물 안내</div>
+    <div><b>수령 위치</b> : 200동 1037A호 (학생회실)<br>
+    <b>수령 시간</b> : 평일 14:00 ~ 18:00</div>
+  </div>
+</main>
+
+<footer class="gut">농업생명과학대학 학생회 · 분실물 현황은 관리대장과 함께 갱신됩니다</footer>
+
+<script>
+// 관리대장 시트의 '공개용 현황' 탭을 웹에 게시(CSV)한 주소. 비어 있으면 예시 목록을 보여줍니다.
+const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR5d-umV_TTInyjxK8dGn_J2ZxhnXASQLwVG0HyXKXrzG2rHMdDMZ2nbzMWTI5amPxY8ASLe5x057w1/pub?gid=1&single=true&output=csv";
+const KEEP_DAYS = null; // 보관 기간. null이면 무제한(D-day 표시 없음)
+const isValuable = (it) => it.feat === "문의 시 확인";
+
+const SAMPLE = [
+  ["L-008","2026-11-11","200동 U-Space","무선이어폰 케이스","전자기기","문의 시 확인","sample:earbuds"],
+  ["L-007","2026-11-10","200동 1층 CU 앞","남색 장우산","우산","손잡이에 노란 스티커","sample:umbrella"],
+  ["L-006","2026-11-10","201동 101호","일반화학 교재","도서","2판, 앞장에 이름 없음","sample:book"],
+  ["L-005","2026-11-07","200동 2층 더벤티 앞","카드지갑","지갑·카드","문의 시 확인","sample:wallet"],
+  ["L-004","2026-11-06","75동 강의실","회색 후드집업","의류","M 사이즈","sample:hoodie"],
+  ["L-003","2026-11-05","200동 8층 복도","공학용 계산기","전자기기","문의 시 확인","sample:calculator"],
+  ["L-002","2026-11-04","200동 U-Space","투명 필통","필기구·문구","샤프 2개, 지우개","sample:pencilcase"],
+  ["L-001","2026-11-03","200동 1층 로비","검은색 에코백","가방","농생대 로고 프린트","sample:ecobag"]
+];
+
+// 시안용 예시 사진 (직접 그린 일러스트). 실제 운영에서는 관리대장의 사진 링크가 쓰입니다.
+const scene = (c1, c2, body) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient><filter id="s" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="6" stdDeviation="7" flood-opacity=".28"/></filter></defs><rect width="400" height="300" fill="url(#g)"/>${body}</svg>`;
+const SAMPLE_PHOTOS = {
+  earbuds: scene("#d6d9dc", "#bfc4c9", `<g filter="url(#s)" transform="translate(200 152) rotate(-8)"><rect x="-78" y="-62" width="156" height="124" rx="40" fill="#fbfbfa"/><path d="M-78,-18 H78" stroke="#d9d9d6" stroke-width="2"/><circle cx="0" cy="4" r="3" fill="#7fc97f"/><circle cx="44" cy="30" r="13" fill="#f4a7b9"/><circle cx="44" cy="30" r="6" fill="#ffffff" fill-opacity=".7"/></g>`),
+  wallet: scene("#ddd6ca", "#c6bba8", `<g filter="url(#s)" transform="translate(200 150) rotate(5)"><rect x="-105" y="-68" width="210" height="136" rx="10" fill="#2a211c"/><rect x="-92" y="-60" width="184" height="20" rx="3" fill="#b9d3ea"/><rect x="-105" y="-46" width="210" height="114" rx="10" fill="#33291f"/><path d="M-92,-30 H92" stroke="#4a3c30" stroke-width="2"/><path d="M-105,20 H105" stroke="#2a211c" stroke-width="2" opacity=".7"/></g>`),
+  calculator: scene("#dcdcd6", "#c3c4bc", `<g filter="url(#s)" transform="translate(200 150) rotate(-6)"><rect x="-72" y="-118" width="144" height="236" rx="14" fill="#30343a"/><rect x="-56" y="-100" width="112" height="44" rx="4" fill="#b9c6a8"/><text x="46" y="-68" text-anchor="end" font-family="Courier New,monospace" font-size="20" fill="#2d3326">3.1416</text>${[0,1,2,3,4,5].map(r=>[0,1,2,3].map(c=>`<rect x="${-56+c*29}" y="${-42+r*26}" width="22" height="17" rx="4" fill="${r===0?'#5b6470':(c===3?'#c96a2b':'#e9e9e6')}"/>`).join('')).join('')}</g>`),
+  umbrella: scene("#ddd6ca", "#c7bca9", `<g filter="url(#s)" transform="translate(195 150) rotate(-22)"><line x1="-168" y1="0" x2="-140" y2="0" stroke="#555" stroke-width="3" stroke-linecap="round"/><path d="M-142,0 L70,-17 Q86,0 70,17 Z" fill="#1f2d55"/><path d="M-142,0 L72,-7" stroke="#2e4074" stroke-width="2"/><path d="M-142,0 L72,8" stroke="#141d3a" stroke-width="2"/><rect x="-12" y="-11" width="10" height="22" rx="2" fill="#141d3a"/><rect x="70" y="-3" width="40" height="6" fill="#3b3b3b"/><path d="M110,0 h10 a19 19 0 0 1 0 38 h-8" fill="none" stroke="#5a3a22" stroke-width="10" stroke-linecap="round"/><circle cx="116" cy="0" r="5" fill="#f2c230"/></g>`),
+  book: scene("#dcdcd6", "#c4c5bd", `<g filter="url(#s)" transform="translate(200 150) rotate(6)"><rect x="-93" y="-117" width="190" height="236" rx="4" fill="#f4f1e8"/><rect x="-100" y="-122" width="190" height="236" rx="4" fill="#1d6f72"/><rect x="-100" y="-122" width="14" height="236" fill="#165a5d"/><text x="2" y="-66" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="21" fill="#ffffff">GENERAL</text><text x="2" y="-41" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="21" fill="#ffffff">CHEMISTRY</text><text x="2" y="-20" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="12" fill="#cfe7e6">2nd Edition</text><polygon points="2,12 28,27 28,57 2,72 -24,57 -24,27" fill="none" stroke="#f2c230" stroke-width="3"/><circle cx="2" cy="42" r="12" fill="none" stroke="#f2c230" stroke-width="2"/></g>`),
+  hoodie: scene("#d9d3c7", "#c3b9a8", `<g filter="url(#s)" transform="translate(200 160)"><path d="M-62,-92 Q0,-150 62,-92 Z" fill="#7c8084"/><rect x="-110" y="-95" width="220" height="190" rx="18" fill="#8d9195"/><path d="M-46,-95 Q0,-122 46,-95" fill="#696d71"/><line x1="0" y1="-95" x2="0" y2="95" stroke="#5f6367" stroke-width="4"/><line x1="0" y1="-95" x2="0" y2="95" stroke="#c3c7ca" stroke-width="1.5" stroke-dasharray="3 3"/><path d="M-16,-92 q-5,40 -2,72" stroke="#ececec" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M16,-92 q5,40 2,72" stroke="#ececec" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M-78,22 L-12,22 L-12,78" fill="none" stroke="#787c80" stroke-width="2.5"/><path d="M78,22 L12,22 L12,78" fill="none" stroke="#787c80" stroke-width="2.5"/><line x1="-110" y1="-18" x2="110" y2="-18" stroke="#7d8186" stroke-width="2" opacity=".6"/></g>`),
+  pencilcase: scene("#d3d9de", "#b9c2ca", `<g filter="url(#s)" transform="translate(200 150) rotate(-4)"><rect x="-140" y="-55" width="280" height="110" rx="26" fill="#ffffff" fill-opacity=".35" stroke="#ffffff" stroke-opacity=".9" stroke-width="2"/><rect x="-110" y="-30" width="190" height="10" rx="3" fill="#2f4a8a"/><path d="M80,-30 l18,5 l-18,5 z" fill="#c9c9c9"/><rect x="-104" y="-12" width="180" height="10" rx="3" fill="#d24b3c"/><path d="M76,-12 l18,5 l-18,5 z" fill="#c9c9c9"/><rect x="-100" y="12" width="70" height="26" rx="3" fill="#fafafa"/><rect x="-80" y="12" width="34" height="26" fill="#2d6bc4"/><rect x="-10" y="20" width="130" height="8" rx="3" fill="#222222"/><rect x="-140" y="-55" width="280" height="110" rx="26" fill="#ffffff" fill-opacity=".2"/><line x1="-118" y1="-55" x2="118" y2="-55" stroke="#8a8a8a" stroke-width="4" stroke-dasharray="2 2"/><rect x="108" y="-62" width="16" height="14" rx="3" fill="#777777"/></g>`),
+  ecobag: scene("#e0dbd2", "#cbc2b2", `<g filter="url(#s)" transform="translate(200 168)"><path d="M-50,-92 v-28 a50 38 0 0 1 100 0 v28" fill="none" stroke="#1e1e1e" stroke-width="12"/><rect x="-110" y="-95" width="220" height="212" rx="6" fill="#232323"/><path d="M0,-40 C30,-40 40,-10 0,22 C-40,-10 -30,-40 0,-40 Z" fill="none" stroke="#f2f2f2" stroke-width="3"/><line x1="0" y1="-34" x2="0" y2="20" stroke="#f2f2f2" stroke-width="2"/><text x="0" y="58" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="22" letter-spacing="3" fill="#f2f2f2">CALS</text></g>`)
+};
+
+const svg = (paths) => `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
+const ICONS = {
+  "전자기기": ["ibs-charger", '<path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/>'],
+  "지갑·카드": ["ibs-heatpack", '<path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/>'],
+  "신분증": ["ibs-heatpack", '<rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M6 17a3 3 0 0 1 6 0"/><path d="M15 10h3"/><path d="M15 14h3"/>'],
+  "가방": ["ibs-calculator", '<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>'],
+  "의류": ["ibs-multitap", '<path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/>'],
+  "필기구·문구": ["ibs-calculator", '<path d="M21.17 6.81a1 1 0 0 0-3.99-3.99L3.84 16.17a2 2 0 0 0-.5.83l-1.32 4.35a.5.5 0 0 0 .62.62l4.35-1.32a2 2 0 0 0 .83-.5z"/><path d="m15 5 4 4"/>'],
+  "도서": ["ibs-multitap", '<path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/>'],
+  "우산": ["ibs-umbrella", '<path d="M22 12a10 10 0 0 0-20 0Z"/><path d="M12 12v8a2 2 0 0 0 4 0"/><path d="M12 2v1"/>'],
+  "기타": ["ibs-calculator", '<path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>']
+};
+
+const state = { items: [], cat: "전체", q: "" };
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const pad = (n) => String(n).padStart(2, "0");
+
+function parseCSV(text) {
+  const rows = []; let row = [], cell = "", q = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (q) {
+      if (c === '"' && text[i + 1] === '"') { cell += '"'; i++; }
+      else if (c === '"') q = false;
+      else cell += c;
+    } else if (c === '"') q = true;
+    else if (c === ",") { row.push(cell); cell = ""; }
+    else if (c === "\n") { row.push(cell.replace(/\r$/, "")); rows.push(row); row = []; cell = ""; }
+    else cell += c;
+  }
+  if (cell || row.length) { row.push(cell); rows.push(row); }
+  return rows;
+}
+
+const toItem = ([no, date, place, name, cat, feat, photo]) => ({ no, date, place, name, cat: ICONS[cat] ? cat : "기타", feat, photo: photo || "" });
+
+function photoSrc(link) {
+  if (link.startsWith("sample:")) {
+    const s = SAMPLE_PHOTOS[link.slice(7)];
+    return s ? "data:image/svg+xml;charset=utf-8," + encodeURIComponent(s) : "";
+  }
+  const m = link.match(/\/d\/([\w-]+)|[?&]id=([\w-]+)/);
+  if (m && link.includes("drive.google")) return "https://drive.google.com/thumbnail?id=" + (m[1] || m[2]) + "&sz=w800";
+  return /^https?:\/\//.test(link) ? link : "";
+}
+
+function deadline(it) {
+  if (!KEEP_DAYS) return null;
+  const d = new Date(it.date + "T00:00:00");
+  if (isNaN(d)) return null;
+  d.setDate(d.getDate() + KEEP_DAYS);
+  const now = new Date(); now.setHours(0, 0, 0, 0);
+  return { date: d, left: Math.round((d - now) / 86400000) };
+}
+
+function shortDate(s) { const n = String(s).match(/\d+/g); return n && n.length >= 3 ? `${+n[1]}.${+n[2]}` : s; }
+
+function cardHTML(it) {
+  const locked = isValuable(it);
+  const [cls, icon] = ICONS[it.cat];
+  const src = it.photo === "비공개" ? "" : photoSrc(it.photo);
+  const dl = deadline(it);
+  let dtxt = "", warn = false;
+  if (dl) {
+    dtxt = dl.left > 0 ? ` · D-${dl.left}` : dl.left === 0 ? " · D-day" : " · 기한 지남";
+    warn = dl.left <= 3;
+  }
+  const badge = `<div class="ic-badge ${warn ? "few" : "avail"}">보관 중${dtxt}</div>`;
+  const thumb = src
+    ? `<img src="${esc(src)}" alt="${esc(it.name)}" loading="lazy">${it.photo.startsWith("sample:") ? '<span class="photo-note">예시 사진</span>' : ""}`
+    : `${svg(icon)}`;
+  return `<div class="item-card">
+    <div class="thumb ${src ? "" : cls}">${thumb}<span class="tag-no">${esc(it.no)}</span></div>
+    <div class="ic-body">
+      <div class="ic-name">${esc(it.name)}</div>
+      <dl class="meta">
+        <dt>습득일</dt><dd>${esc(shortDate(it.date))}</dd>
+        <dt>습득장소</dt><dd>${esc(it.place)}</dd>
+        <dt>특징</dt><dd>${esc(it.feat || "-")}</dd>
+      </dl>
+      ${badge}
+    </div>
+  </div>`;
+}
+
+function render() {
+  const cats = ["전체", ...Object.keys(ICONS).filter((c) => c === "기타" || state.items.some((i) => i.cat === c))];
+  if (!cats.includes(state.cat)) state.cat = "전체";
+  $("chips").innerHTML = cats.map((c) => {
+    const n = c === "전체" ? state.items.length : state.items.filter((i) => i.cat === c).length;
+    return `<button type="button" class="chip" data-cat="${esc(c)}" aria-pressed="${c === state.cat}">${esc(c)}<span class="n">${n}</span></button>`;
+  }).join("");
+  const list = state.items.filter((i) => state.cat === "전체" || i.cat === state.cat);
+  $("list").innerHTML = list.map(cardHTML).join("");
+  $("empty").hidden = list.length > 0;
+  $("sec-count").textContent = state.items.length;
+  const t = new Date();
+  $("sec-asof").textContent = `${t.getFullYear()}.${pad(t.getMonth() + 1)}.${pad(t.getDate())} 기준`;
+}
+
+function stamp(sample) {
+  const t = new Date();
+  $("upd-time").textContent = `${t.getFullYear()}.${pad(t.getMonth() + 1)}.${pad(t.getDate())} ${pad(t.getHours())}:${pad(t.getMinutes())}:${pad(t.getSeconds())}`;
+  $("upd-dot").className = "upd-dot" + (sample ? " sample" : "");
+  $("upd-label").textContent = sample ? "시안 · 예시 데이터" : "업데이트";
+}
+
+async function loadData() {
+  if (SHEET_CSV_URL) {
+    try {
+      const res = await fetch(SHEET_CSV_URL, { cache: "no-store" });
+      if (!res.ok) throw new Error(res.status);
+      const rows = parseCSV(await res.text());
+      const h = rows.findIndex((r) => r[0] === "접수번호");
+      state.items = rows.slice(h + 1).filter((r) => /^L-/.test(r[0] || "")).map(toItem);
+      render(); stamp(false); return;
+    } catch (e) {
+      state.items = []; render(); stamp(false);
+      $("upd-label").textContent = "불러오기 실패 · 새로고침해 주세요";
+      return;
+    }
+  }
+  state.items = SAMPLE.map(toItem);
+  render(); stamp(true);
+}
+
+$("chips").addEventListener("click", (e) => {
+  const b = e.target.closest(".chip"); if (!b) return;
+  state.cat = b.dataset.cat; render();
+});
+$("upd-btn").addEventListener("click", loadData);
+loadData();
+</script>
+
+</body>
+</html>
