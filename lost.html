@@ -231,7 +231,7 @@ function cardHTML(it) {
     ? `<img src="${esc(src)}" alt="${esc(it.name)}" loading="lazy">${it.photo.startsWith("sample:") ? '<span class="photo-note">예시 사진</span>' : ""}`
     : `${svg(icon)}`;
   return `<div class="item-card">
-    <div class="thumb ${src ? "" : cls}">${thumb}<span class="tag-no">${esc(it.no)}</span></div>
+    <div class="thumb ${src ? "" : cls}">${thumb}</div>
     <div class="ic-body">
       <div class="ic-name">${esc(it.name)}</div>
       <dl class="meta">
